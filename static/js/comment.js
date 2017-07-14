@@ -34,7 +34,7 @@ function postComment(text) {
             link.href = `${full_address}/user/${response.author.username}`;
             link.innerHTML = response.author.fullName;
             const comment = document.createElement('p');
-            comment.innerHTML = response.comment;
+            comment.innerHTML = response.commentObject.comment;
             container.appendChild(link);
             container.appendChild(comment);
             comments.insertBefore(container, comments.firstChild);

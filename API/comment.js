@@ -18,58 +18,63 @@ router.post('/add', (req, res) => {
             });
             return false;
         }else{
-            Users.findOne({
-                token: req.body.token
-            }).then(user => {
-                if(!user){
+            // success
+            const comment = req.body.comment;
+            const trackid = req.body.trackid;
+
+            if(typeof comment === 'undefined') {
+                res.json({
+                    error: true,
+                    msg: 'Missing the comment field',
+                    code: 'missing_require_fields',
+                });
+                return false;
+            }
+
+            if(typeof trackid === 'undefined') {
+                res.json({
+                    error: true,
+                    msg: 'Missing the trackid field',
+                    code: 'missing_require_fields',
+                });
+                return false;
+            }
+
+            return Tracks.findOne({
+                _id: trackid
+            }).then(track => {
+
+                if(track === null){
                     res.json({
                         error: true,
-                        msg: 'Token not authorized'
+                        msg: 'Your trackid might be incorrect',
                     });
                     return false;
                 }
-                this.user = user;
-                // success
-                const comment = req.body.comment;
-                const trackid = req.body.trackid;
-                Tracks.findOne({
-                    _id: trackid
-                }).then(track => {
 
-                    if(track === null){
-                        res.json({
-                            error: true,
-                            msg: 'Your trackid might be incorrect',
-                        });
-                        return false;
-                    }
-
-                    // Add the comment into this track
-                    const commentObject = {
+                // Add the comment into this track
+                const commentObject = {
+                    author: user._id,
+                    postDate: new Date(),
+                    comment: comment,
+                };
+                track.comments.push(commentObject);
+                // save the new data back to the db
+                return Tracks.update({
+                    _id: trackid,
+                }, track).then(track => {
+                    res.json({
+                        commentObject,
                         author: {
-                            username: this.user.username,
-                            fullName: this.user.fullName
+                            username: user.username,
+                            fullName: user.fullName,
                         },
-                        postDate: new Date(),
-                        comment: comment,
-                    };
-                    track.comments.push(commentObject);
-                    // save the new data back to the db
-                    return Tracks.update({
-                        _id: trackid,
-                    }, track).then(track => {
-                        res.json(commentObject);
                     });
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-
+                });
             })
-            .catch(error => {
-                console.log(error);
-            });
         }
+    }).catch(error => {
+        console.log(error);
     });
 });
 

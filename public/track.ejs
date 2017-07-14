@@ -38,7 +38,7 @@
                     <%if(comments){%>
                         <%comments.forEach(comment => {%>
                             <div class="comment">
-                                <a href="<%=full_address%>/user/<%=comment.author.username%>"><%=comment.author.fullName%></a>
+                                <a href="/user/<%=comment.author.username%>"><%=comment.author.fullName%></a>
                                 <p><%=comment.comment%></p>
                             </div>
                         <%})%>

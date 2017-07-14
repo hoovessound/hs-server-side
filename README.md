@@ -14,7 +14,7 @@ and thanks for you help to make this silly project come a life.
 
 If you don't have an GCS(Google Cloud Platform) access, please contact Felix via email `moongod101@hotmail.com`
 
-Once you have GCS access, the first thing you need to do is create a directory named `gcsAuth`, and inside the `gcsAuth` directory create a new JSON file named `token.json`, and that JSON file should your GCS access token info.
+Once you have GCS access, the first thing you need to do is create a new JSON file named `gcsAuthToken.json`, and that JSON file should your GCS access token info.
 
 ### Database access
 

@@ -5,7 +5,7 @@ deploy:
   provider: gae
   keyfile: gcsAuth/token.json
   project: hoovessound-173007
-  on: issue#4
+  on: master
 before_install:
 - mkdir gcsAuth
 - openssl aes-256-cbc -K $encrypted_e44152bd72d8_key -iv $encrypted_e44152bd72d8_iv

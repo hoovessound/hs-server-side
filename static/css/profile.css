@@ -1,0 +1,29 @@
+.profilePicture{
+    width: 5em;
+    border-radius: 50%;
+}
+
+#userInfo{
+    padding: 4em 3em;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.masterPlayer .playPuaseButton{
+    background: #CCC;
+    padding: 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 0.5em;
+}
+
+.masterPlayer{
+    margin: 2em;
+}
+
+.playPuaseButton{
+    background: #CCC;
+    padding: 0.1em;
+    border-radius: 5px;
+    cursor: pointer;
+}

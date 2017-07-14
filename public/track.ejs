@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <%if(track !== null){%>
+        <title>HoovesSound | <%=track.title%></title>
+    <%}else{%>
+        <title>HoovesSound | No Tracks :/</title>
+    <%}%>
+</head>
+<body>
+    <%- include('includes/nav')%>
+    <div class="container">
+        <%if(track !== null){%>
+            <h1 id="username"><%=track.author.fullName%></h1>
+        <img src="<%=track.coverImage%>" alt="" class="coverImage">
+            <div class="masterPlayer">
+                <div class="playPuaseButton material-icons">play_arrow</div>
+                <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" class="title"><%=track.author.fullName%> - <%=track.title%></a>
+                <div class="fa fa-heart fave <%=isFave%>"></div>
+                <div class="volume">
+                    <i class="material-icons">volume_up</i>
+                    <input type="range" value="100" max="100" id="volumeBar">
+                </div>
+            </div>
+            
+            <hr>
+            <h1>Comments</h1>
+            <div id="commentSession">
+                <textarea name="comment" id="input"></textarea>
+                <button type="submit" id="post">Post</button>
+                <div id="comments">
+                    <%if(comments){%>
+                        <%comments.forEach(comment => {%>
+                            <div class="comment">
+                                <a href="<%=full_address%>/user/<%=comment.author.username%>"><%=comment.author.fullName%></a>
+                                <p><%=comment.comment%></p>
+                            </div>
+                        <%})%>
+                    <%}else{%>
+                        <h1>No body have comment yet, will ya?</h1>
+                    <%}%>
+                </div>
+            </div>
+        <%}else{%>
+            <h1 id="notracks">Didn't have any tracks yet</h1>
+        <%}%>
+    </div>
+    <script>
+        var oauthToken = "<%=token%>";
+        var trackid = "<%=track._id%>";
+        var full_address = "<%=full_address%>"
+        var audio = new Audio();
+        audio.src = "<%=full_address%>/api/listen/<%=track._id%>";
+    </script>
+    <script src="/static/js/comment.js"></script>
+    <script src="/static/js/track.js"></script>
+</body>
+</html>

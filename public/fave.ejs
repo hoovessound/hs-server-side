@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HoovesSound | Music for bronies music for everyone</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+<%- include('includes/nav')%>
+<div class="container">
+    <h1>Fave Tracks</h1>
+
+    <%if(tracks.tracks.length >= 1 || tracks.tracks === null){%>
+    <div class="masterPlayer">
+        <div class="playPuaseButton material-icons">play_arrow</div>
+        <a href="/track/<%=tracks.tracks[0].author.username%>/<%=tracks.tracks[0].title%>" class="title"><%=tracks.tracks[0].author.fullName%> - <%=tracks.tracks[0].title%></a>
+        <div class="volume">
+            <i class="material-icons">volume_up</i>
+            <input type="range" value="100" max="100" id="volumeBar">
+        </div>
+    </div>
+
+    <div class="tracks">
+        <%tracks.tracks.forEach((track, index) => {%>
+        <div id="<%=track._id%>">
+            <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
+            <a href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+            <div class="player">
+                <div class="timmer">
+                    <spam class="current"></spam>
+                    <spam class="total"></spam>
+                </div>
+            </div>
+        </div>
+        <%});%>
+
+    </div>
+    <%}else{%>
+    <p>You didn't fave any tracks yet</p>
+    <%}%>
+</div>
+<script>
+    const $token = "<%=token%>";
+    const $full_address = "<%=full_address%>";
+    const audio = new Audio();
+    <%if(tracks.tracks.length >= 1){%>
+    audio.src = "<%=full_address%>/api/listen/<%=tracks.tracks[0]._id%>";
+    <%}%>
+</script>
+<script src="/static/js/latestTracks.js"></script>
+</body>
+</html>

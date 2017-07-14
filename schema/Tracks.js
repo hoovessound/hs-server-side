@@ -1,0 +1,21 @@
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const tracksSchema = new Schema({
+    title: String,
+    file: {
+        location: String,
+        extend: Boolean,
+    },
+    author: {
+        username: String,
+        fullName: String,
+    },
+    uploadDate: Date,
+    coverImage: {
+        type: String,
+        default: 'https://images.discordapp.net/attachments/333151306736730115/333680672264945664/missing_song_cover.jpg?width=570&height=570',
+    },
+    comments: Array,
+    fave: Array,
+});
+module.exports = mongoose.model('Tracks', tracksSchema);

@@ -1,0 +1,20 @@
+.icon{
+    width: 3em;
+    border-radius: 50%;
+    border: solid #FFF 0.2em;
+}
+
+.user{
+    padding: 1em;
+}
+
+.masterPlayer{
+    margin: 2em;
+}
+
+.playPuaseButton{
+    background: #CCC;
+    padding: 0.1em;
+    border-radius: 5px;
+    cursor: pointer;
+}

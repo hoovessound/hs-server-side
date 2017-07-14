@@ -1,0 +1,23 @@
+#profilePicture img{
+    width: 5em;
+    border-radius: 50%;
+    cursor: pointer;
+}
+#profilePicture:hover{
+    opacity: 0.7;
+}
+
+#iconInput{
+    display: none;
+}
+
+#userInfo{
+    padding: 4em 3em;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+#fullname{
+    cursor: pointer;
+    display: inline-block;
+}

@@ -23,7 +23,7 @@ router.get('/:username?/:title?', (req, res) => {
             }
             return Tracks.findOne({
                 'author.username': username,
-                title: title
+                title: title,
             }).then(track => {
                 // Find out if the user fave this track or not
                 return rp.get({
@@ -33,13 +33,33 @@ router.get('/:username?/:title?', (req, res) => {
                     }
                 }).then(isFave => {
                     isFave = JSON.parse(isFave);
-                    res.render('track', {
-                        loginUser: user,
-                        track,
-                        comments: track.comments,
-                        full_address,
-                        token,
-                        isFave: isFave.fave ? 'isFave': 'notFave',
+                    let comments = [];
+                    track.comments.forEach(comment =>{
+                        // Find the user object
+                        return Users.findOne({
+                            _id: comment.author,
+                        }, {
+                            username: 1,
+                            fullName: 1,
+                        }).then(commentUser => {
+                            comments.push({
+                                author: {
+                                    username: commentUser.username,
+                                    fullName: commentUser.fullName,
+                                },
+                                comment: comment.comment,
+                            });
+                            if(comments.length === track.comments.length){
+                                res.render('track', {
+                                    loginUser: user,
+                                    track,
+                                    comments,
+                                    full_address,
+                                    token,
+                                    isFave: isFave.fave ? 'isFave': 'notFave',
+                                });
+                            }
+                        });
                     });
                 })
             });

@@ -30,7 +30,6 @@ faveButton.addEventListener('click', e => {
     ajax.onload = function () {
         if(ajax.status === 200 && ajax.readyState === 4){
             const response = JSON.parse(ajax.response);
-            console.log(response)
             if(el.classList.contains('isFave')){
                 el.classList.remove('isFave');
             }else{

@@ -1,9 +1,9 @@
 language: node_js
 node_js:
-  - node
+- node
 deploy:
   provider: gae
-  keyfile: token.json.enc
+  keyfile: gcsAuth/token.json
   project: hoovessound-173007
   on: issue#4
 before_install:

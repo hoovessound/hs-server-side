@@ -27,6 +27,6 @@
   "private": true,
   "scripts": {
     "start": "node src/index.js",
-    "deploy": "travis encrypt-file gcsAuth/token.json --add && travis encrypt-file db.js --add && echo \"Please Push The Changes To The GtiHub Repo\""
+    "deploy": "travis encrypt-file gcsAuth/token.json && travis encrypt-file db.js && echo \"Please Push The Changes To The GtiHub Repo\""
   }
 }

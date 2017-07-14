@@ -11,3 +11,4 @@ before_install:
   - tar xvf encrypt_pack.tar
   - mkdir gcsAuth
   - mv gcsAuthToken.json gcsAuth/gcsAuthToken.json
+  - rm encrypt_pack.tar

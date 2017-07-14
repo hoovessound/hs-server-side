@@ -17,7 +17,7 @@ cli
     .parse(process.argv);
 
 // App init checking
-const db = require(cli.db || '../db');
+const db = require('../db');
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;

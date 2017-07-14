@@ -14,30 +14,16 @@ const color = require('cli-color');
 cli
     .version('1.0.0')
     .option('--port [number]', 'The port that HoovesSound will running on')
-    .option('--gcs [string]', 'GCS token path')
-    .option('--db [string]', 'db.js path')
     .parse(process.argv);
 
 // App init checking
-// Check for GCS access
-const gcsToken = path.join(cli.gcs || `${__dirname}/../gcsAuth/token.json`);
-fsp.exists(gcsToken).then(exists => {
-    if(!exists){
-        console.log(color.red('ERROR: '));
-        console.log('GCS Access Problem');
-        console.log(`Please create a ${path.basename(gcsToken)} in the following path`);
-        console.log(path.join(`${__dirname}/${gcsToken}`));
-        return false;
-    }
-    module.exports.gcsPath = gcsToken;
-}).catch(error => {
-    console.log(error);
-});
-
 const db = require(cli.db || '../db');
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;
+
+// GCS Auth Token Path
+module.exports.gcsPath = path.join(`${__dirname}/../gcsAuthToken.json`)
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {

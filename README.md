@@ -2,7 +2,7 @@
 
 ### Thanks a lot <3
 
-Howdy, I'm the creator of this project, 
+Howdy, I'm the creator of this project - Felix, 
 and I'm so happy to see you here, 
 because this project is still on `Alpha Beat` stage, 
 and you have access to this repo witch mean you are one of a kind, 
@@ -30,7 +30,7 @@ module.exports = {
 
 ### Port
 
-The `default` port should be `3000`
+The default port will be `3000`
 
 
 # Change the run time config
@@ -44,4 +44,4 @@ You can also change the basic config settings via the Terminal
   * `node src/index.js --gcs ./some/directory/I/guess/pony.json`
 
 3. db.js
-    * `node src/index.js --db ./moduleName`
+  * `node src/index.js --db ./moduleName`

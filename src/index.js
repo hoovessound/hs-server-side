@@ -19,21 +19,6 @@ cli
     .parse(process.argv);
 
 // App init checking
-// Check for GCS access
-const gcsToken = path.join(cli.gcs || `${__dirname}/../gcsAuth/token.json`);
-fsp.exists(gcsToken).then(exists => {
-    if(!exists){
-        console.log(color.red('ERROR: '));
-        console.log('GCS Access Problem');
-        console.log(`Please create a ${path.basename(gcsToken)} in the following path`);
-        console.log(path.join(`${__dirname}/${gcsToken}`));
-        return false;
-    }
-    module.exports.gcsPath = gcsToken;
-}).catch(error => {
-    console.log(error);
-});
-
 const db = require(cli.db || '../db');
 
 // Setting up the app port

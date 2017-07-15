@@ -11,5 +11,5 @@ before_install:
   - tar xvf encrypt_pack.tar
   - mkdir gcsAuth
   - mv gcsAuthToken.json gcsAuth/gcsAuthToken.json
-  - mv db.json src/db.js
+  - mv db.js src/db.js
   - rm encrypt_pack.tar

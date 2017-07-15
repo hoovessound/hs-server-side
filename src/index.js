@@ -19,6 +19,8 @@ cli
 // App init checking
 const db = require('./db');
 
+module.exports.gcsPath = db.url;
+
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;
 

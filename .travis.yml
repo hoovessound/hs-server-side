@@ -13,6 +13,6 @@ before_install:
   - mv gcsAuthToken.json gcsAuth/gcsAuthToken.json
   - rm encrypt_pack.tar
   - ls -la
-  - cat db.js
+  - cat db.json
   - ls -ls gcsAuth
   - cat gcsAuth/gcsAuthToken.json

@@ -17,7 +17,7 @@ cli
     .parse(process.argv);
 
 // App init checking
-const db = require('../db');
+const db = JSON.parse(fsp.readFileSync(path.join(`${__dirname}/../db.json`), 'utf-8'));
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;

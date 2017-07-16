@@ -5,3 +5,4 @@ usersContent
 src/db.js
 .DS_Store
 gcsAuth/gcsAuthToken.json
+encrypt_pack.tar

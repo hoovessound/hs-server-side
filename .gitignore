@@ -4,4 +4,4 @@ usersContent
 .idea
 src/db.js
 .DS_Store
-gcsAuthToken.json
+gcsAuth/gcsAuthToken.json

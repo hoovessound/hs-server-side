@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/app.css">
+    <link rel="stylesheet" href="/static/css/track.css">
     <%if(track !== null){%>
         <title>HoovesSound | <%=track.title%></title>
     <%}else{%>
@@ -15,20 +16,24 @@
 </head>
 <body>
     <%- include('includes/nav')%>
+
+    <%if(track !== null){%>
+    <div class="masterPlayer">
+        <div class="playPuaseButton material-icons">play_arrow</div>
+        <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" class="title"><%=track.author.fullName%> - <%=track.title%></a>
+        <div class="fa fa-heart fave <%=isFave%>"></div>
+        <div class="volume">
+            <i class="material-icons">volume_up</i>
+            <input type="range" value="100" max="100" id="volumeBar">
+        </div>
+    </div>
+    <%}%>
+
     <div class="container">
         <%if(track !== null){%>
-            <h1 id="username"><%=track.author.fullName%></h1>
+            <h1 id="title"><%=track.title%></h1>
         <img src="<%=track.coverImage%>" alt="" class="coverImage">
-            <div class="masterPlayer">
-                <div class="playPuaseButton material-icons">play_arrow</div>
-                <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" class="title"><%=track.author.fullName%> - <%=track.title%></a>
-                <div class="fa fa-heart fave <%=isFave%>"></div>
-                <div class="volume">
-                    <i class="material-icons">volume_up</i>
-                    <input type="range" value="100" max="100" id="volumeBar">
-                </div>
-            </div>
-            
+
             <hr>
             <h1>Comments</h1>
             <div id="commentSession">
@@ -38,7 +43,9 @@
                     <%if(comments){%>
                         <%comments.forEach(comment => {%>
                             <div class="comment">
-                                <a href="/user/<%=comment.author.username%>"><%=comment.author.fullName%></a>
+                                <a href="/user/<%=comment.author.username%>">
+                                    <%=comment.author.fullName%>
+                                </a>
                                 <p><%=comment.comment%></p>
                             </div>
                         <%})%>

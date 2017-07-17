@@ -57,6 +57,10 @@ window.addEventListener('scroll', e => {
                         <a href="/track/${track.author.username}/${track.title}">${track.author.fullName} - ${track.title}</a>
                     </div>`;
                     tracksElement.innerHTML += html;
+                    if (history.pushState) {
+                        var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?offset=${offset}`;
+                        window.history.pushState({path:newurl},'',newurl);
+                    }
                 });
             }
         }

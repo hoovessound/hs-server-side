@@ -1,0 +1,44 @@
+.masterPlayer .playPuaseButton{
+    background: #CCC;
+    padding: 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 0.5em;
+}
+
+.masterPlayer{
+    position: fixed;
+    lefet: 0em;
+    bottom: 0em;
+    background: skyblue;
+    width: 100vw;
+    padding: 1.1em;
+}
+
+.playPuaseButton{
+    background: #CCC;
+    padding: 0.1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.volume{
+    width: 30vw;
+    border: solid #000 2px;
+    cursor: pointer;
+    position: relative;
+    background: transparent;
+}
+
+.volume .volumeBar{
+    background: skyblue;
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    height: 100%;
+    width: 100%;
+}
+
+.container{
+    margin-bottom: 10em;
+}

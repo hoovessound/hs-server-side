@@ -2,6 +2,9 @@ let isPlaying = false;
 const masterTitle = document.querySelector('.masterPlayer .title');
 const masterPlayPuaseButton = document.querySelector('.masterPlayer .playPuaseButton');
 const volumeBar = document.querySelector('#volumeBar');
+const getNewOne = document.querySelector('#getNewOne');
+const tracksElement = document.querySelector('.tracks');
+const ajax = new XMLHttpRequest();
 
 // volume bar control
 volumeBar.addEventListener('input', e => {
@@ -32,5 +35,30 @@ masterPlayPuaseButton.addEventListener('click', e => {
         audio.play();
         isPlaying = true;
         masterPlayPuaseButton.innerHTML = 'pause';
+    }
+});
+
+window.addEventListener('scroll', e => {
+    const offsetTop = getNewOne.offsetTop;
+    const currentPosition = window.pageYOffset;
+    if(currentPosition >= offsetTop / 1.5){
+        ajax.open('GET', `/api/tracks?offset=${offset}`);
+        ajax.setRequestHeader('token', $token);
+        ajax.send();
+        ajax.onload = function () {
+            if(ajax.readyState === 4 && ajax.status === 200){
+                offset += 10;
+                const response = JSON.parse(ajax.response);
+                // Append the tracks into the DOM
+                response.tracks.forEach(track => {
+                    const html = `<div id="${track._id}">
+                        <img src="${track.coverImage}" alt="" class="coverImage">
+                        <div class="playPuaseButton material-icons" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" trackid="${track._id}" onclick="playMusic(this)">play_arrow</div>
+                        <a href="/track/${track.author.username}/${track.title}">${track.author.fullName} - ${track.title}</a>
+                    </div>`;
+                    tracksElement.innerHTML += html;
+                });
+            }
+        }
     }
 });

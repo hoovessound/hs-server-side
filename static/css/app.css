@@ -7,7 +7,12 @@
 }
 
 .masterPlayer{
-    margin: 2em;
+    position: fixed;
+    lefet: 0em;
+    bottom: 0em;
+    background: skyblue;
+    width: 100vw;
+    padding: 1.1em;
 }
 
 .playPuaseButton{
@@ -47,6 +52,15 @@
 }
 
 .coverImage{
-    width: 10em;
-    height: 10em;
+    width: 50em;
+    height: 50em;
+}
+
+.container{
+    margin-bottom: 10em;
+    text-align: center;
+}
+
+.container .title{
+    text-align: left;
 }

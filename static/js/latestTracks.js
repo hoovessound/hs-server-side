@@ -4,6 +4,7 @@ const masterPlayPuaseButton = document.querySelector('.masterPlayer .playPuaseBu
 const volumeBar = document.querySelector('#volumeBar');
 const getNewOne = document.querySelector('#getNewOne');
 const tracksElement = document.querySelector('.tracks');
+const container = document.querySelector('.container');
 const ajax = new XMLHttpRequest();
 let ajaxing = false;
 

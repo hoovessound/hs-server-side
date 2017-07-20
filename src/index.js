@@ -23,7 +23,7 @@ const db = require('./db');
 const port = process.env.PORT || cli.port || 3000;
 
 // GCS Auth Token Path
-module.exports.gcsPath = path.join(`${__dirname}/../gcsAuthToken.json`)
+module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`)
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {

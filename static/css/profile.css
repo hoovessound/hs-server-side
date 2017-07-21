@@ -18,7 +18,27 @@
 }
 
 .masterPlayer{
-    margin: 2em;
+    position: fixed;
+    lefet: 0em;
+    bottom: 0em;
+    background: skyblue;
+    width: 100vw;
+    padding: 1.1em;
+}
+
+.volume{
+    width: 30vw;
+    position: relative;
+    float: right;
+}
+
+.volume .volumeBar{
+    background: skyblue;
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    height: 100%;
+    width: 100%;
 }
 
 .playPuaseButton{
@@ -26,4 +46,37 @@
     padding: 0.1em;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.container{
+    margin-bottom: 10em;
+    text-align: center;
+}
+
+.container .title{
+    text-align: left;
+}
+
+.coverImage{
+    width: 50em;
+    height: 50em;
+}
+
+@media (max-width: 415px) {
+    .coverImage{
+        width: 20em;
+        height: 20em;
+        display: block;
+        position: relative;
+        margin: 0 auto;
+        z-index: -1;
+    }
+
+    .volume{
+        display: none;
+    }
+
+    .playPuaseButton{
+        margin: 0.5em 0em;
+    }
 }

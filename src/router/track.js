@@ -214,15 +214,24 @@ router.post('/:username?/:title?/edit', (req, res) => {
 
                             function updateTitle() {
                                 if(fields.title){
-                                    track.title = fields.title;
-                                    Tracks.update({
-                                        _id: track._id
-                                    }, track).then(() => {
-                                        // Finish
-                                        res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
+                                    return Tracks.findOne({
+                                        title: fields.title,
+                                    }).then(authTrack => {
+                                        if(authTrack !== null){
+                                            track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                        }else{
+                                            track.title = fields.title;
+                                        }
+                                        return Tracks.update({
+                                            _id: track._id
+                                        }, track).then(() => {
+                                            // Finish
+                                            res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
+                                        });
+
                                     }).catch(error => {
                                         console.log(error);
-                                    });
+                                    })
                                 }
                             }
 

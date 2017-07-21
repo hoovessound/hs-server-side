@@ -10,8 +10,9 @@ let ajaxing = false;
 
 // volume bar control
 volumeBar.addEventListener('input', e => {
-    const volume = e.target.value;
-    audio.volume = `0.${volume}`;
+    // Thanks https://stackoverflow.com/a/31927281/6511655
+    let volume = parseInt(e.target.value);
+    audio.volume = volume/ 100;
 });
 
 function playMusic(el){

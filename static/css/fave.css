@@ -24,10 +24,8 @@
 
 .volume{
     width: 30vw;
-    border: solid #000 2px;
-    cursor: pointer;
     position: relative;
-    background: transparent;
+    float: right;
 }
 
 .volume .volumeBar{

@@ -5,9 +5,9 @@ const fullurl = require('fullurl');
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
 
-router.get('/:page?', (req, res) => {
+router.get('/?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
-    const page = req.params.page ? `${req.params.page}0` : 0;
+    const offset = req.query.offset || 0;
     const token = req.cookies['oauth-token'];
     if(!req.cookies['oauth-token']){
         res.redirect('/api/auth/login?redirect=' + fullurl(req));
@@ -23,7 +23,7 @@ router.get('/:page?', (req, res) => {
                 return Users.findOne({
                     token,
                 }).then(user => {
-                    return Tracks.find().limit(10).skip(parseInt(page)).sort({
+                    return Tracks.find().limit(10).skip(parseInt(offset)).sort({
                         uploadDate: -1
                     }).then(tracks => {
                         return Tracks.count({}).then(total => {
@@ -34,6 +34,7 @@ router.get('/:page?', (req, res) => {
                                 full_address,
                                 token,
                                 totalPage,
+                                offset,
                             });
                         })
                     })

@@ -4,6 +4,15 @@ const rp = require('request-promise');
 const fullurl = require('fullurl');
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
+const formidable = require('formidable');
+const path = require('path');
+const gcs = require('@google-cloud/storage')({
+    projectId: 'hoovessound',
+    keyFilename: require('../../src/index').gcsPath,
+});
+const sha256 = require('sha256');
+const randomstring = require('randomstring');
+const fsp = require('fs-promise');
 
 router.get('/:username?/:title?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
@@ -69,9 +78,166 @@ router.get('/:username?/:title?', (req, res) => {
                             full_address,
                             token,
                             isFave: isFave.fave ? 'isFave': 'notFave',
+                            error: null,
                         });
                     }
                 })
+            });
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+});
+
+router.get('/:username?/:title?/edit', (req, res) => {
+    const full_address = req.protocol + "://" + req.headers.host;
+    if(!req.cookies['oauth-token']){
+        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+    }else{
+        const username = req.params.username;
+        const title = req.params.title;
+        const token = req.cookies['oauth-token'];
+
+        Users.findOne({
+            token,
+        }).then(user => {
+            if(user === null){
+                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+            }
+
+            if(req.params.username !== user.username){
+                res.redirect(`/track/${req.params.username}/${req.params.title}`);
+                return false;
+            }
+
+            return Tracks.findOne({
+                'author.username': username,
+                title: title,
+            }).then(track => {
+                if(track === null){
+                    res.render('editTrack', {
+                        loginUser: user,
+                        token,
+                        full_address,
+                        error: 'Can not found your track :/'
+                    });
+                }else{
+                    res.render('editTrack', {
+                        loginUser: user,
+                        full_address,
+                        token,
+                        track,
+                        error: false,
+                    });
+                }
+            });
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+});
+
+router.post('/:username?/:title?/edit', (req, res) => {
+    const full_address = req.protocol + "://" + req.headers.host;
+    if(!req.cookies['oauth-token']){
+        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+    }else{
+        const username = req.params.username;
+        const title = req.params.title;
+        const token = req.cookies['oauth-token'];
+
+        Users.findOne({
+            token,
+        }).then(user => {
+            if(user === null){
+                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+            }
+
+            if(req.params.username !== user.username){
+                res.redirect(`/track/${req.params.username}/${req.params.title}`);
+                return false;
+            }
+
+            return Tracks.findOne({
+                'author.username': username,
+                title: title,
+            }).then(track => {
+                if(track === null){
+                    res.redirect('/');
+                }else{
+
+                    const form = formidable.IncomingForm({
+                        uploadDir: path.join(`${__dirname}/../../usersContent`),
+                    });
+                    form.encoding = 'utf-8';
+                    form.parse(req, (error, fields, files) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+
+                            // Check if the user submit an cover image
+                            if(files.image.size > 0){
+                                if(!files.image.type.includes('image')){
+                                    res.render('editTrack', {
+                                        loginUser: user,
+                                        full_address,
+                                        token,
+                                        track,
+                                        error: 'File is not an image type',
+                                    });
+                                }else{
+                                    const ext = path.extname(files.image.name);
+                                    const newID = sha256(randomstring.generate(10));
+                                    let fileID = newID + ext;
+                                    const coverImagePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
+                                    const gcsCoverImage = gcs.bucket('hs-cover-image');
+                                    fsp.rename(files.image.path, coverImagePath).then(() => {
+                                        return gcsCoverImage.upload(coverImagePath).then(file => {
+                                            file = file[0];
+                                            return file.getSignedUrl({
+                                                action: 'read',
+                                                expires: '03-09-2491',
+                                            }).then(url => {
+                                                coverImage = url[0];
+                                                fsp.unlinkSync(coverImagePath);
+                                                track.coverImage = coverImage;
+                                                updateTitle();
+                                            })
+                                        })
+                                    }).catch(error => {
+                                        console.log(error);
+                                    });
+                                }
+                            }else{
+                                updateTitle();
+                            }
+
+                            function updateTitle() {
+                                if(fields.title){
+                                    return Tracks.findOne({
+                                        title: fields.title,
+                                    }).then(authTrack => {
+                                        if(authTrack !== null){
+                                            track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                        }else{
+                                            track.title = fields.title;
+                                        }
+                                        return Tracks.update({
+                                            _id: track._id
+                                        }, track).then(() => {
+                                            // Finish
+                                            res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
+                                        });
+
+                                    }).catch(error => {
+                                        console.log(error);
+                                    })
+                                }
+                            }
+
+                        }
+                    });
+                }
             });
         }).catch(error => {
             console.log(error);

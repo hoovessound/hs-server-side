@@ -1,0 +1,11 @@
+#commentSession{
+    margin-bottom: 3em;
+}
+
+#input{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #161616;
+    outline: none;
+    width: 50vw;
+}

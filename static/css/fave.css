@@ -1,14 +1,3 @@
-.profilePicture{
-    width: 5em;
-    border-radius: 50%;
-}
-
-#userInfo{
-    padding: 4em 3em;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
 .masterPlayer .playPuaseButton{
     background: #CCC;
     padding: 0.5em;
@@ -26,6 +15,13 @@
     padding: 1.1em;
 }
 
+.playPuaseButton{
+    background: #CCC;
+    padding: 0.1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 .volume{
     width: 30vw;
     position: relative;
@@ -41,25 +37,8 @@
     width: 100%;
 }
 
-.playPuaseButton{
-    background: #CCC;
-    padding: 0.1em;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 .container{
     margin-bottom: 10em;
-    text-align: center;
-}
-
-.container .title{
-    text-align: left;
-}
-
-.coverImage{
-    width: 50em;
-    height: 50em;
 }
 
 @media (max-width: 415px) {

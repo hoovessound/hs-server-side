@@ -10,6 +10,7 @@ const fsp = require('fs-promise');
 const fullurl = require('fullurl');
 const cli = require('commander');
 const color = require('cli-color');
+const compression = require('compression');
 
 cli
     .version('1.0.0')
@@ -23,7 +24,7 @@ const db = require('./db');
 const port = process.env.PORT || cli.port || 3000;
 
 // GCS Auth Token Path
-module.exports.gcsPath = path.join(`${__dirname}/../gcsAuthToken.json`)
+module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`)
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
@@ -75,6 +76,9 @@ app.use(cookieSession({
     keys: [randomstring.generate(30)],
     maxAge: 365 * 24 * 60 * 60,
 }));
+
+// Using GZIP
+app.use(compression());
 
 app.use('/api/tracks', require('../API/home'));
 

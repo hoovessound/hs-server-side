@@ -13,19 +13,21 @@
 </head>
 <body>
     <%- include('includes/nav')%>
+
+    <%if(tracks.length >= 1){%>
+    <div class="masterPlayer">
+        <div class="playPuaseButton material-icons">play_arrow</div>
+        <a href="/track/<%=tracks[0].author.username%>/<%=tracks[0].title%>" class="title"><%=tracks[0].author.fullName%> - <%=tracks[0].title%></a>
+        <div class="volume">
+            <i class="material-icons">volume_up</i>
+            <input type="range" value="100" max="100" min="0" id="volumeBar">
+        </div>
+    </div>
+    <%}%>
+
     <div class="container">
-        <h1>Latest Tracks</h1>
-
+        <h1 class="title">Latest Tracks</h1>
         <%if(tracks.length >= 1){%>
-            <div class="masterPlayer">
-                <div class="playPuaseButton material-icons">play_arrow</div>
-                <a href="/track/<%=tracks[0].author.username%>/<%=tracks[0].title%>" class="title"><%=tracks[0].author.fullName%> - <%=tracks[0].title%></a>
-                <div class="volume">
-                    <i class="material-icons">volume_up</i>
-                    <input type="range" value="100" max="100" id="volumeBar">
-                </div>
-            </div>
-
             <div class="tracks">
                 <%tracks.forEach((track, index) => {%>
                     <div id="<%=track._id%>">
@@ -35,11 +37,7 @@
                     </div>
                 <%});%>
 
-                <div class="pages">
-                    <%for(let i = 0; i < totalPage; i++){%>
-                        <a href="/<%=i%>" class="pageNumber"><%=(i + 1)%></a>
-                    <%}%>
-                </div>
+                <div id="getNewOne"></div>
 
             </div>
         <%}else{%>
@@ -49,6 +47,7 @@
     <script>
         const $token = "<%=token%>";
         const $full_address = "<%=full_address%>";
+        let offset = <%=offset%>
         const audio = new Audio();
         audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>";
     </script>

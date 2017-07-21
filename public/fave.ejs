@@ -8,24 +8,26 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/app.css">
+    <link rel="stylesheet" href="/static/css/fave.css">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 </head>
 <body>
 <%- include('includes/nav')%>
+
+<%if(tracks.tracks.length >= 1 || tracks.tracks === null){%>
+<div class="masterPlayer">
+    <div class="playPuaseButton material-icons">play_arrow</div>
+    <a href="/track/<%=tracks.tracks[0].author.username%>/<%=tracks.tracks[0].title%>" class="title"><%=tracks.tracks[0].author.fullName%> - <%=tracks.tracks[0].title%></a>
+    <div class="volume">
+        <i class="material-icons">volume_up</i>
+        <input type="range" value="100" max="100" id="volumeBar">
+    </div>
+</div>
+<%}%>
+
 <div class="container">
     <h1>Fave Tracks</h1>
-
     <%if(tracks.tracks.length >= 1 || tracks.tracks === null){%>
-    <div class="masterPlayer">
-        <div class="playPuaseButton material-icons">play_arrow</div>
-        <a href="/track/<%=tracks.tracks[0].author.username%>/<%=tracks.tracks[0].title%>" class="title"><%=tracks.tracks[0].author.fullName%> - <%=tracks.tracks[0].title%></a>
-        <div class="volume">
-            <i class="material-icons">volume_up</i>
-            <input type="range" value="100" max="100" id="volumeBar">
-        </div>
-    </div>
-
     <div class="tracks">
         <%tracks.tracks.forEach((track, index) => {%>
         <div id="<%=track._id%>">

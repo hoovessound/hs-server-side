@@ -43,6 +43,9 @@ router.get('/:method?/:username?', (req, res) => {
                 .then(user => {
                     return Tracks.find({
                         'author.username': username,
+                        private: false || null,
+                    }).sort({
+                        uploadDate: -1
                     })
                     .then(tracks => {
                         res.json({

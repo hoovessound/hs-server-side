@@ -23,7 +23,9 @@ router.get('/?', (req, res) => {
                 return Users.findOne({
                     token,
                 }).then(user => {
-                    return Tracks.find().limit(10).skip(parseInt(offset)).sort({
+                    return Tracks.find({
+                        private: false || null,
+                    }).limit(10).skip(parseInt(offset)).sort({
                         uploadDate: -1
                     }).then(tracks => {
                         return Tracks.count({}).then(total => {

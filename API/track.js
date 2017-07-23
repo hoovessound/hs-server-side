@@ -257,6 +257,13 @@ router.post('/edit/:id?', (req, res) => {
                         if (error) {
                             console.log(error);
                         } else {
+
+                            if(fields.private === 'true'){
+                                track.private = true;
+                            }else{
+                                track.private = false;
+                            }
+                            
                             // Check if the user submit an cover image
                             if(files.image){
                                 if(files.image.size > 0){
@@ -324,6 +331,12 @@ router.post('/edit/:id?', (req, res) => {
                                     });
                                 }
 
+                                if(track.private){
+                                    track.title = `${fields.title || track.title}-private:${randomstring.generate(50)}`;
+                                    writeDB();
+                                    return false;
+                                }
+
                                 if(fields.title){
                                     // Check if the new title match the old title
                                     if(fields.title !== track.title){
@@ -332,7 +345,7 @@ router.post('/edit/:id?', (req, res) => {
                                             title: fields.title,
                                         }).then(authTrack => {
                                             if(authTrack !== null){
-                                                track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                                    track.title = `${fields.title}(${randomstring.generate(10)})`;
                                             }else{
                                                 track.title = fields.title;
                                             }
@@ -342,40 +355,12 @@ router.post('/edit/:id?', (req, res) => {
                                         // Same title
                                         writeDB();
                                     }
-
                                 }else{
                                     // Didn't pass anything at all :/
                                     res.json({
                                         track,
                                     });
                                 }
-
-                                // return Tracks.findOne({
-                                //     title: fields.title,
-                                // }).then(authTrack => {
-                                //     if(track.title !== fields.title){
-                                //         // Not the same title
-                                //         if(track !== null){
-                                //             track.title = `${fields.title}(${randomstring.generate(10)})`;
-                                //         }else{
-                                //             track.title = fields.title;
-                                //         }
-                                //
-                                //         if(fields.description){
-                                //             track.description = fields.description;
-                                //         }
-                                //
-                                //         return Tracks.update({
-                                //             _id: track._id
-                                //         }, track).then(() => {
-                                //             // Finish
-                                //             res.json({
-                                //                 track,
-                                //             });
-                                //         });
-                                //
-                                //     }
-                                // })
                             }
 
                         }

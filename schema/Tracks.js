@@ -18,5 +18,9 @@ const tracksSchema = new Schema({
     comments: Array,
     fave: Array,
     description: String,
+    private: {
+        type: Boolean,
+        default: false,
+    }
 });
 module.exports = mongoose.model('Tracks', tracksSchema);

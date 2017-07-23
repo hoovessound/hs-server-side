@@ -36,7 +36,10 @@ router.get('/?', (req, res) => {
                             }
                         ]
                     }, {password: 0, tracks: 0}),
-                    Tracks.find({title: regex})
+                    Tracks.find({
+                        title: regex,
+                        private: false || null,
+                    })
                 ]).then(response => {
                     res.render('search', {
                         loginUser: user,

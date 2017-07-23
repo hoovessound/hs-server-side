@@ -175,6 +175,12 @@ router.post('/:username?/:title?/edit', (req, res) => {
                             console.log(error);
                         } else {
 
+                            if(fields.private === 'on'){
+                                track.private = true;
+                            }else{
+                                track.private = false;
+                            }
+
                             // Check if the user submit an cover image
                             if(files.image){
                                 if(files.image.size > 0){
@@ -227,7 +233,7 @@ router.post('/:username?/:title?/edit', (req, res) => {
                             }
 
                             function updateTitle() {
-
+                                let newTitle = fields.title;
                                 function writeDB() {
                                     if(fields.description){
                                         track.description = fields.description;
@@ -241,6 +247,12 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                     });
                                 }
 
+                                if(track.private){
+                                    track.title = `${fields.title || track.title}-private:${randomstring.generate(50)}`;
+                                    writeDB();
+                                    return false;
+                                }
+
                                 if(fields.title){
                                     // Check if the new title match the old title
                                     if(fields.title !== track.title){
@@ -249,7 +261,7 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                             title: fields.title,
                                         }).then(authTrack => {
                                             if(authTrack !== null){
-                                                track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                                    track.title = `${fields.title}(${randomstring.generate(10)})`;
                                             }else{
                                                 track.title = fields.title;
                                             }
@@ -259,7 +271,6 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                         // Same title
                                         writeDB();
                                     }
-
                                 }else{
                                     // Didn't pass anything at all :/
                                     res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);

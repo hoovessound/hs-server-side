@@ -25,6 +25,9 @@ router.get('/:username?', (req, res) => {
                 }).then(profile => {
                     return Tracks.find({
                         'author.username': profile.username,
+                        private: false || null,
+                    }).sort({
+                        uploadDate: -1
                     }).then(tracks => {
                         res.render('profile', {
                             loginUser: user,

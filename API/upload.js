@@ -14,6 +14,7 @@ const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
 });
+const easyimage = require('easyimage');
 
 router.post('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
@@ -65,7 +66,7 @@ router.post('/', (req, res) => {
                         if(!coverImage.type.includes('image')){
                             res.json({
                                 error: true,
-                                msg: 'Please upload an audio file',
+                                msg: 'Please upload an image file',
                                 code: 'not_valid_file_type',
                             });
                             return false;
@@ -81,19 +82,26 @@ router.post('/', (req, res) => {
                         const gcsCoverImage = gcs.bucket('hs-cover-image');
                         fsp.rename(coverImage.path, coverImagePath)
                         .then(() => {
-                            return gcsCoverImage.upload(coverImagePath)
-                            .then(file => {
-                                file = file[0];
-                                return file.getSignedUrl({
-                                    action: 'read',
-                                    expires: '03-09-2491',
+                            // Resize the image first
+                            return easyimage.resize({
+                                src: coverImagePath,
+                                dst: coverImagePath,
+                                width: 500,
+                                height: 500,
+                                ignoreAspectRatio: true,
+                            }).then(processedImage => {
+                                return gcsCoverImage.upload(coverImagePath).then(file => {
+                                    file = file[0];
+                                    return file.getSignedUrl({
+                                        action: 'read',
+                                        expires: '03-09-2491',
+                                    }).then(url => {
+                                        coverImage = url[0];
+                                        fsp.unlinkSync(coverImagePath);
+                                        uploadAudio();
+                                    })
                                 })
-                                .then(url => {
-                                    coverImage = url[0];
-                                    fsp.unlinkSync(coverImagePath);
-                                    uploadAudio();
-                                })
-                            })
+                            });
                         })
                         .catch(error => {
                             console.log(error);

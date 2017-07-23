@@ -13,7 +13,7 @@ const gcs = require('@google-cloud/storage')({
 });
 const fullurl = require('fullurl');
 const fp = require('fs-promise');
-// const jimp = require('jimp');
+const easyimage = require('easyimage');
 
 // save the normal settings
 router.post('/', (req, res) => {
@@ -123,7 +123,6 @@ router.post('/profilepicture/upload', (req, res) => {
                 });
                 form.encoding = 'utf-8';
                 form.parse(req, (error, fields, files) => {
-                    console.log(files)
                     // Check if the request contain the 'image' fields
                     if(typeof files.image === 'undefined') {
                         res.json({
@@ -164,27 +163,38 @@ router.post('/profilepicture/upload', (req, res) => {
                                 success: true,
                                 msg: 'Processing the image'
                             });
-                            return fp.exists(filePath).then(exists => {
-                                if(exists){
-                                    // Upload the file to Google Cloud Storage
-                                    const gcsProfilePictures = gcs.bucket('hs-profile-picture');
-                                    return gcsProfilePictures.upload(filePath).then(file => {
-                                        file = file[0];
-                                        return file.getSignedUrl({
-                                            action: 'read',
-                                            expires: '03-09-2491',
-                                        }).then(url => {
-                                            // Update the new image URL to the DB
-                                            this.user.icon = url[0];
-                                            return Users.update({
-                                                _id: this.user._id,
-                                            }, this.user).then(() => {
-                                                // Remove the icon from local disk
-                                                fp.unlinkSync(filePath);
-                                            });
-                                        })
-                                    });
-                                }
+
+                            // Resize the image to 50x50 Q: 50
+
+                            return easyimage.resize({
+                                src: filePath,
+                                dst: filePath,
+                                width: 50,
+                                height: 50,
+                                ignoreAspectRatio: true,
+                            }).then(processedImage => {
+                                return fp.exists(filePath).then(exists => {
+                                    if(exists){
+                                        // Upload the file to Google Cloud Storage
+                                        const gcsProfilePictures = gcs.bucket('hs-profile-picture');
+                                        return gcsProfilePictures.upload(filePath).then(file => {
+                                            file = file[0];
+                                            return file.getSignedUrl({
+                                                action: 'read',
+                                                expires: '03-09-2491',
+                                            }).then(url => {
+                                                // Update the new image URL to the DB
+                                                this.user.icon = url[0];
+                                                return Users.update({
+                                                    _id: this.user._id,
+                                                }, this.user).then(() => {
+                                                    // Remove the icon from local disk
+                                                    fp.unlinkSync(filePath);
+                                                });
+                                            })
+                                        });
+                                    }
+                                });
                             })
                         }
                     });

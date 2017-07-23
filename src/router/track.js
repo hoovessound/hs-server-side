@@ -192,18 +192,28 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                     const coverImagePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
                                     const gcsCoverImage = gcs.bucket('hs-cover-image');
                                     fsp.rename(files.image.path, coverImagePath).then(() => {
-                                        return gcsCoverImage.upload(coverImagePath).then(file => {
-                                            file = file[0];
-                                            return file.getSignedUrl({
-                                                action: 'read',
-                                                expires: '03-09-2491',
-                                            }).then(url => {
-                                                coverImage = url[0];
-                                                fsp.unlinkSync(coverImagePath);
-                                                track.coverImage = coverImage;
-                                                updateTitle();
+
+                                        // Resize the image first
+                                        return easyimage.resize({
+                                            src: coverImagePath,
+                                            dst: coverImagePath,
+                                            width: 500,
+                                            height: 500,
+                                            ignoreAspectRatio: true,
+                                        }).then(processedImage => {
+                                            return gcsCoverImage.upload(coverImagePath).then(file => {
+                                                file = file[0];
+                                                return file.getSignedUrl({
+                                                    action: 'read',
+                                                    expires: '03-09-2491',
+                                                }).then(url => {
+                                                    coverImage = url[0];
+                                                    fsp.unlinkSync(coverImagePath);
+                                                    track.coverImage = coverImage;
+                                                    updateTitle();
+                                                })
                                             })
-                                        })
+                                        });
                                     }).catch(error => {
                                         console.log(error);
                                     });

@@ -14,13 +14,13 @@ and thanks for you help to make this silly project come a life.
 
 If you don't have an GCS(Google Cloud Platform) access, please contact Felix via email `moongod101@hotmail.com`
 
-Once you have GCS access, the first thing you need to do is create a new JSON file named `gcsAuthToken.json`, and that JSON file should your GCS access token info.
+Once you have GCS access, the first thing you need to do is create a new JSON file named `/gcsAuth/gcsAuthToken.json`, and that JSON file should your GCS access token info.
 
 ### Database access
 
 If you don't have an MongoDB(mLab hosted) access, please contact Felix via email `moongod101@hotmail.com`
 
-Once you have DB access, the first thing you need to do is create a `db.json`, and inside `db.json` exports MongoDB URL
+Once you have DB access, the first thing you need to do is create a `/src/db.json`, and inside `/src/db.json` exports MongoDB URL
 
 ```javascript
 module.exports = {
@@ -39,6 +39,6 @@ You can also change the basic config settings via the Terminal
 
 1. Port
   * `node src/index.js --port 3001`
-
-2. db.json
-  * `node src/index.js --db ./moduleName`
+  
+# Native Dependencies
+1. Imagemagick

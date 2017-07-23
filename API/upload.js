@@ -59,7 +59,7 @@ router.post('/', (req, res) => {
                     }
                     file = files.audio;
                     let coverImage = files.image;
-
+                    const description = fields.description || null;
                     // Check if there a cover image
                     if(typeof coverImage !== 'undefined'){
                         // There is a cover image
@@ -161,6 +161,7 @@ router.post('/', (req, res) => {
                                         },
                                         uploadDate: new Date(),
                                         coverImage,
+                                        description,
                                     }).save().then(track => {
                                         // Save the track id into the user object
                                         user.tracks.push(track._id);

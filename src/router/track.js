@@ -176,75 +176,95 @@ router.post('/:username?/:title?/edit', (req, res) => {
                         } else {
 
                             // Check if the user submit an cover image
-                            if(files.image.size > 0){
-                                if(!files.image.type.includes('image')){
-                                    res.render('editTrack', {
-                                        loginUser: user,
-                                        full_address,
-                                        token,
-                                        track,
-                                        error: 'File is not an image type',
-                                    });
-                                }else{
-                                    const ext = path.extname(files.image.name);
-                                    const newID = sha256(randomstring.generate(10));
-                                    let fileID = newID + ext;
-                                    const coverImagePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
-                                    const gcsCoverImage = gcs.bucket('hs-cover-image');
-                                    fsp.rename(files.image.path, coverImagePath).then(() => {
-
-                                        // Resize the image first
-                                        return easyimage.resize({
-                                            src: coverImagePath,
-                                            dst: coverImagePath,
-                                            width: 500,
-                                            height: 500,
-                                            ignoreAspectRatio: true,
-                                        }).then(processedImage => {
-                                            return gcsCoverImage.upload(coverImagePath).then(file => {
-                                                file = file[0];
-                                                return file.getSignedUrl({
-                                                    action: 'read',
-                                                    expires: '03-09-2491',
-                                                }).then(url => {
-                                                    coverImage = url[0];
-                                                    fsp.unlinkSync(coverImagePath);
-                                                    track.coverImage = coverImage;
-                                                    updateTitle();
-                                                })
-                                            })
+                            if(files.image){
+                                if(files.image.size > 0){
+                                    if(!files.image.type.includes('image')){
+                                        res.render('editTrack', {
+                                            loginUser: user,
+                                            full_address,
+                                            token,
+                                            track,
+                                            error: 'File is not an image type',
                                         });
-                                    }).catch(error => {
-                                        console.log(error);
-                                    });
+                                    }else{
+                                        const ext = path.extname(files.image.name);
+                                        const newID = sha256(randomstring.generate(10));
+                                        let fileID = newID + ext;
+                                        const coverImagePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
+                                        const gcsCoverImage = gcs.bucket('hs-cover-image');
+                                        fsp.rename(files.image.path, coverImagePath).then(() => {
+
+                                            // Resize the image first
+                                            return easyimage.resize({
+                                                src: coverImagePath,
+                                                dst: coverImagePath,
+                                                width: 500,
+                                                height: 500,
+                                                ignoreAspectRatio: true,
+                                            }).then(processedImage => {
+                                                return gcsCoverImage.upload(coverImagePath).then(file => {
+                                                    file = file[0];
+                                                    return file.getSignedUrl({
+                                                        action: 'read',
+                                                        expires: '03-09-2491',
+                                                    }).then(url => {
+                                                        coverImage = url[0];
+                                                        fsp.unlinkSync(coverImagePath);
+                                                        track.coverImage = coverImage;
+                                                        updateTitle();
+                                                    })
+                                                })
+                                            });
+                                        }).catch(error => {
+                                            console.log(error);
+                                        });
+                                    }
+                                }else{
+                                    updateTitle();
                                 }
                             }else{
                                 updateTitle();
                             }
 
                             function updateTitle() {
-                                if(fields.title){
-                                    return Tracks.findOne({
-                                        title: fields.title,
-                                    }).then(authTrack => {
-                                        if(authTrack !== null){
-                                            track.title = `${fields.title}(${randomstring.generate(10)})`;
-                                        }else{
-                                            track.title = fields.title;
-                                        }
-                                        return Tracks.update({
-                                            _id: track._id
-                                        }, track).then(() => {
-                                            // Finish
-                                            res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
-                                        });
 
-                                    }).catch(error => {
-                                        console.log(error);
-                                    })
+                                function writeDB() {
+                                    if(fields.description){
+                                        track.description = fields.description;
+                                    }
+
+                                    return Tracks.update({
+                                        _id: track._id
+                                    }, track).then(() => {
+                                        // Finish
+                                        res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
+                                    });
+                                }
+
+                                if(fields.title){
+                                    // Check if the new title match the old title
+                                    if(fields.title !== track.title){
+                                        // Is not the same
+                                        return Tracks.findOne({
+                                            title: fields.title,
+                                        }).then(authTrack => {
+                                            if(authTrack !== null){
+                                                track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                            }else{
+                                                track.title = fields.title;
+                                            }
+                                            writeDB();
+                                        });
+                                    }else{
+                                        // Same title
+                                        writeDB();
+                                    }
+
+                                }else{
+                                    // Didn't pass anything at all :/
+                                    res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
                                 }
                             }
-
                         }
                     });
                 }

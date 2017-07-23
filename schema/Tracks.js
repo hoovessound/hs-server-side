@@ -17,5 +17,6 @@ const tracksSchema = new Schema({
     },
     comments: Array,
     fave: Array,
+    description: String,
 });
 module.exports = mongoose.model('Tracks', tracksSchema);

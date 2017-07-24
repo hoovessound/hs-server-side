@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>HoovesSound Widget</title>
+</head>
+<body>
+    <%if(track !== null){%>
+    <div id="coverImage" style="background: url(<%=track.coverImage%>)no-repeat; width: 100vw; height: 100vh; background-size: cover; position: fixed; top: 0em; left: 0em; z-index: -1;"></div>
+    <div class="app">
+        <h1 id="title"><%=track.title%></h1>
+        <div class="playPuaseButton material-icons">play_arrow</div><br>
+        <a href="<%=full_address%>/user/<%=track.author.username%>" id="author"><%=track.author.fullName%></a>
+        <div id="playPauseButton"></div>
+        <a href="<%=full_address%>" id="officeWebsiteLink">HoovesSound</a>
+        <%}else{%>
+        <div id="error">Sorry, we can't find your track :/</div>
+        <a href="<%=full_address%>" id="officeWebsiteLink">HoovesSound</a>
+    </div>
+    <%}%>
+    <style>
+    *{
+        padding: 0em;
+        margin: 0em;
+    }
+    .playPuaseButton{
+        background: #CCC;
+        padding: 0.5em;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .app{
+        padding: 1em;
+    }
+    </style>
+    <script>
+    var audio = new Audio();
+    audio.src = "<%=full_address%>/api/listen/<%=track._id%>";
+    var isPlaying = false;
+    audio.addEventListener('ended', function(e){
+        isPlaying = false;
+        masterPlayPuaseButton.innerHTML = 'play_arrow';
+    });
+
+    var masterPlayPuaseButton = document.querySelector('.playPuaseButton');
+    masterPlayPuaseButton.addEventListener('click', function(e){
+        if(isPlaying){
+            audio.pause();
+            isPlaying = false;
+            masterPlayPuaseButton.innerHTML = 'play_arrow';
+        }else{
+            audio.play();
+            isPlaying = true;
+            masterPlayPuaseButton.innerHTML = 'pause';
+        }
+    });
+    </script>
+</body>
+</html>

@@ -15,6 +15,16 @@ router.post('/', (req, res) => {
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
     const response = req.query.response;
 
+    // Check the content type
+    if(req.headers['content-type'] !== 'application/x-www-form-urlencoded'){
+        res.json({
+            error: true,
+            msg: 'Please making sure you are using application/x-www-form-urlencoded as the content type',
+            code: 'invalid_http_request',
+        })
+        return false;
+    }
+
     // Check require fields
     if(typeof req.body.username == 'undefined'){
         if(response === 'json'){

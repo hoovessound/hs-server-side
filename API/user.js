@@ -34,7 +34,18 @@ router.get('/:method?/:username?', (req, res) => {
                     token: token,
                 }, {password: 0, tracks: 0, token: 0})
                 .then(user => {
-                    res.json(user)
+                    return Tracks.find({
+                        'author.username': username,
+                        private: false || null,
+                    }).sort({
+                        uploadDate: -1
+                    })
+                    .then(tracks => {
+                        res.json({
+                            user,
+                            tracks,
+                        });
+                    })
                 })
             }else{
                 return Users.findOne({

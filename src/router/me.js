@@ -92,60 +92,6 @@ router.get('/fave?', (req, res) => {
         }).catch(error => {
             console.log(error);
         });
-        
-        // rp.get({
-        //     url: `${full_address}/api/user/token/${token}`,
-        //     headers: {
-        //         token,
-        //     }
-        // })
-        // .then(user => {
-        //     user = JSON.parse(user);
-        //     // Get the user's fave tracks
-
-        //     // If the user didn't have any tracks yet, just render the page
-        //     if(user.fave.length <= 0){
-        //         res.render('fave', {
-        //             loginUser: user,
-        //             tracks: {
-        //                 tracks: [],
-        //             },
-        //             token,
-        //             full_address,
-        //         });
-        //         return false;
-        //     }
-
-        //     let tracks = [];
-        //     user.fave.forEach(id => {
-        //         return Promise.all([
-        //             rp.get({
-        //                 url: `${full_address}/api/track?id=${id}`,
-        //                 headers: {
-        //                     token,
-        //                 }
-        //             }),
-        //         ])
-        //         .then(track => {
-        //             track = JSON.parse(track);
-        //             tracks.push(track);
-        //             if(tracks.length === user.fave.length){
-        //                 // Finish finding the track object
-        //                 res.render('fave', {
-        //                     loginUser: user,
-        //                     tracks: {
-        //                         tracks,
-        //                     },
-        //                     token,
-        //                     full_address,
-        //                 });
-        //             }
-        //         })
-        //     });
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        // })
     }
 });
 

@@ -13,37 +13,75 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
+    const response = req.query.response;
+
     // Check require fields
     if(typeof req.body.username == 'undefined'){
-        res.render('auth/register', {
-            error: true,
-            message: 'Missing the username fields',
-        });
-        return false;
+        if(response === 'json'){
+            res.json({
+                error: true,
+                msg: 'Missing the username fields',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }else{
+            res.render('auth/register', {
+                error: true,
+                message: 'Missing the username fields',
+            });
+            return false;
+        }
+    }
+
+    if(typeof req.body.password == 'undefined'){
+        if(response === 'json'){
+            res.json({
+                error: true,
+                msg: 'Missing the password fields',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }else{
+            res.render('auth/register', {
+                error: true,
+                message: 'Missing the password fields',
+            });
+            return false;
+        }
     }
 
     if(typeof req.body.fullname == 'undefined'){
-        res.render('auth/register', {
-            error: true,
-            message: 'Missing the password fields',
-        });
-        return false;
-    }
-
-    if(typeof req.body.fullname == 'undefined'){
-        res.render('auth/register', {
-            error: true,
-            message: 'Missing the full name fields',
-        });
-        return false;
+        if(response === 'json'){
+            res.json({
+                error: true,
+                msg: 'Missing the fullname fields',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }else{
+            res.render('auth/register', {
+                error: true,
+                message: 'Missing the fullname fields',
+            });
+            return false;
+        }
     }
 
     if(typeof req.body.email == 'undefined'){
-        res.render('auth/register', {
-            error: true,
-            message: 'Missing the email fields',
-        });
-        return false;
+        if(response === 'json'){
+            res.json({
+                error: true,
+                msg: 'Missing the email fields',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }else{
+            res.render('auth/register', {
+                error: true,
+                message: 'Missing the email fields',
+            });
+            return false;
+        }
     }
 
     // look for existing users
@@ -51,11 +89,20 @@ router.post('/', (req, res) => {
         username: req.body.username,
     }).then(user => {
         if(user !== null){
-            res.render('auth/register', {
-                error: true,
-                message: 'Username is already taken'
-            });
-            return false;
+            if(response === 'json'){
+                res.json({
+                    error: true,
+                    msg: 'Username is already taken',
+                    code: 'unauthorized_action',
+                });
+                return false;
+            }else{
+                res.render('auth/register', {
+                    error: true,
+                    message: 'Username is already taken'
+                });
+                return false;
+            }
         }else{
             // Hash the password
             bcrypt.genSalt(10, (error, salt) => {
@@ -79,11 +126,21 @@ router.post('/', (req, res) => {
                         newUser.save()
                         .then(user => {
                             // save the token into the cookie
-                            res.cookie('oauth-token', user.token, {
-                                maxAge: 365 * 24 * 60 * 60,
-                                httpOnly: true,
-                            });
-                            res.redirect(`${redirect}?success=true&token=${token}`);
+                            if(req.query.no_cookie !== 'true'){
+                                res.cookie('oauth-token', token, {
+                                    maxAge: 365 * 24 * 60 * 60,
+                                    httpOnly: true,
+                                });
+                            }
+                            if(response === 'json') {
+                                // response with a JSON format
+                                res.json({
+                                    token,
+                                });
+                            }else{
+                                // redirect the user into the redirect url
+                                res.redirect(`${redirect}?success=true&token=${token}`);
+                            }
                         })
                         .catch(error => {
                             console.log(error);

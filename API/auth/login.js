@@ -15,21 +15,52 @@ router.post('/', (req, res) => {
 
     // check the oauth requirement
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
-    // find the username
-    if(typeof req.body.username === 'undefined'){
-        res.render('auth/login', {
+    const response = req.query.response;
+
+    // Check the content type
+    if(req.headers['content-type'] !== 'application/x-www-form-urlencoded'){
+        res.json({
             error: true,
-            message: 'Please enter the username'
-        });
+            msg: 'Please making sure you are using application/x-www-form-urlencoded as the content type',
+            code: 'invalid_http_request',
+        })
         return false;
     }
 
+    // find the username
+    if(typeof req.body.username === 'undefined'){
+        if(response === 'json'){
+            res.json({
+                error: true,
+                message: 'Please enter the username',
+                code: 'unauthorized_action',
+            });
+            return false;
+        }else{
+            res.render('auth/login', {
+                error: true,
+                message: 'Please enter the username'
+            });
+            return false;
+        }
+    }
+
     if(typeof req.body.password === 'undefined'){
-        res.render('auth/login', {
-            error: true,
-            message: 'Please enter the password'
-        });
-        return false;
+        if(response === 'json'){
+            res.json({
+                error: true,
+                message: 'Please enter the password',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }else{
+            res.render('auth/login', {
+                error: true,
+                message: 'Please enter the password',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }
     }
 
 
@@ -38,10 +69,21 @@ router.post('/', (req, res) => {
     })
     .then(user => {
         if(user === null){
-            res.render('auth/login', {
-                error: true,
-                message: 'Incorrect username or password',
-            });
+            if(response === 'json'){
+                res.json({
+                    error: true,
+                    message: 'Incorrect username or password',
+                    code: 'unauthorized_action',
+                });
+                return false;
+            }else{
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Incorrect username or password',
+                    code: 'unauthorized_action',
+                });
+                return false;
+            }
         }else{
             // Check for the password
             return bcrypt.compare(req.body.password, user.password).then(same => {
@@ -49,20 +91,40 @@ router.post('/', (req, res) => {
                     // generate the token
                     const token = user.token;
                     // save the token into the cookie
-                    res.cookie('oauth-token', token, {
-                        maxAge: 365 * 24 * 60 * 60,
-                        httpOnly: true,
-                    });
+                    if(req.query.no_cookie !== 'true'){
+                        res.cookie('oauth-token', token, {
+                            maxAge: 365 * 24 * 60 * 60,
+                            httpOnly: true,
+                        });
+                    }
                     // save the token into the session
                     req.session.token = token;
-                    // redirect the user into the redirect url
-                    res.redirect(`${redirect}?success=true&token=${token}`);
+
+                    if(response === 'json') {
+                        // response with a JSON format
+                        res.json({
+                           token,
+                        });
+                    }else{
+                        // redirect the user into the redirect url
+                        res.redirect(`${redirect}?success=true&token=${token}`);
+                    }
+
                 }else{
                     // Incorrect username or password
-                    res.render('auth/login', {
-                        error: true,
-                        message: 'Incorrect username or password',
-                    });
+                    if(response === 'json'){
+                        res.json({
+                            error: true,
+                            message: 'Incorrect username or password',
+                            code: 'unauthorized_action',
+                        });
+                        return false;
+                    }else{
+                        res.render('auth/login', {
+                            error: true,
+                            message: 'Incorrect username or password',
+                        });
+                    }
                 }
             });
         }

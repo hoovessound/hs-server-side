@@ -114,4 +114,6 @@ app.use('/search', require('./router/search'));
 
 app.use('/settings', require('./router/settings'));
 
+app.use('/widget', require('./router/widget'));
+
 app.use('/', require('./router/latesetTracks'));

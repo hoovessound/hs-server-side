@@ -318,10 +318,6 @@ router.post('/edit/:id?', (req, res) => {
                             function updateTitle() {
 
                                 function writeDB() {
-                                    if(fields.description){
-                                        track.description = fields.description;
-                                    }
-
                                     return Tracks.update({
                                         _id: track._id
                                     }, track).then(() => {
@@ -336,6 +332,10 @@ router.post('/edit/:id?', (req, res) => {
                                     track.title = `${fields.title || track.title}-private:${randomstring.generate(50)}`;
                                     writeDB();
                                     return false;
+                                }
+
+                                if(fields.description){
+                                    track.description = fields.description;
                                 }
 
                                 if(fields.title){
@@ -355,12 +355,18 @@ router.post('/edit/:id?', (req, res) => {
                                     }else{
                                         // Same title
                                         writeDB();
+                                        return false;
                                     }
-                                }else{
-                                    // Didn't pass anything at all :/
+                                }
+                                if(!fields.title && !fields.image && !fields.description){
                                     res.json({
-                                        track,
+                                        error: true,
+                                        msg: 'You have to pass in one or more argument',
+                                        code: 'missing_require_fields',
                                     });
+                                    return false;
+                                }else{
+                                    writeDB();
                                 }
                             }
 

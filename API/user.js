@@ -29,43 +29,36 @@ router.get('/:method?/:username?', (req, res) => {
             });
             return false;
         }else{
+            let query;
             if(method === 'token'){
-                return Users.findOne({
-                    token: token,
-                }, {password: 0, tracks: 0, token: 0})
-                .then(user => {
-                    return Tracks.find({
-                        'author.username': username,
-                        private: false || null,
-                    }).sort({
-                        uploadDate: -1
-                    })
-                    .then(tracks => {
-                        res.json({
-                            user,
-                            tracks,
-                        });
-                    })
-                })
+                query = {
+                    token,
+                }
             }else{
-                return Users.findOne({
-                    username: username,
-                }, {password: 0, tracks: 0, token: 0})
-                .then(user => {
-                    return Tracks.find({
-                        'author.username': username,
-                        private: false || null,
-                    }).sort({
-                        uploadDate: -1
-                    })
-                    .then(tracks => {
-                        res.json({
-                            user,
-                            tracks,
-                        });
-                    })
-                })
+                query = {
+                    username,
+                }
             }
+
+            return Users.findOne(query, {
+                password: 0,
+                token: 0
+            }).then(profile => {
+                
+                return Tracks.find({
+                    'author.username': username,
+                    private: false,
+                }).sort({
+                    uploadDate: -1
+                })
+                .then(tracks => {
+                    res.json({
+                        user: profile,
+                        tracks,
+                    });
+                })
+
+            });
         }
     })
     .catch(error => {

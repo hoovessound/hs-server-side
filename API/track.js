@@ -13,6 +13,7 @@ const gcs = require('@google-cloud/storage')({
 const sha256 = require('sha256');
 const randomstring = require('randomstring');
 const fsp = require('fs-promise');
+const easyimage = require('easyimage');
 
 router.get('/:username?/:title?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;

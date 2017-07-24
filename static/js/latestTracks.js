@@ -8,6 +8,11 @@ const container = document.querySelector('.container');
 const ajax = new XMLHttpRequest();
 let ajaxing = false;
 
+audio.addEventListener('ended', e => {
+    isPlaying = false;
+    masterPlayPuaseButton.innerHTML = 'play_arrow';
+});
+
 // volume bar control
 volumeBar.addEventListener('input', e => {
     // Thanks https://stackoverflow.com/a/31927281/6511655

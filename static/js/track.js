@@ -38,3 +38,8 @@ faveButton.addEventListener('click', e => {
         }
     }
 });
+
+audio.addEventListener('ended', e => {
+    isPlaying = false;
+    masterPlayPuaseButton.innerHTML = 'play_arrow';
+});

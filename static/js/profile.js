@@ -27,3 +27,8 @@ masterPlayPuaseButton.addEventListener('click', e => {
         masterPlayPuaseButton.innerHTML = 'pause';
     }
 });
+
+audio.addEventListener('ended', e => {
+    isPlaying = false;
+    masterPlayPuaseButton.innerHTML = 'play_arrow';
+});

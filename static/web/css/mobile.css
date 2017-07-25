@@ -1,0 +1,49 @@
+*{
+    padding: 0em;
+    margin: 0em;
+}
+
+html{
+    text-align: center;
+}
+
+.fa.fa-android{
+    color: #68B445;
+    font-size: 6em;
+}
+
+.title{
+    padding: 1.5em 0em;
+}
+
+.top{
+    position: absolute;
+    background: orange;
+    top: 0em;
+    left: 0em;
+    width: 100vw;
+    height: 35em;
+}
+
+.screenshot{
+    position: relative;
+    background: url('https://f001.backblazeb2.com/b2api/v1/b2_download_file_by_id?fileId=4_z915ad5da1f4f7c9256da021f_f1170fbbd1429fdd3_d20170725_m093022_c001_v0001044_t0053') no-repeat center fixed orange;
+    width: 100%;
+    height: 100vh;
+    background-size: 25em 80vh;
+}
+
+.download{
+    background: skyblue;
+    width: 100vw;
+}
+
+.fa-android{
+    margin-top: 0.5em;
+}
+
+.btn-download{
+    text-transform: uppercase;
+    background: #FF847C;
+    padding: 0.5em 1.5em;
+}

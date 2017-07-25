@@ -16,5 +16,6 @@ const usersSchema = new Schema({
         default: 'http://vignette4.wikia.nocookie.net/mlp/images/1/15/Ponyville_as_seen_from_Twilight_and_Spike%27s_chariot_S1E01.png/revision/latest?cb=20120904164855'
     },
     fave: Array,
+    roles: Array,
 });
 module.exports = mongoose.model('Users', usersSchema);

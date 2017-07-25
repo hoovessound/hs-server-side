@@ -47,3 +47,18 @@ html{
     background: #FF847C;
     padding: 0.5em 1.5em;
 }
+
+#leadDev{
+    background: url('https://avatars3.githubusercontent.com/u/17655680') no-repeat center;
+    width: 5em;
+    height: 5em;
+    border-radius: 50%;
+    background-size: contain;
+    margin: 0.5em auto;
+}
+
+#feature , #opensource{
+    width: 100vw;
+    background: #FCE38A;
+    padding: 1em;
+}

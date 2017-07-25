@@ -36,27 +36,29 @@
         padding: 1em;
     }
     </style>
+    <%if(track !== null){%>
     <script>
-    var audio = new Audio();
-    audio.src = "<%=full_address%>/api/listen/<%=track._id%>";
-    var isPlaying = false;
-    audio.addEventListener('ended', function(e){
-        isPlaying = false;
-        masterPlayPuaseButton.innerHTML = 'play_arrow';
-    });
-
-    var masterPlayPuaseButton = document.querySelector('.playPuaseButton');
-    masterPlayPuaseButton.addEventListener('click', function(e){
-        if(isPlaying){
-            audio.pause();
+        var audio = new Audio();
+        audio.src = "<%=full_address%>/api/listen/<%=track._id%>";
+        var isPlaying = false;
+        audio.addEventListener('ended', function(e){
             isPlaying = false;
             masterPlayPuaseButton.innerHTML = 'play_arrow';
-        }else{
-            audio.play();
-            isPlaying = true;
-            masterPlayPuaseButton.innerHTML = 'pause';
-        }
-    });
+        });
+
+        var masterPlayPuaseButton = document.querySelector('.playPuaseButton');
+        masterPlayPuaseButton.addEventListener('click', function(e){
+            if(isPlaying){
+                audio.pause();
+                isPlaying = false;
+                masterPlayPuaseButton.innerHTML = 'play_arrow';
+            }else{
+                audio.play();
+                isPlaying = true;
+                masterPlayPuaseButton.innerHTML = 'pause';
+            }
+        });
     </script>
+    <%}%>
 </body>
 </html>

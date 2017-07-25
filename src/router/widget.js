@@ -15,7 +15,8 @@ router.get('/:id?', (req, res) => {
     }).catch(error => {
         if(error.message.includes('Cast to ObjectId failed for value')){
             res.render('widget', {
-                track: null,       
+                track: null,
+                full_address,
             });
         }else{
             console.log(error)

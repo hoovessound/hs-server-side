@@ -24,7 +24,16 @@ router.get('/?', (req, res) => {
                     token,
                 }).then(user => {
                     return Tracks.find({
-                        private: false,
+                        $or: [
+                            {
+                                private: false,
+                            },
+                            {
+                                private: {
+                                    $exists: false,
+                                }
+                            }
+                        ]
                     }).limit(10).skip(parseInt(offset)).sort({
                         uploadDate: -1
                     }).then(tracks => {

@@ -47,7 +47,16 @@ router.get('/:method?/:username?', (req, res) => {
                 
                 return Tracks.find({
                     'author.username': username,
-                    private: false,
+                    $or: [
+                        {
+                            private: false,
+                        },
+                        {
+                            private: {
+                                $exists: false,
+                            }
+                        }
+                    ],
                 }).sort({
                     uploadDate: -1
                 })
@@ -62,7 +71,16 @@ router.get('/:method?/:username?', (req, res) => {
         }
     })
     .catch(error => {
-        console.log(error);
+        if(error.message.includes('Cast to ObjectId failed for value')){
+            res.json({
+                error: true,
+                msg: 'Can\'t not found your track',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            console.log(error)
+        }
     });
 });
 

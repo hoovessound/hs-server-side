@@ -169,8 +169,10 @@ router.post('/', (req, res) => {
                                         return Users.update({
                                             _id: user._id,
                                         }, user).then(() => {
+                                            let newResponse = JSON.parse(JSON.stringify(this.track));
+                                            delete newResponse.file;
                                             res.json({
-                                                track: this.track,
+                                                track: newResponse,
                                                 url: full_address + `/track/${user.username}/${title}`,
                                             });
                                         });
@@ -181,27 +183,29 @@ router.post('/', (req, res) => {
 
                                     // Upload the file to Google Cloud Storage
                                     const gcsTracks = gcs.bucket('hs-track');
-                                    gcsTracks.upload(filePath).then(file => {
-                                        file = file[0];
-                                        // Get the download url
-                                        return file.getSignedUrl({
-                                            action: 'read',
-                                            expires: '03-09-2491',
-                                        }).then(url => {
-                                            url = url[0];
-                                            this.track.file.location = url;
-                                            this.track.file.extend = true;
-                                            Tracks.update({
-                                                _id: this.track._id
-                                            }, this.track).then(() => {
-                                                // Remove the lcoal track from the disk
-                                                fs.unlinkSync(filePath);
+                                    gcsTracks.upload(filePath)
+                                        .then(file => {
+                                            file = file[0];
+                                            // Get the download url
+                                            return file.getSignedUrl({
+                                                action: 'read',
+                                                expires: '03-09-2491',
                                             })
+                                                .then(url => {
+                                                    url = url[0];
+                                                    this.track.file.location = url;
+                                                    this.track.file.extend = true;
+                                                    Tracks.update({
+                                                        _id: this.track._id
+                                                    }, this.track).then(() => {
+                                                        // Remove the lcoal track from the disk
+                                                        fs.unlinkSync(filePath);
+                                                    })
+                                                })
                                         })
-                                    })
-                                    .catch(error => {
-                                        console.log(error);
-                                    });
+                                        .catch(error => {
+                                            console.log(error);
+                                        });
                                 }
                             });
                         });

@@ -37,6 +37,8 @@ router.get('/:username?/:title?', (req, res) => {
             if(ID){
                 return Tracks.findOne({
                     _id: ID,
+                }, {
+                    file: 0,
                 })
                 .then(track => {
                     res.json(track);
@@ -45,6 +47,8 @@ router.get('/:username?/:title?', (req, res) => {
                 return Tracks.findOne({
                     'author.username': username,
                     title: title
+                }, {
+                    file: 0,
                 })
                 .then(track => {
                     res.json(track);
@@ -219,7 +223,6 @@ router.post('/edit/:id?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const token = req.body.token || req.headers.token || req.query.token;
     const id = req.params.id;
-
     if (typeof id === 'undefined') {
         res.json({
             error: true,
@@ -241,7 +244,9 @@ router.post('/edit/:id?', (req, res) => {
             return false;
         }else{
             // Check if the track exist
-            return Tracks.findById(id).then(track => {
+            return Tracks.findById(id, {
+                file: 0,
+            }).then(track => {
                 if(track.author.username !== user.username){
                     res.json({
                         error: true,
@@ -258,7 +263,6 @@ router.post('/edit/:id?', (req, res) => {
                         if (error) {
                             console.log(error);
                         } else {
-
                             if(fields.private === 'true'){
                                 track.private = true;
                             }else{

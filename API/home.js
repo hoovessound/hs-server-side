@@ -31,6 +31,8 @@ router.get('/', (req, res) => {
                         }
                     }
                 ]
+            }, {
+                file: 0,
             }).limit(10).skip(offset).sort({uploadDate: -1})
                 .then(tracks => {
                     return Tracks.count({})

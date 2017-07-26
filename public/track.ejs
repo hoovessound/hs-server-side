@@ -36,30 +36,40 @@
             <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>/edit" class="btn btn-default">Edit</a>
             <%}%>
         <h1 id="title"><%=track.title%></h1>
+        <a style="display: block;" href="<%=full_address%>/user/<%=track.author.username%>"><%=track.author.username%></a>
 
+        <a class="share btn btn-info">Widget</a>
+        <input type="text" class="shareURL hide" value='<iframe src="<%=full_address%>/widget/<%=track._id%>"></iframe>' readonly>
 
         <img src="<%=track.coverImage%>" alt="" class="coverImage">
 
-            <hr>
-            <h1>Comments</h1>
-            <div id="commentSession">
-                <textarea name="comment" id="input"></textarea>
-                <button type="submit" id="post">Post</button>
-                <div id="comments">
-                    <%if(comments){%>
-                        <%comments.forEach(comment => {%>
-                            <div class="comment">
-                                <a href="/user/<%=comment.author.username%>">
-                                    <%=comment.author.fullName%>
-                                </a>
-                                <p><%=comment.comment%></p>
-                            </div>
-                        <%})%>
-                    <%}else{%>
-                        <h1>No body have comment yet, will ya?</h1>
-                    <%}%>
-                </div>
+        <hr>
+
+        <h1>Description</h1>
+        <div id="description">
+            <p><%=track.description%></p>
+        </div>
+
+        <hr>
+        <h1>Comments</h1>
+        <div id="commentSession">
+            <textarea name="comment" id="input"></textarea>
+            <button type="submit" id="post">Post</button>
+            <div id="comments">
+                <%if(comments){%>
+                    <%comments.forEach(comment => {%>
+                        <div class="comment">
+                            <a href="/user/<%=comment.author.username%>">
+                                <%=comment.author.fullName%>
+                            </a>
+                            <p><%=comment.comment%></p>
+                        </div>
+                    <%})%>
+                <%}else{%>
+                    <h1>No body have comment yet, will ya?</h1>
+                <%}%>
             </div>
+        </div>
         <%}else{%>
             <h1 id="notracks">Didn't have any tracks yet</h1>
         <%}%>

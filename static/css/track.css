@@ -9,3 +9,25 @@
     outline: none;
     width: 50vw;
 }
+
+.share{
+    width: 10em;
+}
+
+.coverImage{
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    z-index: -1;
+    margin-top: 0.5em;
+}
+
+.shareURL.hide{
+    display: none;
+}
+
+@media (max-width: 415px) {
+    .share{
+        display: none !important;
+    }
+}

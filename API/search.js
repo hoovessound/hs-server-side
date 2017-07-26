@@ -46,8 +46,26 @@ router.get('/', (req, res) => {
                             fullName: regex,
                         }
                     ]
-                }, {password: 0, tracks: 0}),
-                Tracks.find({title: regex})
+                }, {
+                    password: 0,
+                    tracks: 0,
+                    token: 0,
+                }),
+                Tracks.find({
+                    title: regex,
+                    $or: [
+                        {
+                            private: false,
+                        },
+                        {
+                            private: {
+                                $exists: false,
+                            }
+                        }
+                    ]
+                }, {
+                    file: 0,
+                })
             ])
             .then(response => {
                 res.json({

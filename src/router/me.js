@@ -48,60 +48,50 @@ router.get('/fave?', (req, res) => {
         res.redirect('/api/auth/login?redirect=' + fullurl(req));
     }else{
         const token = req.cookies['oauth-token'];
-
-        rp.get({
-            url: `${full_address}/api/user/token/${token}`,
-            headers: {
-                token,
-            }
+        Users.findOne({
+            token: token,
         })
         .then(user => {
-            user = JSON.parse(user);
-            // Get the user's fave tracks
-
-            // If the user didn't have any tracks yet, just render the page
-            if(user.fave.length <= 0){
-                res.render('fave', {
-                    loginUser: user,
-                    tracks: {
-                        tracks: [],
-                    },
-                    token,
-                    full_address,
-                });
-                return false;
-            }
-
-            let tracks = [];
-            user.fave.forEach(id => {
-                return Promise.all([
-                    rp.get({
-                        url: `${full_address}/api/track?id=${id}`,
-                        headers: {
-                            token,
-                        }
-                    }),
-                ])
-                .then(track => {
-                    track = JSON.parse(track);
-                    tracks.push(track);
-                    if(tracks.length === user.fave.length){
-                        // Finish finding the track object
-                        res.render('fave', {
-                            loginUser: user,
-                            tracks: {
-                                tracks,
-                            },
-                            token,
-                            full_address,
+            if (user === null) {
+                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+            }else{
+                if(user.fave.length <= 0){
+                    res.render('fave', {
+                        loginUser: user,
+                        tracks: {
+                            tracks: [],
+                        },
+                        token,
+                        full_address,
+                    });
+                    return false;
+                }else{
+                    // User did fave a track(s)
+                    // Get the track info
+                    let tracks = [];
+                    user.fave.forEach(id => {
+                        return Tracks.findOne({
+                            _id: id,
+                        }).then(track => {
+                            tracks.push(track);
+                            if(tracks.length === user.fave.length){
+                                res.render('fave', {
+                                    loginUser: user,
+                                    tracks: {
+                                        tracks,
+                                    },
+                                    token,
+                                    full_address,
+                                });
+                                return false;
+                            }
                         });
-                    }
-                })
-            });
-        })
-        .catch(error => {
+                    });
+                }
+            }
+        }).catch(error => {
             console.log(error);
-        })
+        });
     }
 });
 

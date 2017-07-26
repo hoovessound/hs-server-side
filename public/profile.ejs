@@ -11,6 +11,7 @@
     <%}%>
     <link rel="stylesheet" href="/static/css/profile.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <%- include('includes/nav')%>
@@ -34,6 +35,13 @@
         <div class="container">
             <div id="userInfo" style="background-image: url('<%=profile.banner%>')">
                 <img src="<%=profile.icon%>" alt="" class="profilePicture">
+                <div id="roles">
+                    <%profile.roles.forEach(role => {%>
+                        <%const title = Object.keys(role)[0];%>
+                        <%const fsIcon = role[title];%>
+                        <div class="role <%=title%> fa fa-<%=fsIcon%>" title="<%=title%>"></div>
+                    <%});%>
+                </div>
                 <h1 id="username"><%=profile.fullName%></h1>
                 <%if(profile.username === loginUser.username){%>
                     <a class="btn btn-success" href="/settings">Settings</a>

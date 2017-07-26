@@ -10,6 +10,7 @@
     "compression": "^1.7.0",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.2",
+    "easyimage": "^2.1.0",
     "ejs": "^2.5.6",
     "express": "^4.15.3",
     "formidable": "^1.1.1",

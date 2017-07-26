@@ -20,14 +20,29 @@ router.get('/', (req, res) => {
             return false;
         }else{
             // Find the the latest 10 tracks order by the upload date
-            return Tracks.find().limit(10).skip(offset).sort({uploadDate: -1}).then(tracks => {
-                return Tracks.count({}).then(total => {
-                    res.json({
-                        tracks,
-                        total,
-                    });
-                })
-            });
+            return Tracks.find({
+                $or: [
+                    {
+                        private: false,
+                    },
+                    {
+                        private: {
+                            $exists: false,
+                        }
+                    }
+                ]
+            }, {
+                file: 0,
+            }).limit(10).skip(offset).sort({uploadDate: -1})
+                .then(tracks => {
+                    return Tracks.count({})
+                        .then(total => {
+                            res.json({
+                                tracks,
+                                total,
+                            });
+                        })
+                });
         }
     })
     .catch(error => {

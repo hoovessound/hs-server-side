@@ -64,6 +64,8 @@ app.use(bodyParser.json());
 // express static
 app.use('/static', express.static(path.join(`${__dirname}/../static`)));
 app.use('/usersContent', express.static(path.join(`${__dirname}/../usersContent`)));
+// Statis HTML website
+app.use('/web', express.static(path.join(`${__dirname}/../web`)));
 
 // Set up the view engine
 app.set('view engine', 'ejs');
@@ -113,5 +115,7 @@ app.use('/user', require('./router/user'));
 app.use('/search', require('./router/search'));
 
 app.use('/settings', require('./router/settings'));
+
+app.use('/widget', require('./router/widget'));
 
 app.use('/', require('./router/latesetTracks'));

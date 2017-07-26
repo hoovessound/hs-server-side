@@ -23,8 +23,23 @@ router.get('/:username?', (req, res) => {
                 return Users.findOne({
                     username,
                 }).then(profile => {
-                    return Tracks.find({
-                        'author.username': profile.username,
+                    
+                    // Check if the user is the ownUser
+                    const ownUser = profile.username === user.username ? true:false;
+                    let searchQuery;
+                    if(ownUser){
+                        searchQuery = {
+                            'author.username': profile.username,
+                        }
+                    }else{
+                        searchQuery = {
+                            'author.username': profile.username,
+                            private: false || null,
+                        }
+                    }
+
+                    return Tracks.find(searchQuery).sort({
+                        uploadDate: -1
                     }).then(tracks => {
                         res.render('profile', {
                             loginUser: user,
@@ -33,6 +48,7 @@ router.get('/:username?', (req, res) => {
                             full_address,
                         });
                     })
+
                 })
             }
         }).catch(error => {

@@ -2,6 +2,8 @@ const volumeBar = document.querySelector('#volumeBar');
 const faveButton = document.querySelector('.fave');
 let isPlaying = false;
 const ajax = new XMLHttpRequest();
+const shareURL = document.querySelector('.shareURL');
+const shareButton = document.querySelector('.share');
 
 const masterPlayPuaseButton = document.querySelector('.masterPlayer .playPuaseButton');
 masterPlayPuaseButton.addEventListener('click', e => {
@@ -37,4 +39,21 @@ faveButton.addEventListener('click', e => {
             }
         }
     }
+});
+
+audio.addEventListener('ended', e => {
+    isPlaying = false;
+    masterPlayPuaseButton.innerHTML = 'play_arrow';
+});
+
+shareButton.addEventListener('click', e => {
+    if(shareURL.classList.contains('hide')){
+        shareURL.classList.remove('hide');
+    }else{
+        shareURL.classList.add('hide');
+    }
+});
+
+shareURL.addEventListener('click', e => {
+    shareURL.select();
 });

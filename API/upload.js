@@ -14,6 +14,7 @@ const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
 });
+const easyimage = require('easyimage');
 
 router.post('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
@@ -58,14 +59,14 @@ router.post('/', (req, res) => {
                     }
                     file = files.audio;
                     let coverImage = files.image;
-
+                    const description = fields.description || null;
                     // Check if there a cover image
                     if(typeof coverImage !== 'undefined'){
                         // There is a cover image
                         if(!coverImage.type.includes('image')){
                             res.json({
                                 error: true,
-                                msg: 'Please upload an audio file',
+                                msg: 'Please upload an image file',
                                 code: 'not_valid_file_type',
                             });
                             return false;
@@ -81,19 +82,26 @@ router.post('/', (req, res) => {
                         const gcsCoverImage = gcs.bucket('hs-cover-image');
                         fsp.rename(coverImage.path, coverImagePath)
                         .then(() => {
-                            return gcsCoverImage.upload(coverImagePath)
-                            .then(file => {
-                                file = file[0];
-                                return file.getSignedUrl({
-                                    action: 'read',
-                                    expires: '03-09-2491',
+                            // Resize the image first
+                            return easyimage.resize({
+                                src: coverImagePath,
+                                dst: coverImagePath,
+                                width: 500,
+                                height: 500,
+                                ignoreAspectRatio: true,
+                            }).then(processedImage => {
+                                return gcsCoverImage.upload(coverImagePath).then(file => {
+                                    file = file[0];
+                                    return file.getSignedUrl({
+                                        action: 'read',
+                                        expires: '03-09-2491',
+                                    }).then(url => {
+                                        coverImage = url[0];
+                                        fsp.unlinkSync(coverImagePath);
+                                        uploadAudio();
+                                    })
                                 })
-                                .then(url => {
-                                    coverImage = url[0];
-                                    fsp.unlinkSync(coverImagePath);
-                                    uploadAudio();
-                                })
-                            })
+                            });
                         })
                         .catch(error => {
                             console.log(error);
@@ -153,6 +161,7 @@ router.post('/', (req, res) => {
                                         },
                                         uploadDate: new Date(),
                                         coverImage,
+                                        description,
                                     }).save().then(track => {
                                         // Save the track id into the user object
                                         user.tracks.push(track._id);
@@ -160,8 +169,10 @@ router.post('/', (req, res) => {
                                         return Users.update({
                                             _id: user._id,
                                         }, user).then(() => {
+                                            let newResponse = JSON.parse(JSON.stringify(this.track));
+                                            delete newResponse.file;
                                             res.json({
-                                                track: this.track,
+                                                track: newResponse,
                                                 url: full_address + `/track/${user.username}/${title}`,
                                             });
                                         });
@@ -172,27 +183,29 @@ router.post('/', (req, res) => {
 
                                     // Upload the file to Google Cloud Storage
                                     const gcsTracks = gcs.bucket('hs-track');
-                                    gcsTracks.upload(filePath).then(file => {
-                                        file = file[0];
-                                        // Get the download url
-                                        return file.getSignedUrl({
-                                            action: 'read',
-                                            expires: '03-09-2491',
-                                        }).then(url => {
-                                            url = url[0];
-                                            this.track.file.location = url;
-                                            this.track.file.extend = true;
-                                            Tracks.update({
-                                                _id: this.track._id
-                                            }, this.track).then(() => {
-                                                // Remove the lcoal track from the disk
-                                                fs.unlinkSync(filePath);
+                                    gcsTracks.upload(filePath)
+                                        .then(file => {
+                                            file = file[0];
+                                            // Get the download url
+                                            return file.getSignedUrl({
+                                                action: 'read',
+                                                expires: '03-09-2491',
                                             })
+                                                .then(url => {
+                                                    url = url[0];
+                                                    this.track.file.location = url;
+                                                    this.track.file.extend = true;
+                                                    Tracks.update({
+                                                        _id: this.track._id
+                                                    }, this.track).then(() => {
+                                                        // Remove the lcoal track from the disk
+                                                        fs.unlinkSync(filePath);
+                                                    })
+                                                })
                                         })
-                                    })
-                                    .catch(error => {
-                                        console.log(error);
-                                    });
+                                        .catch(error => {
+                                            console.log(error);
+                                        });
                                 }
                             });
                         });

@@ -22,6 +22,8 @@ router.get('/', (req, res) => {
             const offset = parseInt(req.query.offset) || 0;
             return Tracks.find({
                 'author.username': user.username,
+            }, {
+                file: 0,
             }).limit(10).skip(offset).sort({uploadDate: -1}).then(tracks => {
                 res.json(tracks);
             });

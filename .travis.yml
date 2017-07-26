@@ -4,6 +4,7 @@ node_js:
 deploy:
   provider: script
   script: deploy.sh
+  skip_cleanup: true
 before_install:
   - openssl aes-256-cbc -K $encrypted_e44152bd72d8_key -iv $encrypted_e44152bd72d8_iv -in encrypt_pack.tar.enc -out encrypt_pack.tar -d
   - tar xvf encrypt_pack.tar

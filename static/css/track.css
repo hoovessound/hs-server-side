@@ -25,3 +25,9 @@
 .shareURL.hide{
     display: none;
 }
+
+@media (max-width: 415px) {
+    .share{
+        display: none !important;
+    }
+}

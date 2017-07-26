@@ -46,6 +46,7 @@ router.get('/:username?', (req, res) => {
                             profile,
                             tracks,
                             full_address,
+                            token,
                         });
                     })
 

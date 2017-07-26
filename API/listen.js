@@ -22,14 +22,12 @@ router.get('/:id?', (req, res) => {
                 request(track.file.location).pipe(res);
             }else{
                 // Send the stream version
+                res.set({
+                    'Transfer-Encoding': 'chunked',
+                });
                 https.get(track.file.location, (response) => {
-                    let body = '';
                     response.on('data', function (chunk) {
                         res.write(chunk);
-                        body += chunk;
-                    });
-                    response.on('end', () => {
-                        res.end(body);
                     });
                 });
             }

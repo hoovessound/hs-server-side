@@ -3,7 +3,7 @@ node_js:
 - node
 deploy:
   provider: script
-  script: chmod +x deploy.sh && deploy.sh
+  script: chmod +x deploy.sh && ./deploy.sh
   skip_cleanup: true
   on:
       branch: issue#4

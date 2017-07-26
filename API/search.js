@@ -25,11 +25,22 @@ router.get('/', (req, res) => {
                 res.json({
                     error: true,
                     msg: 'Missing the query',
+                    code: 'missing_require_fields',
                 });
                 return false;
             }
 
             // Search the query
+
+            if(query.length <= 0){
+                res.json({
+                    error: true,
+                    msg: 'Too less query keyword',
+                    code: 'unexpected_result',
+                });
+                return false;
+                return false;
+            }
 
             function escapeRegex(text) {
                 return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");

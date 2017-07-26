@@ -1,4 +1,6 @@
 language: node_js
+os:
+  - osx
 node_js:
 - node
 deploy:
@@ -9,3 +11,5 @@ deploy:
 before_install:
   - openssl aes-256-cbc -K $encrypted_e44152bd72d8_key -iv $encrypted_e44152bd72d8_iv -in encrypt_pack.tar.enc -out encrypt_pack.tar -d
   - tar xvf encrypt_pack.tar
+  - nvm install node # Making sure is really using the latest node.js
+  - yarn # Making sure it install all the dependencies

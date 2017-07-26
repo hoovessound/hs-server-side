@@ -23,8 +23,13 @@ router.get('/:id?', (req, res) => {
             }else{
                 // Send the stream version
                 https.get(track.file.location, (response) => {
-                    response.on('data', function (body) {
-                        res.write(body);
+                    let body = '';
+                    response.on('data', function (chunk) {
+                        res.write(chunk);
+                        body += chunk;
+                    });
+                    response.on('end', () => {
+                        res.end(body);
                     });
                 });
             }

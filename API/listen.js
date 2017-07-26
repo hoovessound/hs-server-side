@@ -24,7 +24,7 @@ router.get('/:id?', (req, res) => {
                 // Send the stream version
                 https.get(track.file.location, (response) => {
                     response.on('data', function (body) {
-                        res.write(body);
+                        res.write(new Buffer(body));
                     });
                 });
             }

@@ -13,4 +13,4 @@ bash <( curl https://sdk.cloud.google.com) --disable-prompts
 /home/travis/google-cloud-sdk/bin/gcloud config set project $PROJECT_ID
 
 # Deploy the bot
-/home/travis/google-cloud-sdk/bin/gcloud app deploy
+/home/travis/google-cloud-sdk/bin/gcloud app deploy --quiet

@@ -10,7 +10,7 @@ function playMusic(el){
     const username = el.getAttribute('username');
     masterTitle.innerHTML = `${fullName} - ${title}`;
     masterTitle.href = `${$full_address}/track/${username}/${title}`;
-    audio.src = `${$full_address}/api/listen/${trackID}`;
+    audio.src = `${$full_address}/api/listen/${trackID}?token=${token}`;
     audio.play();
     isPlaying = true;
     masterPlayPuaseButton.innerHTML = 'pause';

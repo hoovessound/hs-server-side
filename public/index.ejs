@@ -49,7 +49,7 @@
         const $full_address = "<%=full_address%>";
         let offset = <%=offset%>
         const audio = new Audio();
-        audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>";
+        audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>?token=<%=token%>";
     </script>
     <script src="/static/js/latestTracks.js"></script>
 </body>

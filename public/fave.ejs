@@ -52,7 +52,7 @@
     const $full_address = "<%=full_address%>";
     const audio = new Audio();
     <%if(tracks.tracks.length >= 1){%>
-    audio.src = "<%=full_address%>/api/listen/<%=tracks.tracks[0]._id%>";
+    audio.src = "<%=full_address%>/api/listen/<%=tracks.tracks[0]._id%>?token<%=token%>";
     <%}%>
 </script>
 <script src="/static/js/latestTracks.js"></script>

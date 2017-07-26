@@ -79,7 +79,7 @@
         var trackid = "<%=track._id%>";
         var full_address = "<%=full_address%>"
         var audio = new Audio();
-        audio.src = "<%=full_address%>/api/listen/<%=track._id%>";
+        audio.src = "<%=full_address%>/api/listen/<%=track._id%>?token=<%=token%>";
     </script>
     <script src="/static/js/comment.js"></script>
     <script src="/static/js/track.js"></script>

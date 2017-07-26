@@ -13,7 +13,7 @@ function playMusic(el){
     const title = el.getAttribute('title');
     const fullName = el.getAttribute('fullname');
     const username = el.getAttribute('username');
-    audio.src = `${$full_address}/api/listen/${trackID}`;
+    audio.src = `${$full_address}/api/listen/${trackID}?token=${token}`;
     audio.play();
     isPlaying = true;
 }

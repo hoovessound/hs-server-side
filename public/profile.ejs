@@ -68,8 +68,11 @@
             const $full_address = "<%=full_address%>";
             <%if(tracks.length > 0){%>
                 const audio = new Audio();
-                audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>";
+                audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>?token=<%=token%>";
             <%}%>
+        </script>
+        <script>
+            var token = "<%=token%>"
         </script>
         <script src="/static/js/profile.js"></script>
     <%}%>

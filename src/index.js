@@ -11,6 +11,7 @@ const fullurl = require('fullurl');
 const cli = require('commander');
 const color = require('cli-color');
 const compression = require('compression');
+const helmet = require('helmet');
 
 cli
     .version('1.0.0')
@@ -56,6 +57,19 @@ app.listen(port, () => {
         useMongoClient: true,
     });
 });
+
+// boost up the security
+app.use(helmet());
+function http2https(req, res, next) {
+    if(req.protocol !== 'https'){
+        // If is localhost, just don't do anything
+        if(!req.headers.host.includes('localhost')){
+            res.redirect(fullurl(req));
+        }
+    }
+    next();
+}
+app.use(http2https);
 
 // using some middleware
 app.use(bodyParser.urlencoded({ extended: false }));

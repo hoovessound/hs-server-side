@@ -31,6 +31,6 @@
   "private": true,
   "scripts": {
     "start": "node src/index.js",
-    "deploy": "tar cvf encrypt_pack.tar db.js gcsAuthToken.json && travis encrypt-file encrypt_pack.tar && rm encrypt_pack.tar"
+    "deploy": "tar cvf encrypt_pack.tar src/db.js gcsAuth/gcsAuthToken.json && travis encrypt-file encrypt_pack.tar && rm encrypt_pack.tar"
   }
 }

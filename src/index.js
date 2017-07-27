@@ -90,6 +90,8 @@ app.use('/api/auth/register', require('../API/auth/register'));
 
 app.use('/api/auth/login', require('../API/auth/login'));
 
+app.use('/api/auth/changepassword', require('../API/auth/changepassword'));
+
 app.use('/api/upload', require('../API/upload'));
 
 app.use('/api/listen', require('../API/listen'));

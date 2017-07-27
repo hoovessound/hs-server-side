@@ -28,6 +28,22 @@ module.exports = {
 }
 ````
 
+# Maingun access
+First you have to register your own Maingun account
+
+And filling the `API Key` and the `API URL` inside they `db.js` file
+
+```javascript
+module.exports = {
+    url: 'mongodb://<username>:<password>@<db url>',
+    mailgun: {
+        key: 'key-<YOUR KEY>',
+        domain: 'sandbox1<bal bal bal>.mailgun.org',
+    }
+}
+````
+
+
 ### Port
 
 The default port will be `3000`

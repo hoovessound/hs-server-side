@@ -20,8 +20,9 @@ masterPlayPuaseButton.addEventListener('click', e => {
 
 // volume bar control
 volumeBar.addEventListener('input', e => {
-    const volume = e.target.value;
-    console.log(volume)
+    // Thanks https://stackoverflow.com/a/31927281/6511655
+    let volume = parseInt(e.target.value);
+    audio.volume = volume/ 100;
 });
 
 faveButton.addEventListener('click', e => {

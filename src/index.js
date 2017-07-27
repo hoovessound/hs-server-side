@@ -85,7 +85,7 @@ app.use(compression());
 // https://www.sslforfree.com use case
 app.get('/.well-known/acme-challenge/:filename', function(req, res){
     const filename = req.params.filename;
-    res.sendFile(__dirname + '/' + filename);
+    res.sendFile(path.join(`${__dirname}/../.well-known/acme-challenge/${filename}`));
 });
 
 app.use('/api/tracks', require('../API/home'));

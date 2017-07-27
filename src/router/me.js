@@ -32,6 +32,7 @@ router.get('/', (req, res) => {
                             profile: user,
                             tracks: tracks,
                             full_address,
+                            token,
                         });
                     });
                 })

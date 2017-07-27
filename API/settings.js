@@ -31,6 +31,17 @@ router.post('/', (req, res) => {
             });
             return false;
         }else{
+
+            // Check for MINE types
+            if(req.headers['content-type'] !== 'application/json'){
+                res.json({
+                    error: true,
+                    msg: 'Please using application/json as your HTTP Content-Type',
+                    code: 'invalid_http_request',
+                });
+                return false;
+            }
+
             // Check for the settings object
             if(!req.body.settings){
                 res.json({

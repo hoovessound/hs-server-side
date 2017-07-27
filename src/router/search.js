@@ -11,15 +11,23 @@ router.get('/?', (req, res) => {
         res.redirect('/api/auth/login?redirect=' + fullurl(req));
     }else{
         const token = req.cookies['oauth-token'];
-        const query = req.query.query;
-
+        const query = req.query.query ? req.query.query.trim() : null;
         Users.findOne({
             token: token,
         }).then(user => {
             if (user === null) {
                 res.redirect('/api/auth/login?redirect=' + fullurl(req));
             }else{
-                const query = req.query.query;
+                if(query === null){
+                    res.redirect('/');
+                    return false;
+                }
+
+                if(query.length <= 0){
+                    res.redirect('/');
+                    return false;
+                }
+
                 function escapeRegex(text) {
                     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
                 };
@@ -46,6 +54,7 @@ router.get('/?', (req, res) => {
                         users: response[0],
                         tracks: response[1],
                         full_address,
+                        token,
                     });
                 })
 

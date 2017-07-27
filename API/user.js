@@ -57,6 +57,9 @@ router.get('/:method?/:username?', (req, res) => {
                             }
                         }
                     ],
+                }, {
+                    file: 0,
+
                 }).sort({
                     uploadDate: -1
                 })

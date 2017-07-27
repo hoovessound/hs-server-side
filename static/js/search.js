@@ -3,8 +3,10 @@ const formInput = document.querySelector('#searchForm [name=query]');
 form.addEventListener('submit', e => {
     e.preventDefault();
     // Get the query
-    const query = formInput.value;
-    window.open(`/search?query=${query}`, '_self');
+    const query = formInput.value.trim();
+    if(query.length > 0){
+        window.open(`/search?query=${query}`, '_self');
+    }
 });
 
 function playMusic(el){

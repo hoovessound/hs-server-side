@@ -25,7 +25,7 @@ router.get('/:username?', (req, res) => {
                 }).then(profile => {
                     
                     // Check if the user is the ownUser
-                    const ownUser = profile.username === user.username ? true:false;
+                    const owtnUser = profile.username === user.username ? true:false;
                     let searchQuery;
                     if(ownUser){
                         searchQuery = {

@@ -1,3 +1,4 @@
 runtime: nodejs
 env: flex
+url: .*
 secure: always

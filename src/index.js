@@ -60,16 +60,6 @@ app.listen(port, () => {
 
 // boost up the security
 app.use(helmet());
-function http2https(req, res, next) {
-    if(req.protocol !== 'https'){
-        // If is localhost, just don't do anything
-        if(!req.headers.host.includes('localhost')){
-            res.redirect(fullurl(req));
-        }
-    }
-    next();
-}
-app.use(http2https);
 
 // using some middleware
 app.use(bodyParser.urlencoded({ extended: false }));

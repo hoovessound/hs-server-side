@@ -25,7 +25,6 @@ router.post('/', (req, res) => {
 
     if(token){
         const newPassword = req.body.password;
-        // DPMi7MsaLfyJVOWuabeJwYvIULtNEIZJR6yeYpfEUO6TISlzIU7bi5w769ynPdlaLtouclZsfnm3iDvg5OcBaPvho11qDesEBksyTOmIRyf6QEW5oyPxtYmHTDtjn3dgPaIvD8to0G6kmH0jeUPfPBa8GGORlTqtnUJ77F0aI3TPdwKTa577GsBeEwgiMTTHzsSnHXJXzMIA9syxAPYs8j9Q0wfgZyYQhcbPnMbdWgXbiJKCWwU5smjZV0waFuj
         Changepassword.findOne({
             token,
         })

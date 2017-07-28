@@ -27,68 +27,72 @@ router.post('/', (req, res) => {
 
     // Check require fields
     if(typeof req.body.username == 'undefined'){
+        let msg = 'Missing the username fields';
         if(response === 'json'){
             res.json({
                 error: true,
-                msg: 'Missing the username fields',
+                msg: msg,
                 code: 'missing_require_fields',
             });
             return false;
         }else{
             res.render('auth/register', {
                 error: true,
-                message: 'Missing the username fields',
+                message: msg,
             });
             return false;
         }
     }
 
     if(typeof req.body.password == 'undefined'){
+        let msg = 'Missing the password fields';
         if(response === 'json'){
             res.json({
                 error: true,
-                msg: 'Missing the password fields',
+                msg: msg,
                 code: 'missing_require_fields',
             });
             return false;
         }else{
             res.render('auth/register', {
                 error: true,
-                message: 'Missing the password fields',
+                message: msg,
             });
             return false;
         }
     }
 
     if(typeof req.body.fullname == 'undefined'){
+        let msg = 'Missing the fullname fields';
         if(response === 'json'){
             res.json({
                 error: true,
-                msg: 'Missing the fullname fields',
+                msg: msg,
                 code: 'missing_require_fields',
             });
             return false;
         }else{
             res.render('auth/register', {
                 error: true,
-                message: 'Missing the fullname fields',
+                message: msg,
             });
             return false;
         }
     }
 
     if(typeof req.body.email == 'undefined'){
+        let msg = 'Missing the email fields';
         if(response === 'json'){
             res.json({
                 error: true,
-                msg: 'Missing the email fields',
+                msg: msg,
                 code: 'missing_require_fields',
             });
             return false;
         }else{
             res.render('auth/register', {
                 error: true,
-                message: 'Missing the email fields',
+                message: msg,
             });
             return false;
         }
@@ -99,17 +103,18 @@ router.post('/', (req, res) => {
         username: req.body.username,
     }).then(user => {
         if(user !== null){
+            let msg = 'Username is already taken';
             if(response === 'json'){
                 res.json({
                     error: true,
-                    msg: 'Username is already taken',
+                    msg: msg,
                     code: 'unauthorized_action',
                 });
                 return false;
             }else{
                 res.render('auth/register', {
                     error: true,
-                    message: 'Username is already taken'
+                    message: msg,
                 });
                 return false;
             }

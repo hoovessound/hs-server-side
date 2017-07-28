@@ -85,13 +85,6 @@ app.use(cookieSession({
 
 // Using GZIP
 app.use(compression());
-
-// https://www.sslforfree.com use case
-app.get('/.well-known/acme-challenge/:filename', function(req, res){
-    const filename = req.params.filename;
-    res.sendFile(path.join(`${__dirname}/../.well-known/acme-challenge/${filename}`));
-});
-
 app.use('/api/tracks', require('../API/home'));
 
 app.use('/api/me', require('../API/me'));

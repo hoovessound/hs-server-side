@@ -21,3 +21,9 @@
     cursor: pointer;
     display: inline-block;
 }
+
+#fullname input{
+    background: transparent;
+    border: none;
+    text-align: center;
+}

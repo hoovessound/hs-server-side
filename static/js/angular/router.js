@@ -29,6 +29,16 @@ angular.module('hsRoutes', ['ngRoute'])
                     return `/render/user/${params.username}`;
                 },
             })
+            .when(`/track/:username/:title`, {
+                templateUrl: function(params){
+                    return `/render/track/${params.username}/${params.title}`;
+                },
+            })
+            .when(`/track/:username/:title/edit`, {
+                templateUrl: function(params){
+                    return `/render/track/${params.username}/${params.title}/edit`;
+                },
+            })
 
             // .otherwise({
             //     redirectTo: '/home',

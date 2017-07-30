@@ -1,6 +1,6 @@
 var profilePicture = document.querySelector('#profilePicture .icon');
 var iconInput = document.querySelector('#profilePicture #iconInput');
-var fullname = document.querySelector('#fullname');
+var fullname = document.querySelector('#fullname input');
 
 profilePicture.addEventListener('click', e => {
     iconInput.click();
@@ -17,10 +17,9 @@ iconInput.addEventListener('change', e => {
     ajax.onload = function(){
         if(ajax.readyState === 4 && ajax.status === 200){
             var response = JSON.parse(ajax.response);
-            console.log(response)
             if(response.success){
                 iconInput.value = null;
-                window.open('/', '_self');
+                window.open('/home', '_self');
             }
         }
     }
@@ -44,7 +43,7 @@ function updateFullName(e) {
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.send(JSON.stringify({
         settings: {
-            full_name: fullname.textContent,
+            full_name: fullname.value,
         }
     }));
     fullname.blur();

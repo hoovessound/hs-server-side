@@ -23,7 +23,7 @@
         <div class="fa fa-heart fave <%=isFave%>"></div>
         <h1 id="title"><%=track.title%></h1>
         <a style="display: block;" href="<%=full_address%>/user/<%=track.author.username%>"><%=track.author.username%></a>
-
+        <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div><br>
         <a class="share btn btn-info">Widget</a>
         <input type="text" class="shareURL hide" value='<iframe src="<%=full_address%>/widget/<%=track._id%>"></iframe>' readonly>
 
@@ -61,11 +61,7 @@
         <%}%>
     </div>
     <script>
-        var oauthToken = "<%=token%>";
         var trackid = "<%=track._id%>";
-        var full_address = "<%=full_address%>"
-        var audio = new Audio();
-        audio.src = "<%=full_address%>/api/listen/<%=track._id%>?token=<%=token%>";
     </script>
     <script src="/static/js/comment.js"></script>
     <script src="/static/js/track.js"></script>

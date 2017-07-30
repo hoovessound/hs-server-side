@@ -2,24 +2,6 @@ var form = document.querySelector('#searchForm');
 var formInput = document.querySelector('#searchForm [name=query]');
 
 angular.module('hsSearch', ['ngRoute'])
-    // .config(function ($provide, $routeProvider) {
-    //     $provide.factory('$routeProvider', function () {
-    //         return $routeProvider;
-    //     });
-    // })
-    // .run(function ($routeProvider, $http) {
-    //     form.addEventListener('submit', e => {
-    //         e.preventDefault();
-    //         // Get the query
-    //         var query = formInput.value.trim();
-    //         if(query.length > 0){
-    //             if (history.pushState) {
-    //                 var newurl = window.location.protocol + "//" + window.location.host +  `/search/${query}`;
-    //                 window.history.pushState({path:newurl},'', newurl);
-    //             }
-    //         }
-    //     });
-    // })
     .controller('search', function ($scope,$location, $http) {
         form.addEventListener('submit', e => {
             e.preventDefault();

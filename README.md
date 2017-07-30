@@ -54,7 +54,7 @@ The default port will be `3000`
 You can also change the basic config settings via the Terminal
 
 1. Port
-  * `node src/index.js --port 3001`
+  * `node src/base.js --port 3001`
   
 # Native Dependencies
 1. Imagemagick

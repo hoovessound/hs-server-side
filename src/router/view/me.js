@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const rp = require('request-promise');
 const fullurl = require('fullurl');
-const Users = require('../../schema/Users');
-const Tracks = require('../../schema/Tracks');
+const Users = require('../../../schema/Users');
+const Tracks = require('../../../schema/Tracks');
 
 router.get('/', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
@@ -43,7 +43,7 @@ router.get('/', (req, res) => {
     }
 });
 
-router.get('/fave?', (req, res) => {
+router.get('/fave', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
         res.redirect('/api/auth/login?redirect=' + fullurl(req));

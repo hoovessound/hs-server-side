@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const rp = require('request-promise');
 const fullurl = require('fullurl');
-const Users = require('../../schema/Users');
-const Tracks = require('../../schema/Tracks');
+const Users = require('../../../schema/Users');
+const Tracks = require('../../../schema/Tracks');
 
-router.get('/?', (req, res) => {
+router.get('/:query?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
         res.redirect('/api/auth/login?redirect=' + fullurl(req));
     }else{
         const token = req.cookies['oauth-token'];
-        const query = req.query.query ? req.query.query.trim() : null;
+        const query = req.params.query ? req.params.query.trim() : null;
         Users.findOne({
             token: token,
         }).then(user => {

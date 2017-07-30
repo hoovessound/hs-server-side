@@ -7,10 +7,9 @@
     <title>HoovesSound | Search</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/search.css">
-    <%- include('includes/adsense')%>
+
 </head>
 <body>
-    <%- include('includes/nav')%>
     <div class="container">
         <h1>Search</h1>
         <%if(users){%>
@@ -39,10 +38,5 @@
             <%});%>
         <%}%>
     </div>
-    <script>
-        const $full_address = "<%=full_address%>";
-        const audio = new Audio();
-        var token = "<%=token%>";
-    </script>
 </body>
 </html>

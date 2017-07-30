@@ -2,7 +2,7 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="/static/css/nav.css">
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default" ng-controller="search">
     <div class="container-fluid">
         <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -16,7 +16,7 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="/">Home <span class="sr-only"></span></a></li>
+                <li><a href="/home">Home <span class="sr-only"></span></a></li>
             </ul>
             <ul class="nav navbar-nav">
                 <li><a href="/me/fave">Fave <span class="sr-only"></span></a></li>

@@ -1,0 +1,26 @@
+<div class="container">
+    <h1 class="title">Latest Tracks</h1>
+    <%if(tracks.length >= 1){%>
+    <div class="tracks">
+        <%tracks.forEach((track, index) => {%>
+        <div id="<%=track._id%>">
+            <img src="<%=track.coverImage%>" alt="" class="coverImage">
+            <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
+            <a href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+        </div>
+        <%});%>
+
+        <div id="getNewOne"></div>
+
+    </div>
+    <%}else{%>
+    <p>No one have ever upload an track yet, will ya?</p>
+    <%}%>
+    <script>
+        var offset = <%=offset%>
+        if(audio.paused){
+            audio.src = "<%=full_address%>/api/listen/<%=track._id%>?token<%=token%>";
+        }
+    </script>
+    <script src="/static/js/latestTracks.js"></script>
+</div>

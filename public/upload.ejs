@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>HoovesSound | Upload</title>
-    <%- include('includes/adsense')%>
 </head>
 <body>
-    <%- include('includes/nav')%>
     <div class="container">
         <%if(error){%>
             <div class="error">
@@ -31,9 +29,6 @@
             <button type="submit">Upload</button>
         </form>
     </div>
-    <script>
-        var $token = "<%=token%>";
-    </script>
     <script src="/static/js/upload.js"></script>
 </body>
 </html>

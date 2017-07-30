@@ -10,28 +10,13 @@
         <title>HoovesSound | <%=profile.fullName%></title>
     <%}%>
     <link rel="stylesheet" href="/static/css/profile.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <%- include('includes/adsense')%>
 </head>
 <body>
-    <%- include('includes/nav')%>
     <%if(profile === null){%>
         <div class="container">
             <p>There not such a user :/</p>
         </div>
     <%}else{%>
-
-        <%if(tracks.length >= 1){%>
-            <div class="masterPlayer">
-                <div class="playPuaseButton material-icons">play_arrow</div>
-                <a href="<%=full_address%>/track/<%=tracks[0].author.username%>/<%=tracks[0].title%>" class="title"><%=tracks[0].author.fullName%> - <%=tracks[0].title%></a>
-                <div class="volume">
-                    <i class="material-icons">volume_up</i>
-                    <input type="range" value="100" max="100" min="0" id="volumeBar">
-                </div>
-            </div>
-        <%}%>
 
         <div class="container">
             <div id="userInfo" style="background-image: url('<%=profile.banner%>')">
@@ -66,14 +51,11 @@
             <%}%>
         </div>
         <script>
-            const $full_address = "<%=full_address%>";
             <%if(tracks.length > 0){%>
-                const audio = new Audio();
-                audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>?token=<%=token%>";
+                if(audio.paused){
+                    audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>?token=<%=token%>";
+                }
             <%}%>
-        </script>
-        <script>
-            var token = "<%=token%>"
         </script>
         <script src="/static/js/profile.js"></script>
     <%}%>

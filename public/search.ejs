@@ -28,12 +28,6 @@
             <div id="<%=track._id%>">
                 <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
                 <a href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
-                <div class="player">
-                    <div class="timmer">
-                        <spam class="current"></spam>
-                        <spam class="total"></spam>
-                    </div>
-                </div>
             </div>
             <%});%>
         <%}%>

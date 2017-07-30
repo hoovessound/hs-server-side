@@ -1,5 +1,6 @@
 angular.module('hs', [
     'hsRoutes',
     'hsSearch',
-    'hsEditTracks'
+    'hsEditTracks',
+    // 'hsSearchLink',
 ]);

@@ -4,8 +4,10 @@ angular.module('hsRoutes', ['ngRoute'])
             .when('/', {
                 redirectTo: '/home',
             })
-            .when('/home', {
-                templateUrl: '/render/tracks',
+            .when('/home/:offset?', {
+                templateUrl: function ($params) {
+                    return `/render/tracks?offset=${ $params.offset ? $params.offset : 0}`;
+                },
             })
             .when('/me/fave', {
                 templateUrl: '/render/me/fave',

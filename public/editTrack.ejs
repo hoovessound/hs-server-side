@@ -18,7 +18,7 @@
     <%if(error){%>
         <p><%=error%></p>
     <%}else{%>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="trackEditForm" trackid="<%=track._id%>">
         <p>Title: <input type="text" name="title" value="<%=track.title%>"></p>
         <p>Description: <textarea name="description" id="description"><%=track.description%></textarea></p>
         <p>Cover Image: <input type="file" name="image"></p>
@@ -28,10 +28,9 @@
             <p>Private: <input type="checkbox" name="private" id="private"></p>
         <%}%>
         <img src="<%=track.coverImage%>" alt="" class="coverImage">
-        <button class="btn btn-success">Update</button>
+        <button class="btn btn-success" ng-controller="editTrack">Update</button>
     </form>
     <%}%>
 </div>
-<script src="/static/js/latestTracks.js"></script>
 </body>
 </html>

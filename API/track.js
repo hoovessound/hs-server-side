@@ -220,7 +220,6 @@ router.get('/fave/isfave/:id?', (req, res) => {
 });
 
 router.post('/edit/:id?', (req, res) => {
-    const full_address = req.protocol + "://" + req.headers.host;
     const token = req.body.token || req.headers.token || req.query.token;
     const id = req.params.id;
     if (typeof id === 'undefined') {
@@ -256,7 +255,7 @@ router.post('/edit/:id?', (req, res) => {
                     return false;
                 }else{
                     const form = formidable.IncomingForm({
-                        uploadDir: path.join(`${__dirname}/../../usersContent`),
+                        uploadDir: path.join(`${__dirname}/../usersContent`),
                     });
                     form.encoding = 'utf-8';
                     form.parse(req, (error, fields, files) => {
@@ -283,10 +282,9 @@ router.post('/edit/:id?', (req, res) => {
                                         const ext = path.extname(files.image.name);
                                         const newID = sha256(randomstring.generate(10));
                                         let fileID = newID + ext;
-                                        const coverImagePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
+                                        const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
                                         const gcsCoverImage = gcs.bucket('hs-cover-image');
                                         fsp.rename(files.image.path, coverImagePath).then(() => {
-
                                             // Resize the image first
                                             return easyimage.resize({
                                                 src: coverImagePath,

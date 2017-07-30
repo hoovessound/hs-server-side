@@ -107,7 +107,7 @@ router.get('/:username?/:title?/edit', (req, res) => {
             }
 
             if(req.params.username !== user.username){
-                res.redirect(`/track/${req.params.username}/${req.params.title}`);
+                res.send('<h1>You don\'t have access to that</h1>');
                 return false;
             }
 

@@ -2,16 +2,7 @@ var volumeBar = document.querySelector('#volumeBar');
 var faveButton = document.querySelector('.fave');
 var shareURL = document.querySelector('.shareURL');
 var shareButton = document.querySelector('.share');
-
-masterPlayPuaseButton.addEventListener('click', e => {
-    if(!audio.paused){
-        audio.pause();
-        masterPlayPuaseButton.innerHTML = 'play_arrow';
-    }else{
-        audio.play();
-        masterPlayPuaseButton.innerHTML = 'pause';
-    }
-});
+var playPauseButton = document.querySelector('.playPuaseButton');
 
 // volume bar control
 volumeBar.addEventListener('input', e => {

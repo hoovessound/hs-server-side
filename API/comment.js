@@ -19,6 +19,7 @@ router.post('/add', (req, res) => {
             return false;
         }else{
             // success
+            console.log(req.body)
             const comment = req.body.comment;
             const trackid = req.body.trackid;
 

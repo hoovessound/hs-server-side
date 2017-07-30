@@ -29,11 +29,6 @@ function playMusic(el){
     masterPlayPuaseButton.innerHTML = 'pause';
 }
 
-function homePlay() {
-    console.log('ahhh')
-    masterTitle.innerHTML = `Fuck you`;
-}
-
 masterPlayPuaseButton.addEventListener('click', e => {
     if(!audio.paused){
         audio.pause();

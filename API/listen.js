@@ -8,12 +8,10 @@ const request = require('request');
 
 router.get('/:id?', (req, res) => {
     const id = req.params.id;
-    const token = req.body.token || req.headers.token || req.query.token;
+    console.log(id)
     Tracks.findOne({
         _id: id,
     }).then(track => {
-        // Send back the autio file
-        const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);
         // Check if the file is extened or not
         if(track.file.extend){
             // Get the sound track from GCS
@@ -22,18 +20,9 @@ router.get('/:id?', (req, res) => {
                 'Transfer-Encoding': 'chunked',
             });
             request(track.file.location).pipe(res);
-            // https.get(track.file.location, (response) => {
-            //     let body = '';
-            //     response.on('data', function (chunk) {
-            //         res.write(chunk);
-            //         body += chunk;
-            //     });
-            //     response.on('end', () => {
-            //         res.send(body);
-            //     });
-            // });
-
         }else{
+            // Send back the autio file
+            const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);
             res.sendFile(trackPath);
         }
 

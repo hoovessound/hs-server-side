@@ -59,7 +59,7 @@ window.addEventListener('scroll', e => {
                     offset += 10;
                     var response = JSON.parse(ajax.response);
                     // Append the tracks into the DOM
-                    response.tracks.forEach(track => {
+                    response.tracks.forEach((track, index) => {
                         var html = `<div id="${track._id}">
                         <img src="${track.coverImage}" alt="" class="coverImage">
                         <div class="playPuaseButton material-icons" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" trackid="${track._id}" onclick="playMusic(this)">play_arrow</div>
@@ -67,9 +67,11 @@ window.addEventListener('scroll', e => {
                     </div>`;
                         tracksElement.innerHTML += html;
                         if (history.pushState) {
-                            var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?offset=${offset}`;
-                            window.history.pushState({path:newurl},'',newurl);
-                            ajaxing = false;
+                            if(index === 9){
+                                var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `/${offset}`;
+                                window.history.pushState({path:newurl},'',newurl);
+                                ajaxing = false;
+                            }
                         }
                     });
                 }

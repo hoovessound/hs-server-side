@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const rp = require('request-promise');
 const fullurl = require('fullurl');
-const Tracks = require('../../schema/Tracks');
+const Tracks = require('../../../schema/Tracks');
 
 router.get('/:id?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;

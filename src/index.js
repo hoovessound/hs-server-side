@@ -12,6 +12,7 @@ const cli = require('commander');
 const color = require('cli-color');
 const compression = require('compression');
 const helmet = require('helmet');
+const morgan = require('morgan');
 
 cli
     .version('1.0.0')
@@ -83,51 +84,16 @@ app.use(cookieSession({
     maxAge: 365 * 24 * 60 * 60,
 }));
 
-// Using GZIP
-app.use(compression());
+// Productions only settings
+if(process.env.NODE_ENV === 'production'){
+    // Using GZIP
+    app.use(compression());
+}else{
+    // using the morgan dev server log
+    app.use(morgan('dev'));
+}
 
-// https://www.sslforfree.com use case
-app.get('/.well-known/acme-challenge/:filename', function(req, res){
-    const filename = req.params.filename;
-    res.sendFile(path.join(`${__dirname}/../.well-known/acme-challenge/${filename}`));
-});
+// Using the API
+app.use('/api', require('./router/API/base'));
 
-app.use('/api/tracks', require('../API/home'));
-
-app.use('/api/me', require('../API/me'));
-
-app.use('/api/auth/register', require('../API/auth/register'));
-
-app.use('/api/auth/login', require('../API/auth/login'));
-
-app.use('/api/auth/changepassword', require('../API/auth/changepassword'));
-
-app.use('/api/upload', require('../API/upload'));
-
-app.use('/api/listen', require('../API/listen'));
-
-app.use('/api/user', require('../API/user'));
-
-app.use('/api/track', require('../API/track'));
-
-app.use('/api/search', require('../API/search'));
-
-app.use('/api/settings', require('../API/settings'));
-
-app.use('/api/comment', require('../API/comment'));
-
-app.use('/track', require('./router/track'));
-
-app.use('/upload', require('./router/upload'));
-
-app.use('/me', require('./router/me'));
-
-app.use('/user', require('./router/user'));
-
-app.use('/search', require('./router/search'));
-
-app.use('/settings', require('./router/settings'));
-
-app.use('/widget', require('./router/widget'));
-
-app.use('/', require('./router/latesetTracks'));
+app.use('/', require('./router/view/base'));

@@ -3,11 +3,9 @@ const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
 
-router.get('/', (req, res) => {
-    const full_address = req.protocol + "://" + req.headers.host;
+router.post('/:query?', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
-    const offset = parseInt(req.query.offset) || 0;
-    const query = req.query.query;
+    const query = req.params.query || req.query.query;
     Users.find({
         token: token,
     })
@@ -38,7 +36,6 @@ router.get('/', (req, res) => {
                     msg: 'Too less query keyword',
                     code: 'unexpected_result',
                 });
-                return false;
                 return false;
             }
 

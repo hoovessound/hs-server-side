@@ -3,8 +3,8 @@ const router = express.Router();
 const Tracks = require('../schema/Tracks');
 const path = require('path');
 const fs = require('fs');
-const request = require('request');
 const https = require('https');
+const request = require('request');
 
 router.get('/:id?', (req, res) => {
     const id = req.params.id;
@@ -17,25 +17,26 @@ router.get('/:id?', (req, res) => {
         // Check if the file is extened or not
         if(track.file.extend){
             // Get the sound track from GCS
-
-            if(token){
-                request(track.file.location).pipe(res);
-            }else{
-                // Send the stream version
-                res.set({
-                    'Transfer-Encoding': 'chunked',
-                });
-                https.get(track.file.location, (response) => {
-                    response.on('data', function (chunk) {
-                        res.write(chunk);
-                    });
-                });
-            }
+            // res.redirect(track.file.location);
+            res.set({
+                'Transfer-Encoding': 'chunked',
+            });
+            request(track.file.location).pipe(res);
+            // https.get(track.file.location, (response) => {
+            //     let body = '';
+            //     response.on('data', function (chunk) {
+            //         res.write(chunk);
+            //         body += chunk;
+            //     });
+            //     response.on('end', () => {
+            //         res.send(body);
+            //     });
+            // });
 
         }else{
             res.sendFile(trackPath);
         }
-        
+
     })
     .catch(error => {
         if(error.message.includes('Cast to ObjectId failed for value')){

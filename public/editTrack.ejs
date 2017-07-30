@@ -10,11 +10,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/editTrack.css">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <%- include('includes/adsense')%>
 </head>
 <body>
-<%- include('includes/nav')%>
-
 <div class="container">
     <h1>Edit Track</h1>
     <hr>
@@ -35,10 +32,6 @@
     </form>
     <%}%>
 </div>
-<script>
-    const $token = "<%=token%>";
-    const $full_address = "<%=full_address%>";
-</script>
 <script src="/static/js/latestTracks.js"></script>
 </body>
 </html>

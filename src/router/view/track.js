@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const rp = require('request-promise');
 const fullurl = require('fullurl');
-const Users = require('../../schema/Users');
-const Tracks = require('../../schema/Tracks');
+const Users = require('../../../schema/Users');
+const Tracks = require('../../../schema/Tracks');
 const formidable = require('formidable');
 const path = require('path');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
-    keyFilename: require('../../src/index').gcsPath,
+    keyFilename: require('../../index').gcsPath,
 });
 const sha256 = require('sha256');
 const randomstring = require('randomstring');

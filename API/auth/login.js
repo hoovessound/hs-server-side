@@ -29,34 +29,36 @@ router.post('/', (req, res) => {
 
     // find the username
     if(typeof req.body.username === 'undefined'){
+        let msg = 'Please enter the username';
         if(response === 'json'){
             res.json({
                 error: true,
-                message: 'Please enter the username',
+                message: msg,
                 code: 'unauthorized_action',
             });
             return false;
         }else{
             res.render('auth/login', {
                 error: true,
-                message: 'Please enter the username'
+                message: msg,
             });
             return false;
         }
     }
 
     if(typeof req.body.password === 'undefined'){
+        let msg = 'Please enter the password';
         if(response === 'json'){
             res.json({
                 error: true,
-                message: 'Please enter the password',
+                message: msg,
                 code: 'missing_require_fields',
             });
             return false;
         }else{
             res.render('auth/login', {
                 error: true,
-                message: 'Please enter the password',
+                message: msg,
                 code: 'missing_require_fields',
             });
             return false;
@@ -69,17 +71,18 @@ router.post('/', (req, res) => {
     })
     .then(user => {
         if(user === null){
+            let msg = 'Incorrect username or password';
             if(response === 'json'){
                 res.json({
                     error: true,
-                    message: 'Incorrect username or password',
+                    message: msg,
                     code: 'unauthorized_action',
                 });
                 return false;
             }else{
                 res.render('auth/login', {
                     error: true,
-                    message: 'Incorrect username or password',
+                    message: msg,
                     code: 'unauthorized_action',
                 });
                 return false;
@@ -112,17 +115,18 @@ router.post('/', (req, res) => {
 
                 }else{
                     // Incorrect username or password
+                    let msg = 'Incorrect username or password';
                     if(response === 'json'){
                         res.json({
                             error: true,
-                            message: 'Incorrect username or password',
+                            message: msg,
                             code: 'unauthorized_action',
                         });
                         return false;
                     }else{
                         res.render('auth/login', {
                             error: true,
-                            message: 'Incorrect username or password',
+                            message: msg,
                         });
                     }
                 }

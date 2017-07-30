@@ -1,7 +1,6 @@
-const profilePicture = document.querySelector('#profilePicture .icon');
-const iconInput = document.querySelector('#profilePicture #iconInput');
-const fullname = document.querySelector('#fullname');
-const ajax = new XMLHttpRequest();
+var profilePicture = document.querySelector('#profilePicture .icon');
+var iconInput = document.querySelector('#profilePicture #iconInput');
+var fullname = document.querySelector('#fullname');
 
 profilePicture.addEventListener('click', e => {
     iconInput.click();
@@ -9,15 +8,15 @@ profilePicture.addEventListener('click', e => {
 
 iconInput.addEventListener('change', e => {
     // Upload the pictire
-    const file = e.target.files[0];
-    const form = new FormData();
+    var file = e.target.files[0];
+    var form = new FormData();
     form.append('image', file);
     ajax.open('POST', '/api/settings/profilepicture/upload');
     ajax.setRequestHeader('token', token);
     ajax.send(form);
     ajax.onload = function(){
         if(ajax.readyState === 4 && ajax.status === 200){
-            const response = JSON.parse(ajax.response);
+            var response = JSON.parse(ajax.response);
             console.log(response)
             if(response.success){
                 iconInput.value = null;

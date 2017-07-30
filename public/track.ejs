@@ -13,29 +13,14 @@
     <%}else{%>
         <title>HoovesSound | No Tracks :/</title>
     <%}%>
-    <%- include('includes/adsense')%>
 </head>
 <body>
-    <%- include('includes/nav')%>
-
-    <%if(track !== null){%>
-    <div class="masterPlayer">
-        <div class="playPuaseButton material-icons">play_arrow</div>
-        <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" class="title"><%=track.author.fullName%> - <%=track.title%></a>
-        <div class="fa fa-heart fave <%=isFave%>"></div>
-        <div class="volume">
-            <i class="material-icons">volume_up</i>
-            <input type="range" value="100" max="100" id="volumeBar">
-        </div>
-    </div>
-    <%}%>
-
     <div class="container">
         <%if(track !== null){%>
-
             <%if(track.author.username === loginUser.username){%>
-            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>/edit" class="btn btn-default">Edit</a>
+                <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>/edit" class="btn btn-default">Edit</a>
             <%}%>
+        <div class="fa fa-heart fave <%=isFave%>"></div>
         <h1 id="title"><%=track.title%></h1>
         <a style="display: block;" href="<%=full_address%>/user/<%=track.author.username%>"><%=track.author.username%></a>
 
@@ -84,6 +69,5 @@
     </script>
     <script src="/static/js/comment.js"></script>
     <script src="/static/js/track.js"></script>
-    <script src="/static/js/hotkey.js"></script>
 </body>
 </html>

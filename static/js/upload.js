@@ -1,10 +1,9 @@
-const fileInput = document.querySelector('#file');
-const coverImage = document.querySelector('#image');
-const uploadForm = document.querySelector('#uploadForm');
-const progressBar = document.querySelector('#progress');
-const errorMessgae = document.querySelector('.error');
-const title = document.querySelector('#title');
-const ajax = new XMLHttpRequest();
+var fileInput = document.querySelector('#file');
+var coverImage = document.querySelector('#image');
+var uploadForm = document.querySelector('#uploadForm');
+var progressBar = document.querySelector('#progress');
+var errorMessgae = document.querySelector('.error');
+var title = document.querySelector('#title');
 
 fileInput.addEventListener('change', e => {
     const file = e.target.files[0];
@@ -21,7 +20,6 @@ uploadForm.addEventListener('submit', e => {
     e.preventDefault();
     if(fileInput.files[0]){
         const file = fileInput.files[0];
-        const ajax = new XMLHttpRequest();
         const form = new FormData();
         ajax.open('POST', '/api/upload');
         form.append('audio', file);

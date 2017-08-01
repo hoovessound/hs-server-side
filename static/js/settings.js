@@ -20,6 +20,8 @@ iconInput.addEventListener('change', e => {
             if(response.success){
                 iconInput.value = null;
                 window.open('/home', '_self');
+            }else{
+                document.querySelector('.error').innerHTML = response.msg;
             }
         }
     }

@@ -68,7 +68,7 @@ router.post('/', (req, res) => {
                 _id: user._id,
             }, user)
             .then(() => {
-                // Reutrn a new user object
+                // Return a new user object
                 return Users.findOne({
                     _id: user._id
                 }, {
@@ -154,6 +154,17 @@ router.post('/profilepicture/upload', (req, res) => {
                         });
                         return false;
                     }
+
+                    // Check if the file is an GIF file
+                    if(file.type.includes('gif')){
+                        res.json({
+                            error: true,
+                            msg: 'GIF image is not supported',
+                            code: 'not_valid_file_type',
+                        });
+                        return false;
+                    }
+
                     const ext = path.extname(file.name);
                     // Remvoe the ext first
                     file.name = file.name.replace(ext, '');

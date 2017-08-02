@@ -2,11 +2,11 @@
     <h1 class="title">Latest Tracks</h1>
     <%if(tracks.length >= 1){%>
     <div class="tracks">
-        <%tracks.forEach((track, index) => {%>
+        <%tracks.forEach((track) => {%>
         <div id="<%=track._id%>">
             <img src="<%=track.coverImage%>" alt="" class="coverImage">
             <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
-            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
         </div>
         <%});%>
 

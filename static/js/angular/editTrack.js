@@ -13,7 +13,6 @@ angular.module('hsEditTracks', ['ngRoute'])
             ajax.setRequestHeader('token', token);
             ajax.send(formData);
             ajax.onload = function () {
-                var response = JSON.parse(ajax.response).track;
                 $location.url(`/track/${response.author.username}/${response.title}`);
                 $http({
                     method: 'GET',

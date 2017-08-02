@@ -8,17 +8,12 @@ const request = require('request');
 
 router.get('/:id?', (req, res) => {
     const id = req.params.id;
-    console.log(id)
     Tracks.findOne({
         _id: id,
     }).then(track => {
         // Check if the file is extened or not
         if(track.file.extend){
             // Get the sound track from GCS
-            // res.redirect(track.file.location);
-            res.set({
-                'Transfer-Encoding': 'chunked',
-            });
             request(track.file.location).pipe(res);
         }else{
             // Send back the autio file

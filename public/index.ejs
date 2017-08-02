@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HoovesSound | Music for bronies music for everyone</title>
+    <title>HoovesSound | Music For Bronies Music For Everyone</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -26,20 +26,23 @@
     <script src="/static/js/angular/editTrack.js"></script>
     <script src="/static/js/angular/homeTrackLink.js"></script>
     <script src="/static/js/angular/toEditTrack.js"></script>
+    <script src="/static/js/angular/masterPlayerTitle.js"></script>
     <%- include('includes/adsense')%>
 </head>
 <body>
     <div id="app" ng-app="hs">
         <%- include('includes/nav')%>
         <div id="view" ng-view></div>
-    </div>
-    <div class="masterPlayer">
-        <div class="playPuaseButton material-icons">play_arrow</div>
-        <a class="title" href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
-        <div class="volume">
-            <i class="material-icons">volume_up</i>
-            <input type="range" value="100" max="100" id="volumeBar">
+
+        <div class="masterPlayer">
+            <div class="playPuaseButton material-icons">play_arrow</div>
+            <a username="<%=track.author.username%>" title="<%=track.title%>" ng-click="masterPlayerTitle($event)" ng-controller="masterPlayerTitle" class="title" href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+            <div class="volume">
+                <i class="material-icons">volume_up</i>
+                <input type="range" value="100" max="100" id="volumeBar">
+            </div>
         </div>
+
     </div>
     <script src="/static/js/hotkey.js"></script>
     <script src="/static/js/latestTracks.js"></script>

@@ -4,4 +4,5 @@ angular.module('hs', [
     'hsEditTracks',
     'homeTrackLink',
     'toEditLink',
+    'masterPlayerTitle',
 ]);

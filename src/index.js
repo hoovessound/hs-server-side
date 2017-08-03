@@ -1,13 +1,15 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const http = require('http');
 const app = express();
-const bodyParser = require('body-parser');
+const server = http.createServer(app);
+const io = require('socket.io').listen(server);
 const path = require('path');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const randomstring = require('randomstring');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const fsp = require('fs-promise');
-const fullurl = require('fullurl');
 const cli = require('commander');
 const color = require('cli-color');
 const compression = require('compression');
@@ -51,7 +53,7 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
     console.log(error);
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`HoovesSound are running on port ${color.yellow(port)}`);
     // connect to the db
     mongoose.connect(db.url, {
@@ -92,6 +94,12 @@ if(process.env.NODE_ENV === 'production'){
     // using the morgan dev server log
     app.use(morgan('dev'));
 }
+
+// Using Socket.io
+app.use((req, res, next) => {
+    res.io = io;
+    next();
+});
 
 // Using the API
 app.use('/api', require('./router/API/base'));

@@ -11,12 +11,15 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         var full_address = "<%=full_address%>";
         var $full_address = "<%=full_address%>";
         var token = "<%=token%>";
         var $token = "<%=token%>";
         var audio = new Audio();
+        var notificationInit = false;
+        var io = io();
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.js"></script>
@@ -46,5 +49,6 @@
     </div>
     <script src="/static/js/hotkey.js"></script>
     <script src="/static/js/latestTracks.js"></script>
+    <script src="/static/js/notification.js"></script>
 </body>
 </html>

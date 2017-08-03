@@ -16,8 +16,6 @@ router.use('/render/search', require('./search'));
 
 router.use('/render/settings', require('./settings'));
 
-router.use('/render/widget', require('./widget'));
-
 router.use('/render/tracks', require('./latesetTracks'));
 
 router.get('*', (req, res) => {

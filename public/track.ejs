@@ -25,7 +25,7 @@
         <a style="display: block;" href="<%=full_address%>/user/<%=track.author.username%>"><%=track.author.username%></a>
         <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div><br>
         <a class="share btn btn-info">Widget</a>
-        <input type="text" class="shareURL hide" value='<iframe src="<%=full_address%>/widget/<%=track._id%>"></iframe>' readonly>
+        <input type="text" class="shareURL hide" value='<iframe src="<%=full_address%>/api/widget/<%=track._id%>"></iframe>' readonly>
 
         <img src="<%=track.coverImage%>" alt="" class="coverImage">
 

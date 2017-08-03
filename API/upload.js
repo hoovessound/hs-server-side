@@ -10,6 +10,7 @@ const fs = require('fs');
 const request = require('request');
 const fullurl = require('fullurl');
 const fsp = require('fs-promise');
+const rp = require('request-promise');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
@@ -200,6 +201,21 @@ router.post('/', (req, res) => {
                                                     }, this.track).then(() => {
                                                         // Remove the lcoal track from the disk
                                                         fs.unlinkSync(filePath);
+                                                        // Send a notification to the user
+                                                        return rp({
+                                                            url: `${full_address}/api/notification`,
+                                                            headers: {
+                                                                token,
+                                                            },
+                                                            method: 'post',
+                                                            json: true,
+                                                            body: {
+                                                                to: user._id,
+                                                                title: 'Track Is Uploaded!',
+                                                                body: `${title} Is Uploaded`,
+                                                                link: `${full_address}/api/notification`,
+                                                            }
+                                                        })
                                                     })
                                                 })
                                         })

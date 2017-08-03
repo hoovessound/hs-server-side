@@ -245,6 +245,21 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                     }, track).then(() => {
                                         // Finish
                                         res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
+                                        // Send a notification to the user
+                                        return rp({
+                                            url: `${full_address}/api/notification`,
+                                            headers: {
+                                                token,
+                                            },
+                                            method: 'post',
+                                            json: true,
+                                            body: {
+                                                to: user._id,
+                                                title: 'Track Is Edited!',
+                                                body: `${track.title} Is Edited`,
+                                                link: `${full_address}/track/${req.params.username}/${track.title}`,
+                                            }
+                                        })
                                     });
                                 }
 
@@ -275,6 +290,20 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                 }else{
                                     // Didn't pass anything at all :/
                                     res.redirect(`/track/${req.params.username}/${track.title}?updating=true`);
+                                    return rp({
+                                        url: `${full_address}/api/notification`,
+                                        headers: {
+                                            token,
+                                        },
+                                        method: 'post',
+                                        json: true,
+                                        body: {
+                                            to: user._id,
+                                            title: 'Track Is Edited I Guess :/',
+                                            body: `Looks Like You Didn\'t Change A Bit Yet`,
+                                            link: `${full_address}/track/${req.params.username}/${track.title}`,
+                                        }
+                                    })
                                 }
                             }
                         }

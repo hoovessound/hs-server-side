@@ -14,6 +14,7 @@ const sha256 = require('sha256');
 const randomstring = require('randomstring');
 const fsp = require('fs-promise');
 const easyimage = require('easyimage');
+const request = require('request');
 
 router.get('/:username?/:title?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
@@ -222,6 +223,7 @@ router.get('/fave/isfave/:id?', (req, res) => {
 router.post('/edit/:id?', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
     const id = req.params.id;
+    const full_address = req.protocol + "://" + req.headers.host;
     if (typeof id === 'undefined') {
         res.json({
             error: true,

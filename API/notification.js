@@ -118,4 +118,64 @@ router.post('/', (req, res) => {
     });
 });
 
+router.post('/remove', (req, res) => {
+    const token = req.body.token || req.headers.token || req.query.token;
+    const id = req.query.id;
+    Users.findOne({
+        token: token,
+    })
+    .then(user => {
+        if (user === null) {
+            res.json({
+                error: true,
+                msg: 'Can not find your token',
+                code: 'token_not_found',
+            });
+            return false;
+        }else{
+            // Search for that user
+            const id = req.body.id;
+            let findMsg = false;
+            let index;
+            user.notification.forEach((msg, i) => {
+                this.msg = msg;
+                findMsg = true;
+                index = i;
+            });
+            if(!findMsg){
+                res.json({
+                    error: true,
+                    msg: 'Can\'t not that user id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else {
+                // Remove the message from the user's notification stack
+                user.notification.splice(index, 1);
+                return Users.update({
+                    _id: user._id,
+                }, user)
+                .then(() => {
+                    res.json({
+                        status: 'removed',
+                        id,
+                    });
+                })
+            }
+        }
+    })
+    .catch((error) => {
+        if(error.message.includes('Cast to ObjectId failed for value')){
+            res.json({
+                error: true,
+                msg: 'Can\'t not that user id',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            console.log(error)
+        }
+    });
+});
+
 module.exports = router;

@@ -14,7 +14,7 @@ volumeBar.addEventListener('input', e => {
 faveButton.addEventListener('click', e => {
     var el = e.target;
     ajax.open('POST', `/api/track/fave/${trackid}`);
-    ajax.setRequestHeader('token', oauthToken);
+    ajax.setRequestHeader('token', token);
     ajax.send();
     ajax.onload = function () {
         if(ajax.status === 200 && ajax.readyState === 4){

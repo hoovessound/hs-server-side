@@ -14,7 +14,32 @@ io.on('notification:new', function (payload) {
 <a href="${payload.link || null}">
     <spam class="body">${payload.body}</spam>
 </a>
+<div class="removeMessage material-icons" payloadId="${payload.id}" onclick="removePayload(event);">delete</div>
 </div>`;
             newNote.innerHTML += payloadHTML;
         }
+
 });
+
+function removePayload(e) {
+    e.preventDefault();
+    var target = e.target;
+    var id = target.getAttribute('payloadId');
+    ajax.open('POST', `${full_address}/api/notification/remove`);
+    ajax.setRequestHeader('Content-Type', 'application/json');
+    ajax.setRequestHeader('token', token);
+    ajax.send(JSON.stringify({
+        id,
+    }));
+    ajax.onload = function () {
+        if(ajax.status === 200 && ajax.readyState === 4){
+            var response = JSON.parse(ajax.response);
+            // Remove the element from eh DOM
+            function remove(id) {
+                var elem = document.getElementById(id);
+                return elem.parentNode.removeChild(elem);
+            }
+            remove(response.id)
+        }
+    }
+}

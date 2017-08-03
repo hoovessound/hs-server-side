@@ -163,6 +163,7 @@ router.post('/', (req, res) => {
                                         uploadDate: new Date(),
                                         coverImage,
                                         description,
+                                        private: true,
                                     }).save().then(track => {
                                         // Save the track id into the user object
                                         user.tracks.push(track._id);
@@ -176,6 +177,20 @@ router.post('/', (req, res) => {
                                                 track: newResponse,
                                                 url: full_address + `/track/${user.username}/${title}`,
                                             });
+                                            return rp({
+                                                url: `${full_address}/api/notification`,
+                                                headers: {
+                                                    token,
+                                                },
+                                                method: 'post',
+                                                json: true,
+                                                body: {
+                                                    to: user._id,
+                                                    title: 'Your Track Is Been Processing',
+                                                    body: `${title} Is Been Processing, And Ready To Be Publish!`,
+                                                    link: `${full_address}/track/${user.username}/${title}`,
+                                                }
+                                            })
                                         });
                                     })
                                     .catch(error => {
@@ -213,7 +228,7 @@ router.post('/', (req, res) => {
                                                                 to: user._id,
                                                                 title: 'Track Is Uploaded!',
                                                                 body: `${title} Is Uploaded`,
-                                                                link: `${full_address}/api/notification`,
+                                                                link: `${full_address}/track/${user.username}/${title}`,
                                                             }
                                                         })
                                                     })

@@ -91,17 +91,17 @@ router.post('/', (req, res) => {
                                 height: 500,
                                 ignoreAspectRatio: true,
                             }).then(processedImage => {
-                                return gcsCoverImage.upload(coverImagePath).then(file => {
-                                    file = file[0];
-                                    return file.getSignedUrl({
-                                        action: 'read',
-                                        expires: '03-09-2491',
-                                    }).then(url => {
-                                        coverImage = url[0];
-                                        fsp.unlinkSync(coverImagePath);
-                                        uploadAudio();
-                                    })
-                                })
+                                // return gcsCoverImage.upload(coverImagePath).then(file => {
+                                //     file = file[0];
+                                //     return file.getSignedUrl({
+                                //         action: 'read',
+                                //         expires: '03-09-2491',
+                                //     }).then(url => {
+                                //         coverImage = url[0];
+                                //         fsp.unlinkSync(coverImagePath);
+                                //         uploadAudio();
+                                //     })
+                                // })
                             });
                         })
                         .catch(error => {
@@ -163,6 +163,7 @@ router.post('/', (req, res) => {
                                         uploadDate: new Date(),
                                         coverImage,
                                         description,
+                                        private: true,
                                     }).save().then(track => {
                                         // Save the track id into the user object
                                         user.tracks.push(track._id);
@@ -176,6 +177,20 @@ router.post('/', (req, res) => {
                                                 track: newResponse,
                                                 url: full_address + `/track/${user.username}/${title}`,
                                             });
+                                            return rp({
+                                                url: `${full_address}/api/notification`,
+                                                headers: {
+                                                    token,
+                                                },
+                                                method: 'post',
+                                                json: true,
+                                                body: {
+                                                    to: user._id,
+                                                    title: 'Your Track Is Been Processing',
+                                                    body: `${title} Is Been Processing, And Ready To Be Publish!`,
+                                                    link: `${full_address}/track/${user.username}/${title}`,
+                                                }
+                                            })
                                         });
                                     })
                                     .catch(error => {
@@ -183,45 +198,45 @@ router.post('/', (req, res) => {
                                     });
 
                                     // Upload the file to Google Cloud Storage
-                                    const gcsTracks = gcs.bucket('hs-track');
-                                    gcsTracks.upload(filePath)
-                                        .then(file => {
-                                            file = file[0];
-                                            // Get the download url
-                                            return file.getSignedUrl({
-                                                action: 'read',
-                                                expires: '03-09-2491',
-                                            })
-                                                .then(url => {
-                                                    url = url[0];
-                                                    this.track.file.location = url;
-                                                    this.track.file.extend = true;
-                                                    Tracks.update({
-                                                        _id: this.track._id
-                                                    }, this.track).then(() => {
-                                                        // Remove the lcoal track from the disk
-                                                        fs.unlinkSync(filePath);
-                                                        // Send a notification to the user
-                                                        return rp({
-                                                            url: `${full_address}/api/notification`,
-                                                            headers: {
-                                                                token,
-                                                            },
-                                                            method: 'post',
-                                                            json: true,
-                                                            body: {
-                                                                to: user._id,
-                                                                title: 'Track Is Uploaded!',
-                                                                body: `${title} Is Uploaded`,
-                                                                link: `${full_address}/api/notification`,
-                                                            }
-                                                        })
-                                                    })
-                                                })
-                                        })
-                                        .catch(error => {
-                                            console.log(error);
-                                        });
+                                    // const gcsTracks = gcs.bucket('hs-track');
+                                    // gcsTracks.upload(filePath)
+                                    //     .then(file => {
+                                    //         file = file[0];
+                                    //         // Get the download url
+                                    //         return file.getSignedUrl({
+                                    //             action: 'read',
+                                    //             expires: '03-09-2491',
+                                    //         })
+                                    //             .then(url => {
+                                    //                 url = url[0];
+                                    //                 this.track.file.location = url;
+                                    //                 this.track.file.extend = true;
+                                    //                 Tracks.update({
+                                    //                     _id: this.track._id
+                                    //                 }, this.track).then(() => {
+                                    //                     // Remove the lcoal track from the disk
+                                    //                     fs.unlinkSync(filePath);
+                                    //                     // Send a notification to the user
+                                    //                     return rp({
+                                    //                         url: `${full_address}/api/notification`,
+                                    //                         headers: {
+                                    //                             token,
+                                    //                         },
+                                    //                         method: 'post',
+                                    //                         json: true,
+                                    //                         body: {
+                                    //                             to: user._id,
+                                    //                             title: 'Track Is Uploaded!',
+                                    //                             body: `${title} Is Uploaded`,
+                                    //                             link: `${full_address}/api/notification`,
+                                    //                         }
+                                    //                     })
+                                    //                 })
+                                    //             })
+                                    //     })
+                                    //     .catch(error => {
+                                    //         console.log(error);
+                                    //     });
                                 }
                             });
                         });

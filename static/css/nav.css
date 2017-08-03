@@ -3,3 +3,11 @@
     border-radius: 50%;
     margin-left: 1em;
 }
+
+.notificationButton{
+    cursor: pointer;
+}
+
+.notificationButton.raining{
+    background: skyblue;
+}

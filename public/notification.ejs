@@ -1,0 +1,42 @@
+<script src="/socket.io/socket.io.js"></script>
+<div id="notification">
+    <div id="newNote"></div>
+    <%notification.forEach(message => {%>
+        <div id="<%=message.id%>" class="payload">
+            <%if(message.icon){%>
+            <img src="<%=message.icon%>" class="icon">
+            <%}%>
+
+            <%if(message.title){%>
+            <p class="title"><%=message.title%></p>
+            <%}%>
+
+            <%if(message.link){%>
+            <a href="<%=message.link%>">
+                <spam class="body"><%=message.body%></spam>
+            </a>
+            <%}else{%>
+            <spam class="body"><%=message.body%></spam>
+            <%}%>
+        </div>
+    <%})%>
+</div>
+
+<style>
+    .icon{
+        width: 3em;
+        height: 3em;
+        border-radius: 50%;
+    }
+    .title{
+        display: inline-block;
+    }
+    .body, .link{
+        display: block;
+    }
+    .payload{
+        backgroudn: #FFF;
+        box-shadow: rgba(0,0,0, 0.2) 1px 5px 5px;
+        padding: 0.5em;
+    }
+</style>

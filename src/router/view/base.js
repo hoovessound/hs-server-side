@@ -18,6 +18,8 @@ router.use('/render/settings', require('./settings'));
 
 router.use('/render/tracks', require('./latesetTracks'));
 
+router.use('/render/notification', require('./notification'));
+
 router.get('*', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const token = req.cookies['oauth-token'];

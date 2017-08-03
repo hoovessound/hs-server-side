@@ -41,6 +41,9 @@ angular.module('hsRoutes', ['ngRoute'])
                     return `/render/track/${params.username}/${params.title}/edit`;
                 },
             })
+            .when(`/notification`, {
+                templateUrl: '/render/notification',
+            })
 
             // .otherwise({
             //     redirectTo: '/home',

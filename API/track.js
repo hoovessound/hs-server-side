@@ -74,6 +74,7 @@ router.get('/:username?/:title?', (req, res) => {
 router.post('/fave/:id?', (req, res) => {
     const id = req.params.id;
     const token = req.body.token || req.headers.token || req.query.token;
+    const full_address = req.protocol + "://" + req.headers.host;
     let findFave = false;
     if (typeof id === 'undefined') {
         res.json({
@@ -122,6 +123,21 @@ router.post('/fave/:id?', (req, res) => {
                 } else {
                     user.fave.push(track._id);
                     status = 'added';
+                    request({
+                        url: `${full_address}/api/notification`,
+                        headers: {
+                            token,
+                        },
+                        method: 'post',
+                        json: true,
+                        body: {
+                            to: user._id,
+                            title: 'Someone Has Liked Your Track',
+                            body: `${user.username} Has Favorited Your Track`,
+                            link: `${full_address}/track/${user.username}/${track.title}`,
+                            icon: track.coverImage,
+                        }
+                    })
                 }
                 return Users.update({
                     _id: this.user._id,

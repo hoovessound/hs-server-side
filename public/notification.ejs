@@ -18,6 +18,8 @@
             <%}else{%>
             <spam class="body"><%=message.body%></spam>
             <%}%>
+
+            <div class="removeMessage material-icons" payloadId="<%=message.id%>" onclick="removePayload(event)">delete</div>
         </div>
     <%})%>
 </div>
@@ -38,5 +40,12 @@
         backgroudn: #FFF;
         box-shadow: rgba(0,0,0, 0.2) 1px 5px 5px;
         padding: 0.5em;
+    }
+    .removeMessage{
+        margin-top: 0.1em;
+        cursor: pointer;
+        background: #ff5b27;
+        padding: 0.1em 0.3em;
+        border-radius: 5px;
     }
 </style>

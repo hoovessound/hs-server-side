@@ -25,4 +25,6 @@ router.use('/settings', require('../../../API/settings'));
 
 router.use('/comment', require('../../../API/comment'));
 
+router.use('/widget', require('./../../../API/widget'));
+
 module.exports = router;

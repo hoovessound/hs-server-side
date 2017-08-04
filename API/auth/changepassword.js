@@ -6,7 +6,7 @@ const Changepassword = require('../../schema/Changepassword');
 const nodemailer = require('nodemailer');
 const randomstring = require('randomstring');
 const mg = require('nodemailer-mailgun-transport');
-const authFile = require('../../src/db');
+const authFile = require('../../src/index');
 
 router.get('/', (req, res) => {
     const token = req.query.token;

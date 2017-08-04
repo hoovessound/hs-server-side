@@ -15,11 +15,51 @@ const color = require('cli-color');
 const compression = require('compression');
 const helmet = require('helmet');
 const morgan = require('morgan');
-
+let dbUrl;
 cli
     .version('1.0.0')
     .option('--port [number]', 'The port that HoovesSound will running on')
     .parse(process.argv);
+
+// Settings up MongoDB
+if(process.env.DB){
+    module.exports.db = {
+        url: process.env.DB,
+    }
+    console.log(`Using DB: ${color.yellow(process.env.DB)}`)
+}else{
+    console.log(`Please set up the  ${color.yellow('$DB')} environmental variable`);
+    process.exit();
+}
+
+// Settings up Google Cloud Platform
+if(process.env.GCS_AUTH){
+    const gcsAuth = JSON.parse(process.env.GCS_AUTH);
+    module.exports.gcs_auth = gcsAuth;
+    console.log(`GCS Project ID: ${color.yellow(gcsAuth.project_id)}`);
+}else{
+    console.log(`Please set up the  ${color.yellow('$GCS_AUTH')} environmental variable`);
+    process.exit();
+}
+
+// Settings up Mailgun
+if(process.env.MAILGUN_KEY){
+    module.exports.mailgun = {
+        key: process.env.MAILGUN_KEY,
+    }
+}else{
+    console.log(`Please set up the  ${color.yellow('$MAILGUN_KEY')} environmental variable`);
+    process.exit();
+}
+
+if(process.env.MAILGUN_DOMAIN){
+    module.exports.mailgun = {
+        domain:  process.env.MAILGUN_DOMAIN,
+    }
+}else{
+    console.log(`Please set up the  ${color.yellow('$MAILGUN_DOMAIN')} environmental variable`);
+    process.exit();
+}
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;
@@ -40,7 +80,6 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
     if(!exists){
         fsp.mkdir(path.join(`${__dirname}/../tracks`), () => {
             console.log('tracks directory created');
-            return false;
         });
     }
 }).catch(error => {
@@ -68,9 +107,9 @@ module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
 const db = require('./db');
 
 server.listen(port, () => {
-    console.log(`HoovesSound are running on port ${color.yellow(port)}`);
+    console.log(`HoovesSound are running on port ${color.green(port)}`);
     // connect to the db
-    mongoose.connect(db.url, {
+    mongoose.connect(process.env.DB, {
         useMongoClient: true,
     });
 });

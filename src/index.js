@@ -35,7 +35,14 @@ if(process.env.DB){
 // Settings up Google Cloud Platform
 if(process.env.GCS_AUTH){
     const gcsAuth = JSON.parse(process.env.GCS_AUTH);
-    module.exports.gcs_auth = gcsAuth;
+    // Create that file
+    if(!fsp.existsSync(path.join(`${__dirname}/../gcsAuth`))){
+        console.log('Creating the gcsAuth directory');
+        fsp.mkdirSync(path.join(`${__dirname}/../gcsAuth`));
+    }
+    const gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
+    fsp.writeFileSync(gcsPath, process.env.GCS_AUTH);
+    module.exports.gcsPath = gcsPath;
     console.log(`GCS Project ID: ${color.yellow(gcsAuth.project_id)}`);
 }else{
     console.log(`Please set up the  ${color.yellow('$GCS_AUTH')} environmental variable`);

@@ -93,6 +93,26 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
     console.log(error);
 });
 
+// If the run time is on production
+if(process.env.NODE_ENV) {
+    // Create the config file
+    console.log(`Node environment ${color.green('IS')} ${color.yellow('PRODUCTION')}`);
+    console.log('Creating config file');
+    console.log('Creating src/db.js');
+    fsp.writeFileSync(path.join(`${__dirname}/db.js`), process.env.DBJS);
+    console.log('Creating gscAuth/gscAuthToken.json');
+    fsp.writeFileSync(path.join(`${__dirname}/../gscAuth/gscAuthToken.json`), process.env.GCS_KEY_FILE);
+    console.log(`App config files is ${color.green('READY')}`);
+}else{
+    console.log(`Node environment is ${color.blue('NOT')} ${color.yellow('PRODUCTION')}`);
+    console.log('Using local db.js and gacAuthToke.json');
+}
+
+// GCS Auth Token Path
+module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
+// App init checking
+const db = require('./db');
+
 server.listen(port, () => {
     console.log(`HoovesSound are running on port ${color.green(port)}`);
     // connect to the db

@@ -10,4 +10,5 @@
 
 .notificationButton.raining{
     background: skyblue;
+    border-radius: 50%;
 }

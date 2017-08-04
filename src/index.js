@@ -34,9 +34,9 @@ if(process.env.DB){
 
 // Settings up Google Cloud Platform
 if(process.env.GCS_AUTH){
-    const gcsAuth = JSON.parse(process.env.GCS_AUTH)
+    const gcsAuth = JSON.parse(process.env.GCS_AUTH);
     module.exports.gcs_auth = gcsAuth;
-    console.log(`GCS Project ID: ${color.yellow(gcsAuth.project_id)}`)
+    console.log(`GCS Project ID: ${color.yellow(gcsAuth.project_id)}`);
 }else{
     console.log(`Please set up the  ${color.yellow('$GCS_AUTH')} environmental variable`);
     process.exit();
@@ -44,14 +44,18 @@ if(process.env.GCS_AUTH){
 
 // Settings up Mailgun
 if(process.env.MAILGUN_KEY){
-    module.exports.mailgun_key = process.env.MAILGUN_KEY;
+    module.exports.mailgun = {
+        key: process.env.MAILGUN_KEY,
+    }
 }else{
     console.log(`Please set up the  ${color.yellow('$MAILGUN_KEY')} environmental variable`);
     process.exit();
 }
 
 if(process.env.MAILGUN_DOMAIN){
-    module.exports.mailgun_domain = process.env.MAILGUN_DOMAIN;
+    module.exports.mailgun = {
+        domain:  process.env.MAILGUN_DOMAIN,
+    }
 }else{
     console.log(`Please set up the  ${color.yellow('$MAILGUN_DOMAIN')} environmental variable`);
     process.exit();
@@ -59,9 +63,6 @@ if(process.env.MAILGUN_DOMAIN){
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;
-
-// GCS Auth Token Path
-module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`)
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {

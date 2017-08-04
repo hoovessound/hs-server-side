@@ -7,3 +7,4 @@ src/db.js
 gcsAuth/gcsAuthToken.json
 encrypt_pack.tar
 .well-known
+gcsAuth

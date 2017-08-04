@@ -95,8 +95,6 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
 
 // GCS Auth Token Path
 module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
-// App init checking
-const db = require('./db');
 
 server.listen(port, () => {
     console.log(`HoovesSound are running on port ${color.green(port)}`);

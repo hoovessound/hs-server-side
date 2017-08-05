@@ -9,18 +9,13 @@
             <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
         </div>
         <%});%>
-
-        <div id="getNewOne"></div>
-
     </div>
     <%}else{%>
     <p>No one have ever upload an track yet, will ya?</p>
     <%}%>
+    <div class="btn btn-default loadMore" onclick="getMoreContent()">Load More</div>
     <script>
         var offset = <%=offset%>
-        if(audio.paused){
-            audio.src = "<%=full_address%>/api/listen/<%=track._id%>?token<%=token%>";
-        }
     </script>
     <script src="/static/js/latestTracks.js"></script>
 </div>

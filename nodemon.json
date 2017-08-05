@@ -1,6 +1,11 @@
 {
     "ignore": [
-        "static",
-        "public"
+        "static/",
+        "public/",
+        "gcsAuth/",
+        "tracks/",
+        "usersContent/",
+        ".git/",
+        ".gitignroe"
     ]
 }

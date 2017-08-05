@@ -9,13 +9,30 @@ io.on('notification:new', function (payload) {
     }else{
         // Inside the notification page
         var payloadHTML = `<div id="${payload.id}" class="payload">
-<img src="${payload.icon || ''}" class="icon">
-<p class="title">${payload.title || null}</p>
-<a href="${payload.link || null}">
-    <spam class="body">${payload.body}</spam>
-</a>
+{icon}
+{title}
+{body}
 <div class="removeMessage material-icons" payloadId="${payload.id}" onclick="removePayload(event);">delete</div>
 </div>`;
+
+        if(payload.icon){
+            payloadHTML = payloadHTML.replace('{icon}', `<img src="${payload.icon}" class="icon">`);
+        }else{
+            payloadHTML = payloadHTML.replace('{icon}', '');
+        }
+
+        if(payload.title){
+            payloadHTML = payloadHTML.replace('{title}', `<p class="title">${payload.title}</p>`);
+        }else{
+            payloadHTML = payloadHTML.replace('{title}', '');
+        }
+
+        if(payload.link){
+            payloadHTML = payloadHTML.replace('{body}', `<a href="${payload.link}"><spam class="body">${payload.body}</spam></a>`);
+        }else{
+            payloadHTML = payloadHTML.replace('{body}', `<spam class="body">${payload.body}</spam>`);
+        }
+
             newNote.innerHTML += payloadHTML;
         }
 

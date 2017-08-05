@@ -91,19 +91,19 @@ router.post('/', (req, res) => {
 
                 user.notification.push(payload);
 
-                // Save the message to the DB
-                console.log(body);
-                // Message formatting
                 // Message environment variables
                 function envRender(string, args){
                     const regex = new RegExp(/{(.*?)}/igm);
                     // Find an array of the {} thing
-                    string.match(regex).forEach(variable => {
-                        const varName = variable.replace(/{|}/g, '');
-                        const evalString = `args${varName}`;
-                        const varVal = typeof eval(evalString) !== 'undefined' ? eval(evalString) : '';
-                        string = string.replace(variable, varVal);
-                    });
+                    if(string.match(regex)){
+                        // Need env variable
+                        string.match(regex).forEach(variable => {
+                            const varName = variable.replace(/{|}/g, '');
+                            const evalString = `args${varName}`;
+                            const varVal = typeof eval(evalString) !== 'undefined' ? eval(evalString) : '';
+                            string = string.replace(variable, varVal);
+                        });
+                    }
                     return string;
                 }
 
@@ -117,7 +117,8 @@ router.post('/', (req, res) => {
                         push_date: date,
                     }
                 }
-                payload.body = envRender(body, envData);
+                payload.body = envRender(payload.body, envData);
+                // Save the message to the DB
                 return Users.update({
                     _id: user._id,
                 }, user)

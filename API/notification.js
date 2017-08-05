@@ -63,7 +63,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
-    const id = req.query.id;
+    let body = req.body.body;
     Users.findOne({
         token: token,
     })
@@ -92,7 +92,32 @@ router.post('/', (req, res) => {
                 user.notification.push(payload);
 
                 // Save the message to the DB
+                console.log(body);
+                // Message formatting
+                // Message environment variables
+                function envRender(string, args){
+                    const regex = new RegExp(/{(.*?)}/igm);
+                    // Find an array of the {} thing
+                    string.match(regex).forEach(variable => {
+                        const varName = variable.replace(/{|}/g, '');
+                        const evalString = `args${varName}`;
+                        const varVal = typeof eval(evalString) !== 'undefined' ? eval(evalString) : '';
+                        string = string.replace(variable, varVal);
+                    });
+                    return string;
+                }
 
+                const envData = {
+                    user: {
+                        full_name: user.fullName,
+                        username: user.username,
+                        uid: user._id,
+                    },
+                    message: {
+                        push_date: date,
+                    }
+                }
+                payload.body = envRender(body, envData);
                 return Users.update({
                     _id: user._id,
                 }, user)
@@ -120,7 +145,6 @@ router.post('/', (req, res) => {
 
 router.post('/remove', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
-    const id = req.query.id;
     Users.findOne({
         token: token,
     })

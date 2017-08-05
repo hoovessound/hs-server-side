@@ -122,6 +122,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(`${__dirname}/../public`));
 
 // set up the cookie stuff
+app.set('trust proxy', 1);
 app.use(cookieParser());
 app.use(cookieSession({
     name: 'session',

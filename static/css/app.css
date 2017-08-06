@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Anton');
+
 .masterPlayer .playPuaseButton{
     background: #CCC;
     padding: 0.5em;
@@ -61,6 +63,20 @@
 
 .container .title{
     text-align: left;
+}
+
+#footer{
+    padding-bottom: 8em;
+}
+
+#donate .text{
+    text-transform: uppercase;
+    background: #F96854;
+    display: inline;
+    padding: 0.5em;
+    color: #FFF;
+    font-family: 'Anton', sans-serif;
+    text-decoration: none;
 }
 
 @media (max-width: 415px) {

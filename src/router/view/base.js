@@ -59,6 +59,7 @@ router.get('*', (req, res) => {
                         totalPage: 0,
                         offset: 10,
                         isFave: false,
+                        year: new Date().getFullYear(),
                     });
                 })
             }

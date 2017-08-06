@@ -125,19 +125,19 @@ router.post('/', (req, res) => {
                 .then(() => {
                     payload.emited = user.socket.length;
                     res.json(payload);
-                    const socketConnection = require('../src/router/view/base').socketConnection;
-                    if(typeof socketConnection !== 'undefined'){
-                        // Send the payload via the web socket
-                        return Users.findOne({
-                            _id: user._id,
+                    const socketConnection = require('../src/index').socketConnection;
+                    // Send the payload via the web socket
+                    return Users.findOne({
+                        _id: user._id,
+                    })
+                    .then(user => {
+                        user.socket.forEach((connectionID) => {
+                            // Emit the message via the web socket
+                            socketConnection[connectionID].emit('notification:new', payload);
+                            // console.log(socketConnection[connectionID]);
+                            // console.log(socketConnection)
                         })
-                        .then(user => {
-                            user.socket.forEach((connectionID) => {
-                                // Emit the message via the web socket
-                                socketConnection[connectionID].emit('notification:new', payload);
-                            })
-                        })
-                    }
+                    })
                 })
                 .catch(error => {
                     console.log(error);

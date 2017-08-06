@@ -1,0 +1,28 @@
+
+@media (min-width: 415px) {
+    html{
+        background: url('https://design.canonical.com/wp-content/uploads/7aac/Yakkety_Yak_Wallpaper_4096x2304_grey_version.png') no-repeat;
+        background-size: cover;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    #app{
+        width: 32em;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #FFF;
+        padding: 7em 2em;
+    }
+}
+
+@media (max-width: 415px){
+    #loginButton{
+        position: absolute;
+        right: 1em;
+    }
+
+
+}

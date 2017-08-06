@@ -9,23 +9,24 @@
     <title>HoovesSounds | Login</title>
 </head>
 <body>
-
+<div id="app">
     <%if(error){%>
-        <div id="messages" class="error">
-    <%}else{%>
+    <div id="messages" class="error">
+        <%}else{%>
         <div id="messages">
-    <%}%>
-        <%=message%>
-    </div>
+            <%}%>
+            <%=message%>
+        </div>
 
-    <div class="icon"></div>
-    <h1>Login</h1>
-    <form id="loginForm" action="" method="post" enctype="application/x-www-form-urlencoded">
-        <p>Username: <input type="text" class="username" value="" name="username"></p>
-        <p>Password: <input type="password" class="password" value="" name="password"></p>
-        <button type="submit" class="btn waves-effect waves-default">Login</button>
-    </form>
-    <a href="/api/auth/register">Register</a><br>
+        <div class="icon"></div>
+        <h1>Login</h1>
+        <form id="loginForm" action="" method="post" enctype="application/x-www-form-urlencoded">
+            <p><input type="text" class="username" value="" name="username" placeholder="Username"></p>
+            <p><input type="password" class="password" value="" name="password" placeholder="Password"></p>
+            <button type="submit" class="btn waves-effect waves-default" id="loginButton">Login</button>
+        </form>
+        <a href="/api/auth/register">Register</a><br>
         <a href="/api/auth/changepassword">Forgot Password</a>
+</div>
 </body>
 </html>

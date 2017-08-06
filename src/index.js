@@ -3,6 +3,7 @@ const http = require('http');
 const app = express();
 const server = http.createServer(app);
 const io = require('socket.io').listen(server);
+module.exports.io = io;
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -15,7 +16,14 @@ const color = require('cli-color');
 const compression = require('compression');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const Users = require('../schema/Users');
+const cookie = require('cookie');
+
 let dbUrl;
+
+let socketConnection = {};
+module.exports.socketConnection = socketConnection;
+
 cli
     .version('1.0.0')
     .option('--port [number]', 'The port that HoovesSound will running on')
@@ -143,6 +151,57 @@ if(process.env.NODE_ENV === 'production'){
 app.use((req, res, next) => {
     res.io = io;
     next();
+});
+
+io.on('connection', (socket) => {
+    const clientCookie = cookie.parse(socket.handshake.headers.cookie);
+    const token = clientCookie['oauth-token'];
+    if(token){
+        Users.findOne({
+            token,
+        })
+        .then(user => {
+            if(user !== null){
+
+                // Everything look fine
+                const addConnection = setTimeout(() => {
+                    console.log('adding new connection ' + socket.id)
+                    // Save the connectionID to the user DB
+                    user.socket.push(socket.id);
+                    // Save the socket to the socketConnection object
+                    socketConnection[socket.id] = socket;
+                    module.exports.socketConnection = socketConnection;
+                    // Save the connectionID to the user DB
+                    Users.update({
+                        _id: user._id,
+                    }, user)
+                    .catch(error => {
+                        console.log(error);
+                    });
+                }, 2000);
+
+                socket.on('disconnect', function(){
+                    clearTimeout(addConnection);
+                    // Remove the socket ID from the current session
+                    delete socketConnection[socket.id];
+                    module.exports.socketConnection = socketConnection;
+                    console.log('removing a connectino ' + socket.id);
+                    // Update the user's socket stack
+                    user.socket.splice(user.socket.indexOf(socket.id), 1);
+                    Users.update({
+                        _id: user._id,
+                    }, user)
+                    .catch(error => {
+                        console.log(error);
+                    })
+                });
+
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 });
 
 // Using the API

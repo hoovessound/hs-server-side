@@ -35,7 +35,6 @@
     <div id="app" ng-app="hs">
         <%- include('includes/nav')%>
         <div id="view" ng-view></div>
-
         <div class="masterPlayer">
             <div class="playPuaseButton material-icons">play_arrow</div>
             <a username="<%=track.author.username%>" title="<%=track.title%>" ng-click="masterPlayerTitle($event)" ng-controller="masterPlayerTitle" class="title" href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
@@ -44,7 +43,14 @@
                 <input type="range" value="100" max="100" id="volumeBar">
             </div>
         </div>
-
+        <div id="footer">
+            <hr>
+            &copy; <%=year%> HoovesSound <br>
+            <a href="https://github.com/hoovessound">GitHub</a> <br><br>
+            <a id="donate" href="https://www.patreon.com/felixfong227">
+                <p class="text">patreon</p>
+            </a>
+        </div>
     </div>
     <script src="/static/js/hotkey.js"></script>
     <script src="/static/js/latestTracks.js"></script>

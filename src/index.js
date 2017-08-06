@@ -165,7 +165,6 @@ io.on('connection', (socket) => {
 
                 // Everything look fine
                 const addConnection = setTimeout(() => {
-                    console.log('adding new connection ' + socket.id)
                     // Save the connectionID to the user DB
                     user.socket.push(socket.id);
                     // Save the socket to the socketConnection object
@@ -185,7 +184,6 @@ io.on('connection', (socket) => {
                     // Remove the socket ID from the current session
                     delete socketConnection[socket.id];
                     module.exports.socketConnection = socketConnection;
-                    console.log('removing a connectino ' + socket.id);
                     // Update the user's socket stack
                     user.socket.splice(user.socket.indexOf(socket.id), 1);
                     Users.update({

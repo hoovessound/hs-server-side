@@ -131,12 +131,27 @@ router.post('/', (req, res) => {
                         _id: user._id,
                     })
                     .then(user => {
+                        let needToBeRemove = [];
                         user.socket.forEach((connectionID) => {
                             // Emit the message via the web socket
-                            socketConnection[connectionID].emit('notification:new', payload);
-                            // console.log(socketConnection[connectionID]);
-                            // console.log(socketConnection)
+                            if(typeof socketConnection[connectionID] !== 'undefined') {
+                                socketConnection[connectionID].emit('notification:new', payload);
+                            }else{
+                                needToBeRemove.push(connectionID);
+                            }
+                        });
+
+                        // Remove the fake connection ID
+                        needToBeRemove.forEach(fakeID => {
+                            user.socket.splice(user.socket.indexOf(fakeID), 1);
+                            return Users.update({
+                                _id: user._id,
+                            }, user)
+                            .catch(error => {
+                                console.log(error);
+                            })
                         })
+
                     })
                 })
                 .catch(error => {

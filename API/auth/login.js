@@ -16,6 +16,7 @@ router.post('/', (req, res) => {
     // check the oauth requirement
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
     const response = req.query.response;
+    const service = req.query.service;
 
     // Check the content type
     if(req.headers['content-type'] !== 'application/x-www-form-urlencoded'){
@@ -94,12 +95,10 @@ router.post('/', (req, res) => {
                     // generate the token
                     const token = user.token;
                     // save the token into the cookie
-                    if(req.query.no_cookie !== 'true'){
-                        res.cookie('oauth-token', token, {
-                            maxAge: 365 * 24 * 60 * 60,
-                            httpOnly: true,
-                        });
-                    }
+                    res.cookie('oauth-token', token, {
+                        maxAge: 365 * 24 * 60 * 60,
+                        httpOnly: true,
+                    });
                     // save the token into the session
                     req.session.token = token;
 
@@ -110,7 +109,13 @@ router.post('/', (req, res) => {
                         });
                     }else{
                         // redirect the user into the redirect url
-                        res.redirect(`${redirect}?success=true&token=${token}`);
+
+                        if(service === 'hs_service_login') {
+                            res.redirect(redirect);
+                        }else{
+                            res.redirect(`${redirect}?success=true&token=${token}`);
+                        }
+
                     }
 
                 }else{

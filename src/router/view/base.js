@@ -27,7 +27,7 @@ router.get('*', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const token = req.cookies['oauth-token'];
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.redirect(`/api/auth/login?redirect=${fullurl(req)}&service=hs_service_login`);
     }else{
         Users.findOne({
             token: token,

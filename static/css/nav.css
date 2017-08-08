@@ -12,3 +12,9 @@
     background: skyblue;
     border-radius: 50%;
 }
+
+.searchIcon{
+    color: #ccc;
+    cursor: pointer;
+    text-decoration: none;
+}

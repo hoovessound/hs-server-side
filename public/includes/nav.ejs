@@ -1,6 +1,3 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="/static/css/nav.css">
 <nav class="navbar navbar-default" ng-controller="search">
     <div class="container-fluid">
@@ -23,16 +20,24 @@
             </ul>
             <form class="navbar-form navbar-left" role="search" method="post" action="/search" id="searchForm">
                 <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search" name="query">
+                    <input type="text" class="form-control" placeholder="Search" name="query">
+                    <a type="submit" class="material-icons searchIcon">search</a>
                 </div>
-                <button type="submit" class="btn btn-default">Submit</button>
             </form>
+
+
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="/me">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown">
                         <img src="<%=loginUser.icon%>" alt="" id="userProfilePicture">
-                        <%=loginUser.fullName%>
+                        <span><%=loginUser.fullName%></span>
+                        <span class="caret"></span>
                     </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a href="/me">Profile</a></li>
+                        <li><a href="/settings">Settings</a></li>
+                    </ul>
                 </li>
             </ul>
 

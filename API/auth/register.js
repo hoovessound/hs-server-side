@@ -5,6 +5,8 @@ const Users = require('../../schema/Users');
 const randomstring = require('randomstring');
 
 router.get('/', (req, res) => {
+    res.send('<h1>You will be <a href="https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link">Redirect</a> to sign up as a open beta tester in 5 seconds later</h1><script>setTimeout(function(){window.open("https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link", "_self")}, 5000)</script>')
+    return false;
     res.render('auth/register', {
         error: false,
         message: null,
@@ -12,6 +14,13 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    res.json({
+        error: true,
+        msg: 'Please sign up as a open beta tester at https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
+        code: 'service_lock_down',
+        url: 'https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
+    })
+    return false;
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
     const response = req.query.response;
 

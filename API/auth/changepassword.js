@@ -107,6 +107,7 @@ router.post('/', (req, res) => {
                     error: true,
                     message: 'Please enter the email',
                     code: 'missing_require_fields',
+                    token,
                 });
                 return false;
             }
@@ -129,6 +130,7 @@ router.post('/', (req, res) => {
                             error: true,
                             message: 'Incorrect email',
                             code: 'unauthorized_action',
+                            token,
                         });
                         return false;
                     }

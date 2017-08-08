@@ -133,7 +133,7 @@ app.set('views', path.join(`${__dirname}/../public`));
 app.set('trust proxy', 1);
 app.use(cookieParser());
 app.use(cookieSession({
-    name: 'session',
+    name: `hoovessound-session-${randomstring.generate(30)}`,
     keys: [randomstring.generate(30)],
     maxAge: 365 * 24 * 60 * 60,
 }));

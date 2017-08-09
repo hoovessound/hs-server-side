@@ -1,4 +1,4 @@
-angular.module('getMoreContent', ['ngRoute'])
+angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
 .controller('getMoreContent', function ($scope,$location, $http) {
     var loadMoreButton = document.querySelector('.btn.btn-default.loadMore');
     loadMoreButton.addEventListener('click', function (e) {
@@ -21,13 +21,14 @@ angular.module('getMoreContent', ['ngRoute'])
                         <a href="${full_address}/track/${track.author.username}/${track.title}" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" class="trackName">${track.author.fullName} - ${track.title}</a>
                     </div>`;
                 tracksElement.innerHTML += html;
-                // if (history.pushState) {
-                //     if(index === 9){
-                //         var newurl = window.location.protocol + "//" + window.location.host + `/home/${offset}`;
-                //         window.history.pushState({path:newurl},'',newurl);
-                //         ajaxing = false;
-                //     }
-                // }
+                if (history.pushState) {
+                    if(index === 9){
+                        // var newurl = window.location.protocol + "//" + window.location.host + `/home/${offset}`;
+                        // window.history.pushState({path:newurl},'',newurl);
+                        // ajaxing = false;
+                        $location.update_path(`/home/${offset}`);
+                    }
+                }
             });
         })
 

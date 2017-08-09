@@ -8,6 +8,7 @@ angular.module('hsRoutes', ['ngRoute'])
                 templateUrl: function ($params) {
                     return `/render/tracks?offset=${ $params.offset ? $params.offset : 0}`;
                 },
+                reloadOnSearch: false,
             })
             .when('/me/fave', {
                 templateUrl: '/render/me/fave',

@@ -5,4 +5,5 @@ angular.module('hs', [
     'homeTrackLink',
     'toEditLink',
     'masterPlayerTitle',
+    'getMoreContent',
 ]);

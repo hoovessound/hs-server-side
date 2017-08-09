@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Anton');
 @import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
 
+.trackContainer{
+    width: 30em;
+    height: 30em;
+    position: relative;
+    margin: 0 auto;
+    background-size: cover;
+}
+
 .masterPlayer .playPuaseButton{
     background: #CCC;
     padding: 0.5em;
@@ -18,11 +26,26 @@
     padding: 1.1em;
 }
 
-.playPuaseButton{
-    background: #CCC;
-    padding: 0.1em;
-    border-radius: 5px;
+.trackContainer .playPuaseButton{
+    background: skyblue;
+    padding: 0.5em;
+    border-radius: 50%;
     cursor: pointer;
+    color: #FFF;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.trackContainer .trackName{
+    width: auto;
+    position: absolute;
+    left: 0em;
+    bottom: 0em;
+    background: #FFF;
+    padding: 0.5em;
+    box-shadow: 3px -2px 5px rgba(255,255,255, 0.8);
 }
 
 .volume{

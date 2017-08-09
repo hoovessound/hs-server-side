@@ -3,17 +3,16 @@
     <%if(tracks.length >= 1){%>
     <div class="tracks">
         <%tracks.forEach((track) => {%>
-        <div id="<%=track._id%>">
-            <img src="<%=track.coverImage%>" alt="" class="coverImage">
+        <div id="<%=track._id%>" style="background-image: url(<%=track.coverImage%>);" class="trackContainer">
             <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
-            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" class="trackName"><%=track.author.fullName%> - <%=track.title%></a>
         </div>
         <%});%>
     </div>
     <%}else{%>
     <p>No one have ever upload an track yet, will ya?</p>
     <%}%>
-    <div class="btn btn-default loadMore" onclick="getMoreContent()">Load More</div>
+    <div class="btn btn-default loadMore" ng-controller="getMoreContent" ng-click="getMoreContent($event); $event.stopPropagation();">Load More</div>
     <script>
         var offset = <%=offset%>
     </script>

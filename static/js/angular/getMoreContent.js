@@ -23,9 +23,6 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
                 tracksElement.innerHTML += html;
                 if (history.pushState) {
                     if(index === 9){
-                        // var newurl = window.location.protocol + "//" + window.location.host + `/home/${offset}`;
-                        // window.history.pushState({path:newurl},'',newurl);
-                        // ajaxing = false;
                         $location.update_path(`/home/${offset}`);
                     }
                 }

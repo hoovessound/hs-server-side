@@ -38,34 +38,3 @@ masterPlayPuaseButton.addEventListener('click', e => {
         masterPlayPuaseButton.innerHTML = 'pause';
     }
 });
-
-function getMoreContent() {
-    if(offset === 0) {
-        offset = 10;
-    }
-    ajax.open('GET', `/api/tracks?offset=${offset}`);
-    ajax.setRequestHeader('token', $token);
-    ajax.send();
-    ajax.onload = function () {
-        if(ajax.readyState === 4 && ajax.status === 200){
-            offset += 10;
-            var response = JSON.parse(ajax.response);
-            // Append the tracks into the DOM
-            response.tracks.forEach((track, index) => {
-                var html = `<div id="${track._id}">
-                        <img src="${track.coverImage}" alt="" class="coverImage">
-                        <div class="playPuaseButton material-icons" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" trackid="${track._id}" onclick="playMusic(this)">play_arrow</div>
-                        <a href="/track/${track.author.username}/${track.title}">${track.author.fullName} - ${track.title}</a>
-                    </div>`;
-                tracksElement.innerHTML += html;
-                if (history.pushState) {
-                    if(index === 9){
-                        var newurl = window.location.protocol + "//" + window.location.host + `/home/${offset}`;
-                        window.history.pushState({path:newurl},'',newurl);
-                        ajaxing = false;
-                    }
-                }
-            });
-        }
-    }
-}

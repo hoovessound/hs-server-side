@@ -162,7 +162,6 @@ io.on('connection', (socket) => {
         })
         .then(user => {
             if(user !== null){
-
                 // Everything look fine
                 const addConnection = setTimeout(() => {
                     // Save the connectionID to the user DB

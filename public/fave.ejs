@@ -13,9 +13,9 @@
     <%if(tracks.tracks.length >= 1 || tracks.tracks === null){%>
     <div class="tracks">
         <%tracks.tracks.forEach((track, index) => {%>
-        <div id="<%=track._id%>">
+        <div id="<%=track._id%>" style="background-image: url(<%=track.coverImage%>);" class="trackContainer">
             <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
-            <a href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" class="trackName"><%=track.author.fullName%> - <%=track.title%></a>
         </div>
         <%});%>
 
@@ -24,13 +24,6 @@
     <p>You didn't fave any tracks yet</p>
     <%}%>
 </div>
-<script>
-    <%if(tracks.tracks.length >= 1){%>
-    if(audio.paused){
-        audio.src = "<%=full_address%>/api/listen/<%=tracks.tracks[0]._id%>?token<%=token%>";
-    }
-    <%}%>
-</script>
 <script src="/static/js/latestTracks.js"></script>
 </body>
 </html>

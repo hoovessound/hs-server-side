@@ -211,7 +211,7 @@ router.post('/', (req, res) => {
                                                     url = url[0];
                                                     this.track.file.location = url;
                                                     this.track.file.extend = true;
-                                                    this.track.file.private = false;
+                                                    this.track.private = false;
                                                     Tracks.update({
                                                         _id: this.track._id
                                                     }, this.track).then(() => {

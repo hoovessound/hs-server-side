@@ -16,91 +16,75 @@ const fsp = require('fs-promise');
 const easyimage = require('easyimage');
 const request = require('request');
 
-router.get('/:username?/:title?', (req, res) => {
-    const full_address = req.protocol + "://" + req.headers.host;
-    const token = req.body.token || req.headers.token || req.query.token;
-    const username = req.params.username || req.headers.username;
-    const title = req.params.title || req.headers.title;
-    const ID = req.query.id;
-    Users.findOne({
-        token: token,
-    })
-    .then(user => {
+async function authUser(res, token) {
+    const user = await Users.findOne({token});
+    return new Promise((ref, rej) => {
         if(user === null){
-            res.json({
+            const object = {
                 error: true,
                 msg: 'Can not find your token',
                 code: 'token_not_found',
-            });
-            return false;
+            };
+            res.json(object);
+            rej(object);
         }else{
+            ref(user);
+        }
+    });
+}
 
-            if(ID){
-                return Tracks.findOne({
-                    _id: ID,
-                }, {
-                    file: 0,
-                })
-                .then(track => {
-                    res.json(track);
-                });
-            }else{
-                return Tracks.findOne({
+class FindTrack {
+
+    constructor(res, token, req){
+        this.res = res;
+        this.token = token;
+        this.req = req;
+    }
+
+    async findByUsernameAndTitle(username, title){
+        try{
+            const user = await authUser(this.res, this.token);
+            if(user){
+                const track = await Tracks.findOne({
                     'author.username': username,
                     title: title
                 }, {
                     file: 0,
-                })
-                .then(track => {
-                    res.json(track);
                 });
+                this.res.json(track);
             }
         }
-    })
-    .catch(error => {
-        if(error.message.includes('Cast to ObjectId failed for value')){
-            res.json({
-                error: true,
-                msg: 'Can\'t not found your track',
-                code: 'unexpected_result',
-            });
-            return false;
-        }else{
-            console.log(error)
+        catch(error){
+            console.log(error);
         }
-    })
-});
-
-router.post('/fave/:id?', (req, res) => {
-    const id = req.params.id;
-    const token = req.body.token || req.headers.token || req.query.token;
-    const full_address = req.protocol + "://" + req.headers.host;
-    let findFave = false;
-    if (typeof id === 'undefined') {
-        res.json({
-            error: true,
-            msg: 'Missing the id field',
-            code: 'missing_require_fields',
-        });
-        return false;
     }
-    Users.findOne({
-        token,
-    })
-    .then(user => {
-        if (user === null) {
-            res.json({
-                error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
-            });
-            return false;
-        } else {
-            this.user = user;
-            return Tracks.findOne({
-                _id: id,
-            })
-            .then(track => {
+
+    async findById(id){
+        try{
+            const user = await authUser(this.res, this.token);
+            if(user){
+                const track = await Tracks.findOne({
+                    _id: id,
+                }, {
+                    file: 0,
+                })
+                this.res.json(track);
+            }
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
+
+    async faveOrUnfave(id){
+
+        try{
+            let findFave = false;
+            const user = await authUser(this.res, this.token);
+            const full_address = this.req.protocol + "://" + this.req.headers.host;
+            if(user){
+                const track = await Tracks.findOne({_id: id});
+
                 if (track === null) {
                     res.json({
                         error: true,
@@ -108,95 +92,68 @@ router.post('/fave/:id?', (req, res) => {
                         code: 'missing_result_object',
                     })
                     return false;
-                }
-                // If the user already fave the track, just remove it, if not add one
-                user.fave.forEach(id => {
-                    if (id == track._id.toString()) {
-                        findFave = true;
-                    }
-                });
-
-                if (findFave) {
-                    // Remove it
-                    user.fave.splice(user.fave.indexOf(track._id.toString()), 1);
-                    status = 'removed';
-                } else {
-                    user.fave.push(track._id);
-                    status = 'added';
-                    request({
-                        url: `${full_address}/api/notification`,
-                        headers: {
-                            token,
-                        },
-                        method: 'post',
-                        json: true,
-                        body: {
-                            to: user._id,
-                            title: 'Someone Has Liked Your Track',
-                            body: `${user.username} Has Favorited Your Track`,
-                            link: `${full_address}/track/${user.username}/${track.title}`,
-                            icon: track.coverImage,
+                }else{
+                    // If the user already fave the track, just remove it, if not add one
+                    user.fave.forEach(id => {
+                        if (id == track._id.toString()) {
+                            findFave = true;
                         }
-                    })
-                }
-                return Users.update({
-                    _id: this.user._id,
-                }, user)
-                .then(afterUpdate => {
-                    res.json({
-                        faves: user.fave,
-                        status,
-                    })
-                })
-            });
-        }
-    })
-    .catch(error => {
-        if(error.message.includes('Cast to ObjectId failed for value')){
-            res.json({
-                error: true,
-                msg: 'Can\'t not found your track',
-                code: 'unexpected_result',
-            });
-            return false;
-        }else{
-            console.log(error)
-        }
-    })
-});
+                    });
+                    if (findFave) {
+                        // Remove it
+                        user.fave.splice(user.fave.indexOf(track._id.toString()), 1);
+                        status = 'removed';
+                    } else {
+                        user.fave.push(track._id);
+                        status = 'added';
+                    }
 
-router.get('/fave/isfave/:id?', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    const id = req.params.id;
-    let findFave = false;
-    if (typeof id === 'undefined') {
-        res.json({
-            error: true,
-            msg: 'Missing the id field',
-            code: 'missing_require_fields',
-        });
-        return false;
+                    const updateFaveStatus = await Users.update({
+                        _id: user._id,
+                    }, user)
+                    if(updateFaveStatus){
+                        this.res.json({
+                            faves: user.fave,
+                            status,
+                        });
+
+                        request({
+                            url: `${full_address}/api/notification`,
+                            headers: {
+                                token: this.token,
+                            },
+                            method: 'post',
+                            json: true,
+                            body: {
+                                to: user._id,
+                                title: 'Someone Has Liked Your Track',
+                                body: `${user.username} Has Favorited Your Track`,
+                                link: `${full_address}/track/${user.username}/${track.title}`,
+                                icon: track.coverImage,
+                            }
+                        });
+                    }
+
+                }
+
+            }
+        }
+        catch(error){
+            console.log(error);
+        }
     }
 
-    Users.findOne({
-        token,
-    })
-    .then(user => {
-        if (user === null) {
-            res.json({
-                error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
-            });
-            return false;
-        } else {
-            this.user = user;
-            return Tracks.findOne({
-                _id: id,
-            })
-            .then(track => {
+    async isFave(id){
+        try{
+            const user = await authUser(this.res, this.token);
+            let findFave = false;
+            if(user){
+                const track = await Tracks.findOne({
+                    _id: id,
+                });
+
                 if (track === null) {
-                    res.json({
+                    this.res.json({
                         error: true,
                         msg: 'Can not found your track',
                         code: 'missing_result_object',
@@ -211,29 +168,65 @@ router.get('/fave/isfave/:id?', (req, res) => {
                 });
 
                 if (findFave) {
-                    res.json({
+                    this.res.json({
                         fave: true,
                     })
                 }else{
-                    res.json({
+                    this.res.json({
                         fave: false,
                     })
                 }
-            });
+
+            }
         }
-    })
-    .catch(error => {
-        if(error.message.includes('Cast to ObjectId failed for value')){
-            res.json({
-                error: true,
-                msg: 'Can\'t not found your track',
-                code: 'unexpected_result',
-            });
-            return false;
-        }else{
-            console.log(error)
+        catch(error){
+            console.log(error);
         }
-    })
+    }
+}
+
+router.get('/:username?/:title?', (req, res) => {
+    const token = req.body.token || req.headers.token || req.query.token;
+    const username = req.params.username || req.headers.username;
+    const title = req.params.title || req.headers.title;
+    const ID = req.query.id;
+    const findTrack = new FindTrack(res, token);
+
+    if(!ID){
+        findTrack.findByUsernameAndTitle(username, title);
+    }else{
+        findTrack.findById(ID);
+    }
+});
+
+router.post('/fave/:id?', (req, res) => {
+    const id = req.params.id;
+    const token = req.body.token || req.headers.token || req.query.token;
+    const findTrack = new FindTrack(res, token, req);
+    if (typeof id === 'undefined') {
+        res.json({
+            error: true,
+            msg: 'Missing the id field',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+    findTrack.faveOrUnfave(id);
+});
+
+router.get('/fave/isfave/:id?', (req, res) => {
+    const token = req.body.token || req.headers.token || req.query.token;
+    const id = req.params.id;
+    const findTrack = new FindTrack(res, token, req);
+    if (typeof id === 'undefined') {
+        res.json({
+            error: true,
+            msg: 'Missing the id field',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+    findTrack.isFave(id);
 });
 
 router.post('/edit/:id?', (req, res) => {

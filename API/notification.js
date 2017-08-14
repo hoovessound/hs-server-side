@@ -138,15 +138,13 @@ router.post('/', (req, res) => {
                                 socketConnection[connectionID].emit('notification:new', payload);
                             }else{
                                 // Remove the fake connection ID
-                                needToBeRemove.forEach(fakeID => {
-                                    user.socket.splice(user.socket.indexOf(fakeID), 1);
-                                    return Users.update({
-                                        _id: user._id,
-                                    }, user)
-                                    .catch(error => {
-                                        console.log(error);
-                                    });
-                                })
+                                user.socket.splice(user.socket.indexOf(connectionID), 1);
+                                return Users.update({
+                                    _id: user._id,
+                                }, user)
+                                .catch(error => {
+                                    console.log(error);
+                                });
                             }
                         });
                     })

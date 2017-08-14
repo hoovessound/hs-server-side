@@ -142,6 +142,16 @@ app.use(cookieSession({
 if(process.env.NODE_ENV === 'production'){
     // Using GZIP
     app.use(compression());
+
+    app.use((req, res, next) => {
+        // HTTP to HTTPS
+        if(req.secure){
+            return next();
+        }else{
+            res.redirect(301, 'https://' + req.hostname + req.url);
+        }
+    });
+
 }else{
     // using the morgan dev server log
     app.use(morgan('dev'));

@@ -12,36 +12,30 @@ and thanks for you help to make this silly project come a life.
 
 ### GCS Access
 
-If you don't have an GCS(Google Cloud Platform) access, please contact Felix via email `moongod101@hotmail.com`
+If you don't have an GCS(Google Cloud Platform) access, please contact Felix via Twitter, my handle is `@felixfong227`
 
-Once you have GCS access, the first thing you need to do is create a new JSON file named `/gcsAuth/gcsAuthToken.json`, and that JSON file should your GCS access token info.
+Set your `keyfile.json` as an environment variables
+
+`$GCS_AUTH='<keyfile.json JSON string>'`
 
 ### Database access
 
-If you don't have an MongoDB(mLab hosted) access, please contact Felix via email `moongod101@hotmail.com`
+If you don't have an MongoDB(mLab hosted) access, please contact Felix via Twitter, my handle is `@felixfong227`
 
-Once you have DB access, the first thing you need to do is create a `/src/db.json`, and inside `/src/db.json` exports MongoDB URL
+Set your DB url as an environment variables
 
-```javascript
-module.exports = {
-    url: 'mongodb://<username>:<password>@<db url>'
-}
-````
+`$DB='<MongoDB url>'`
 
 # Maingun access
 First you have to register your own Maingun account
 
-And filling the `API Key` and the `API URL` inside they `db.js` file
+And filling the `API Key` and the `API URL`
 
-```javascript
-module.exports = {
-    url: 'mongodb://<username>:<password>@<db url>',
-    mailgun: {
-        key: 'key-<YOUR KEY>',
-        domain: 'sandbox1<bal bal bal>.mailgun.org',
-    }
-}
-````
+Set your `API Key` as an environment variables
+
+`$MAILGUN_KEY='<your Mailgun API key>'`
+
+`$MAILGUN_DOMAIN='<your Mailgun API domain>'`
 
 
 ### Port
@@ -58,3 +52,4 @@ You can also change the basic config settings via the Terminal
   
 # Native Dependencies
 1. Imagemagick
+    * Please making sure you have Imagemagick installed, because the application will process the `Track Cover` and the `Profile Picture` before uploading to GCS

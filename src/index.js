@@ -163,6 +163,8 @@ app.use((req, res, next) => {
     next();
 });
 
+module.exports.io = io;
+
 io.on('connection', (socket) => {
     const clientCookie = cookie.parse(socket.handshake.headers.cookie);
     const token = clientCookie['oauth-token'];
@@ -179,6 +181,10 @@ io.on('connection', (socket) => {
                     // Save the socket to the socketConnection object
                     socketConnection[socket.id] = socket;
                     module.exports.socketConnection = socketConnection;
+
+                    // Call the track sync feature
+                    require('./websocket/trackSync')(socket);
+
                     // Save the connectionID to the user DB
                     Users.update({
                         _id: user._id,

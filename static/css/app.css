@@ -26,6 +26,10 @@
     padding: 1.1em;
 }
 
+.masterPlayer.remotePlay{
+    background: #bbff72;
+}
+
 .trackContainer .playPuaseButton{
     background: skyblue;
     padding: 0.5em;

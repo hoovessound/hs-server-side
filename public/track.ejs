@@ -33,7 +33,7 @@
 
         <h1>Description</h1>
         <div id="description">
-            <p><%=track.description%></p>
+            <p><%-track.description%></p>
         </div>
 
         <hr>
@@ -48,7 +48,7 @@
                             <a href="/user/<%=comment.author.username%>">
                                 <%=comment.author.fullName%>
                             </a>
-                            <p><%=comment.comment%></p>
+                            <p><%-comment.comment%></p>
                         </div>
                     <%})%>
                 <%}else{%>

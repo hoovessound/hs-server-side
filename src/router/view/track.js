@@ -15,6 +15,18 @@ const randomstring = require('randomstring');
 const fsp = require('fs-promise');
 const easyimage = require('easyimage');
 
+const TextFormattign = {
+    url: (text) => {
+        const regex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/igm;
+        if(text.match(regex)){
+            const url = text.match(regex);
+            return text.replace(url, `<a href="${url}" target="_blank">${url}</a>`);
+        }else{
+            return text;
+        }
+    }
+}
+
 router.get('/:username?/:title?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
@@ -35,6 +47,10 @@ router.get('/:username?/:title?', (req, res) => {
                 title: title,
             }).then(track => {
                 // Find out if the user fave this track or not
+
+                track.description = TextFormattign.url(track.description);
+                console.log(track.description)
+
                 return rp.get({
                     url: `${full_address}/api/track/fave/isfave/${track._id}`,
                     headers: {
@@ -45,6 +61,9 @@ router.get('/:username?/:title?', (req, res) => {
                     if(track.comments.length >= 1){
                         let comments = [];
                         track.comments.forEach(comment =>{
+
+                            // text formatting
+                            comment.comment = TextFormattign.url(comment.comment);
                             // Find the user object
                             return Users.findOne({
                                 _id: comment.author,

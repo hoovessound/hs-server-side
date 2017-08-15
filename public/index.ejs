@@ -19,6 +19,17 @@
         var $token = token;
         var audio = new Audio();
         var io = io();
+
+        // Web socket test
+        io.on('init:testing', function (payload) {
+            if(io.id === payload.yourId){
+                console.log(payload.msg);
+            }else{
+                console.log('Something when wrong!! please fire an issue at the HoovesSound sound GitHub repo');
+                location.reload();
+            }
+        });
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.js"></script>

@@ -19,8 +19,6 @@ const morgan = require('morgan');
 const Users = require('../schema/Users');
 const cookie = require('cookie');
 
-let dbUrl;
-
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
 
@@ -168,53 +166,36 @@ module.exports.io = io;
 io.on('connection', (socket) => {
     const clientCookie = cookie.parse(socket.handshake.headers.cookie);
     const token = clientCookie['oauth-token'];
-    if(token){
-        Users.findOne({
-            token,
-        })
-        .then(user => {
-            if(user !== null){
-                // Everything look fine
-                const addConnection = setTimeout(() => {
-                    // Save the connectionID to the user DB
-                    user.socket.push(socket.id);
-                    // Save the socket to the socketConnection object
-                    socketConnection[socket.id] = socket;
-                    module.exports.socketConnection = socketConnection;
 
-                    // Call the track sync feature
-                    require('./websocket/trackSync')(socket);
+    // Testing message
+    socket.emit('init:testing', {
+        msg: 'Your client had connected to the HoovesSound web socket services, please enjoy :D',
+        yourId: socket.id,
+    });
 
-                    // Save the connectionID to the user DB
-                    Users.update({
-                        _id: user._id,
-                    }, user)
-                    .catch(error => {
-                        console.log(error);
-                    });
-                }, 2000);
+    Users.findOne({
+        token,
+    })
+    .then(user => {
 
-                socket.on('disconnect', function(){
-                    clearTimeout(addConnection);
-                    // Remove the socket ID from the current session
-                    delete socketConnection[socket.id];
-                    module.exports.socketConnection = socketConnection;
-                    // Update the user's socket stack
-                    user.socket.splice(user.socket.indexOf(socket.id), 1);
-                    Users.update({
-                        _id: user._id,
-                    }, user)
-                    .catch(error => {
-                        console.log(error);
-                    })
-                });
+        if(typeof socketConnection[user.username] === 'undefined'){
+            socketConnection[user.username] = {};
+        }
+        socketConnection[user.username][socket.id] = socket;
+        module.exports.socketConnection = socketConnection;
 
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
+        socket.on('disconnect', () => {
+            delete socketConnection[user.username][socket.id];
+            module.exports.socketConnection = socketConnection;
+        });
+
+        // Call the track sync feature
+        require('./websocket/trackSync')(socket);
+
+    })
+    .catch(error => {
+        console.log(error);
+    })
 });
 
 // Using the API

@@ -66,13 +66,13 @@ function playMusic(el){
     });
 }
 
-masterPlayPuaseButton.addEventListener('click', e => {
-    if(!audio.paused){
-        pauseTheAudio();
-    }else{
+masterPlayPuaseButton.onclick   = function (e) {
+    if(audio.paused) {
         playTheAudio();
+    }else{
+        pauseTheAudio();
     }
-});
+}
 
 function pauseTheAudio() {
     audio.pause();
@@ -86,7 +86,7 @@ function pauseTheAudio() {
 function playTheAudio(e) {
     audio.play();
     masterPlayPuaseButton.innerHTML = 'pause';
-    io.emit('audio:toserver:start', {
+    io.emit('audio:toserver:play', {
         token: token,
         id: io.id,
     });

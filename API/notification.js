@@ -123,31 +123,14 @@ router.post('/', (req, res) => {
                     _id: user._id,
                 }, user)
                 .then(() => {
-                    payload.emited = user.socket.length;
                     res.json(payload);
-                    const socketConnection = require('../src/index').socketConnection;
+                    const socketConnection = require('../src/index').socketConnection[user.username];
                     // Send the payload via the web socket
-                    return Users.findOne({
-                        _id: user._id,
-                    })
-                    .then(user => {
-
-                        user.socket.forEach((connectionID) => {
-                            // Emit the message via the web socket
-                            if(typeof socketConnection[connectionID] !== 'undefined') {
-                                socketConnection[connectionID].emit('notification:new', payload);
-                            }else{
-                                // Remove the fake connection ID
-                                user.socket.splice(user.socket.indexOf(connectionID), 1);
-                                return Users.update({
-                                    _id: user._id,
-                                }, user)
-                                .catch(error => {
-                                    console.log(error);
-                                });
-                            }
-                        });
-                    })
+                    for(let key in socketConnection){
+                        if(key){
+                            socketConnection[key].emit('notification:new', payload)
+                        }
+                    }
                 })
                 .catch(error => {
                     console.log(error);

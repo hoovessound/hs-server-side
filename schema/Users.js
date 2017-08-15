@@ -18,6 +18,5 @@ const usersSchema = new Schema({
     fave: Array,
     roles: Array,
     notification: Array,
-    socket: Array,
 });
 module.exports = mongoose.model('Users', usersSchema);

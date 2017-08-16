@@ -1,5 +1,4 @@
 const Users = require('../../schema/Users');
-
 module.exports = function (socket) {
     // When someone play a new track
     socket.on('audio:toserver:new', (payload) => {
@@ -17,6 +16,18 @@ module.exports = function (socket) {
                     }
                 }
             }
+
+            user.lastPlay = {
+                date: new Date(),
+                trackID: payload.trackID,
+                volume: payload.volume,
+                isPlaying: true,
+            }
+
+            return Users.update({
+                _id: user._id
+            }, user);
+
         })
         .catch(error => {
             console.log(error);
@@ -39,6 +50,13 @@ module.exports = function (socket) {
                     }
                 }
             }
+
+            user.lastPlay.isPlaying = false;
+
+            return Users.update({
+                _id: user._id
+            }, user);
+
         })
         .catch(error => {
             console.log(error);
@@ -56,11 +74,17 @@ module.exports = function (socket) {
             for(let key in socketConnection){
                 if(key){
                     if(socketConnection[key].id !== payload.id){
-                        // But don't sent the event to the sender itself
                         socketConnection[key].emit('audio:fromserver:play', payload)
                     }
                 }
             }
+
+            user.lastPlay.isPlaying = false;
+
+            return Users.update({
+                _id: user._id
+            }, user);
+
         })
         .catch(error => {
             console.log(error);
@@ -77,11 +101,17 @@ module.exports = function (socket) {
             for(let key in socketConnection){
                 if(key){
                     if(socketConnection[key].id !== payload.id){
-                        // But don't sent the event to the sender itself
                         socketConnection[key].emit('audio:fromserver:volume', payload)
                     }
                 }
             }
+
+            user.lastPlay.volume = payload.volume;
+
+            return Users.update({
+                _id: user._id
+            }, user);
+
         })
         .catch(error => {
             console.log(error);

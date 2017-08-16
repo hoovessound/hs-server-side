@@ -18,5 +18,14 @@ const usersSchema = new Schema({
     fave: Array,
     roles: Array,
     notification: Array,
+    lastPlay: {
+        date: Schema.Types.Date,
+        trackID: Schema.Types.ObjectId,
+        volume: Number,
+        isPlaying: {
+            type: Boolean,
+            default: false,
+        }
+    },
 });
 module.exports = mongoose.model('Users', usersSchema);

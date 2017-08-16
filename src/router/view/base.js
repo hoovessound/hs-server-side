@@ -51,16 +51,39 @@ router.get('*', (req, res) => {
                 }).limit(1).sort({
                     uploadDate: -1
                 }).then(track => {
-                    res.render('index', {
-                        loginUser: user,
-                        track,
-                        full_address,
-                        token,
-                        totalPage: 0,
-                        offset: 10,
-                        isFave: false,
-                        year: new Date().getFullYear(),
-                    });
+                    if(typeof user.lastPlay.trackID !== 'undefined'){
+                        // Fetch the last track object
+                        return Tracks.findOne({
+                            _id: user.lastPlay.trackID,
+                        })
+                        .then(track => {
+                            res.render('index', {
+                                loginUser: user,
+                                track,
+                                full_address,
+                                token,
+                                totalPage: 0,
+                                offset: 10,
+                                isFave: false,
+                                year: new Date().getFullYear(),
+                                initAudioSource: `${full_address}/api/listen/${track._id}`,
+                                volume: user.lastPlay.volume,
+                            });
+                        })
+                    }else{
+                        res.render('index', {
+                            loginUser: user,
+                            track,
+                            full_address,
+                            token,
+                            totalPage: 0,
+                            offset: 10,
+                            isFave: false,
+                            year: new Date().getFullYear(),
+                            initAudioSource: `${full_address}/api/listen/${track._id}`,
+                            volume: 100,
+                        });
+                    }
                 })
             }
         })

@@ -19,17 +19,19 @@
         var $token = token;
         var audio = new Audio();
         var io = io();
-
         // Web socket test
         io.on('init:testing', function (payload) {
             if(io.id === payload.yourId){
                 console.log(payload.msg);
+                console.log(payload.yourId)
             }else{
                 console.log('Something when wrong!! please fire an issue at the HoovesSound sound GitHub repo');
                 location.reload();
             }
         });
 
+        // Init audio
+        audio.src = '<%=initAudioSource%>';
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.js"></script>
@@ -47,12 +49,28 @@
     <div id="app" ng-app="hs">
         <%- include('includes/nav')%>
         <div id="view" ng-view></div>
-        <div class="masterPlayer">
-            <div class="playPuaseButton material-icons">play_arrow</div>
+            <%if(loginUser.lastPlay.isPlaying){%>
+            <div class="masterPlayer remotePlay">
+            <%}else{%>
+            <div class="masterPlayer">
+            <%}%>
+            <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>">
+                <%if(loginUser.lastPlay.isPlaying){%>
+                    pause
+                <%}else{%>
+                  play_arrow
+                <%}%>
+            </div>
             <a username="<%=track.author.username%>" title="<%=track.title%>" ng-click="masterPlayerTitle($event)" ng-controller="masterPlayerTitle" class="title" href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
             <div class="volume">
                 <i class="material-icons">volume_up</i>
                 <input type="range" value="100" max="100" id="volumeBar">
+                <%if(volume){%>
+                <script>
+                    audio.volume = <%=volume%> / 100;
+                    volumeBar.value = <%=volume%>;
+                </script>
+                <%}%>
             </div>
         </div>
         <div id="footer">

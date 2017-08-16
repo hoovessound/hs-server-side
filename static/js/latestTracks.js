@@ -6,6 +6,7 @@ var tracksElement = document.querySelector('.tracks');
 var container = document.querySelector('.container');
 var ajax = new XMLHttpRequest();
 var ajaxing = false;
+var initPlay = true;
 audio.addEventListener('ended', e => {
     masterPlayPuaseButton.innerHTML = 'play_arrow';
 });
@@ -20,14 +21,19 @@ io.on('audio:fromserver:change', function(payload) {
 });
 
 io.on('audio:fromserver:pause', function(payload) {
+    console.log('act pause time')
+    masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'play_arrow';
 });
 
 io.on('audio:fromserver:play', function(payload) {
+    console.log('act play time')
+    masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'pause';
 });
 
 io.on('audio:fromserver:volume', function(payload) {
+    masterPlayer.classList.add('remotePlay');
     audio.volume = payload.volume / 100;
     volumeBar.value = payload.volume;
 });
@@ -63,20 +69,27 @@ function playMusic(el){
         username: username,
         token: token,
         id: io.id,
+        volume: volumeBar.value,
     });
 }
 
 masterPlayPuaseButton.onclick   = function (e) {
-    if(audio.paused) {
-        playTheAudio();
+    if(initPlay){
+        playMusic(e.target);
+        initPlay = false;
     }else{
-        pauseTheAudio();
+        if(audio.paused) {
+            playTheAudio();
+        }else{
+            pauseTheAudio();
+        }
     }
 }
 
-function pauseTheAudio() {
+function pauseTheAudio(e) {
     audio.pause();
     masterPlayPuaseButton.innerHTML = 'play_arrow';
+    console.log('sent pause time')
     io.emit('audio:toserver:pause', {
         token: token,
         id: io.id,
@@ -86,6 +99,7 @@ function pauseTheAudio() {
 function playTheAudio(e) {
     audio.play();
     masterPlayPuaseButton.innerHTML = 'pause';
+    console.log('sent play time')
     io.emit('audio:toserver:play', {
         token: token,
         id: io.id,

@@ -187,6 +187,16 @@ io.on('connection', (socket) => {
         socket.on('disconnect', () => {
             delete socketConnection[user.username][socket.id];
             module.exports.socketConnection = socketConnection;
+            if(socketConnection[user.username].length <= 0){
+                // No more connected client
+                user.lastPlay.isPlaying = false;
+                Users.update({
+                    _id: user._id,
+                }, user)
+                .catch(error => {
+                    console.log(error);
+                })
+            }
         });
 
         // Call the track sync feature

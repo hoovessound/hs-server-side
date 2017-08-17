@@ -187,8 +187,8 @@ router.post('/', (req, res) => {
                                                 body: {
                                                     to: user._id,
                                                     title: 'Your Track Is Been Processing',
-                                                    body: `${title} Is Been Processing, And Ready To Be Publish!`,
-                                                    link: `${full_address}/track/${user.username}/${title}`,
+                                                    body: `${title} Is Been Processing, And In The Mean Time Please Visit Our Latest Track Page :D`,
+                                                    link: `${full_address}/home`,
                                                 }
                                             })
                                         });
@@ -207,33 +207,33 @@ router.post('/', (req, res) => {
                                                 action: 'read',
                                                 expires: '03-09-2491',
                                             })
-                                                .then(url => {
-                                                    url = url[0];
-                                                    this.track.file.location = url;
-                                                    this.track.file.extend = true;
-                                                    this.track.private = false;
-                                                    Tracks.update({
-                                                        _id: this.track._id
-                                                    }, this.track).then(() => {
-                                                        // Remove the lcoal track from the disk
-                                                        fs.unlinkSync(filePath);
-                                                        // Send a notification to the user
-                                                        return rp({
-                                                            url: `${full_address}/api/notification`,
-                                                            headers: {
-                                                                token,
-                                                            },
-                                                            method: 'post',
-                                                            json: true,
-                                                            body: {
-                                                                to: user._id,
-                                                                title: 'Track Is Uploaded!',
-                                                                body: `${title} Is Uploaded`,
-                                                                link: `${full_address}/track/${user.username}/${title}`,
-                                                            }
-                                                        })
+                                            .then(url => {
+                                                url = url[0];
+                                                this.track.file.location = url;
+                                                this.track.file.extend = true;
+                                                this.track.private = false;
+                                                Tracks.update({
+                                                    _id: this.track._id,
+                                                }, this.track).then(() => {
+                                                    // Remove the local track from the disk
+                                                    fs.unlinkSync(filePath);
+                                                    // Send a notification to the user
+                                                    return rp({
+                                                        url: `${full_address}/api/notification`,
+                                                        headers: {
+                                                            token,
+                                                        },
+                                                        method: 'post',
+                                                        json: true,
+                                                        body: {
+                                                            to: user._id,
+                                                            title: 'Track Is Uploaded!',
+                                                            body: `${title} Is Uploaded`,
+                                                            link: `${full_address}/track/${user.username}/${title}`,
+                                                        }
                                                     })
                                                 })
+                                            })
                                         })
                                         .catch(error => {
                                             console.log(error);

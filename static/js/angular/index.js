@@ -6,4 +6,5 @@ angular.module('hs', [
     'toEditLink',
     'masterPlayerTitle',
     'getMoreContent',
+    'uploadTrack',
 ]);

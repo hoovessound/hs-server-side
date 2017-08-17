@@ -17,7 +17,7 @@
             </div>
         <%}%>
         <h1>Upload</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+        <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm" ng-controller="uploadTrack">
             <p>Title: <input type="text" name="title" id="title" autocomplete="false"></p>
             <p>Please drag or choose one of your AUDIO file</p>
             <p><input type="file" name="file" id="file"></p>
@@ -29,6 +29,5 @@
             <button type="submit">Upload</button>
         </form>
     </div>
-    <script src="/static/js/upload.js"></script>
 </body>
 </html>

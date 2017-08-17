@@ -107,6 +107,10 @@
     text-decoration: none;
 }
 
+.loadMore{
+    margin-top: 0.5em;
+}
+
 @media (max-width: 415px) {
     .coverImage{
         width: 20em;
@@ -124,7 +128,19 @@
     .playPuaseButton{
         margin: 0.5em 0em;
     }
-}
-.loadMore{
-    margin-top: 0.5em;
+
+    .trackContainer{
+        width: 20em;
+        height: 20em;
+    }
+
+    .trackContainer .trackName{
+        width: 100%;
+    }
+    
+    .masterPlayer .playPuaseButton{
+        position: absolute;
+        right: 0.5em;
+        bottom: 0.5em;
+    }
 }

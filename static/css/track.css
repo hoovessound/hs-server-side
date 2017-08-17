@@ -26,6 +26,15 @@
     display: none;
 }
 
+.container .playPuaseButton{
+    background: skyblue;
+    padding: 0.5em;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #FFF;
+    margin: 0.5em 0em;
+}
+
 @media (max-width: 415px) {
     .share{
         display: none !important;

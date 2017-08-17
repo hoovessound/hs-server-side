@@ -20,7 +20,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
                         <div class="playPuaseButton material-icons" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" trackid="${track._id}" onclick="playMusic(this)">play_arrow</div>
                         <a href="${full_address}/track/${track.author.username}/${track.title}" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" class="trackName">${track.author.fullName} - ${track.title}</a>
                     </div>`;
-                tracksElement.innerHTML += html;
+                document.querySelector('.tracks').innerHTML += html;
                 if (history.pushState) {
                     if(index === 9){
                         $location.update_path(`/home/${offset}`);

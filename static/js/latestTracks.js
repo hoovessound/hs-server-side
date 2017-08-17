@@ -12,7 +12,7 @@ audio.addEventListener('ended', e => {
 });
 
 io.on('audio:fromserver:change', function(payload) {
-    masterTitle.innerHTML = `${payload.fullName} - ${payload.title} (Remote)`;
+    masterTitle.innerHTML = `${payload.fullName} - ${payload.title}`;
     masterPlayer.classList.add('remotePlay');
     masterTitle.href = `${$full_address}/track/${payload.username}/${payload.title}`;
     audio.src = `${$full_address}/api/listen/${payload.trackID}?token=${$token}`;
@@ -21,15 +21,19 @@ io.on('audio:fromserver:change', function(payload) {
 });
 
 io.on('audio:fromserver:pause', function(payload) {
-    console.log('act pause time')
     masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'play_arrow';
+    if(!audio.paused){
+        audio.pause();
+    }
 });
 
 io.on('audio:fromserver:play', function(payload) {
-    console.log('act play time')
     masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'pause';
+    if(audio.paused){
+        audio.play();
+    }
 });
 
 io.on('audio:fromserver:volume', function(payload) {
@@ -74,22 +78,16 @@ function playMusic(el){
 }
 
 masterPlayPuaseButton.onclick   = function (e) {
-    if(initPlay){
-        playMusic(e.target);
-        initPlay = false;
+    if(audio.paused) {
+        playTheAudio();
     }else{
-        if(audio.paused) {
-            playTheAudio();
-        }else{
-            pauseTheAudio();
-        }
+        pauseTheAudio();
     }
 }
 
 function pauseTheAudio(e) {
     audio.pause();
     masterPlayPuaseButton.innerHTML = 'play_arrow';
-    console.log('sent pause time')
     io.emit('audio:toserver:pause', {
         token: token,
         id: io.id,
@@ -99,7 +97,6 @@ function pauseTheAudio(e) {
 function playTheAudio(e) {
     audio.play();
     masterPlayPuaseButton.innerHTML = 'pause';
-    console.log('sent play time')
     io.emit('audio:toserver:play', {
         token: token,
         id: io.id,

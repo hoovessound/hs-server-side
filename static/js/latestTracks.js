@@ -1,6 +1,7 @@
 var masterTitle = document.querySelector('.masterPlayer .title');
 var masterPlayPuaseButton = document.querySelector('.masterPlayer .playPuaseButton');
 var masterPlayer = document.querySelector('.masterPlayer');
+var masterPlayerTimeStamp = document.querySelector('.masterPlayer .timeStamp');
 var volumeBar = document.querySelector('#volumeBar');
 var tracksElement = document.querySelector('.tracks');
 var container = document.querySelector('.container');
@@ -8,7 +9,12 @@ var ajax = new XMLHttpRequest();
 var ajaxing = false;
 var initPlay = true;
 audio.addEventListener('ended', e => {
+    // When the audio is ended, try to fetch an other track automatically
     masterPlayPuaseButton.innerHTML = 'play_arrow';
+    setTimeout(function () {
+        // Wait 1 second, and fetch the song ( fade out effect )
+        localPlayList.nextTrack();
+    }, 1000);
 });
 
 io.on('audio:fromserver:change', function(payload) {
@@ -55,6 +61,8 @@ volumeBar.addEventListener('input', e => {
 });
 
 function playMusic(el){
+    masterPlayerTimeStamp.value = 0;
+    audio.currentTime = 0;
     masterPlayer.classList.remove('remotePlay');
     // Fetch the track info from the API
     var trackID = el.getAttribute('trackid');
@@ -63,8 +71,11 @@ function playMusic(el){
     var username = el.getAttribute('username');
     masterTitle.innerHTML = `${fullName} - ${title}`;
     masterTitle.href = `${$full_address}/track/${username}/${title}`;
-    audio.src = `${$full_address}/api/listen/${trackID}?token=${$token}`;
+    audio.src = `${$full_address}/api/listen/${trackID}`;
     audio.play();
+    audio.onloadedmetadata = function () {
+        masterPlayerTimeStamp.max = audio.duration;
+    }
     masterPlayPuaseButton.innerHTML = 'pause';
     io.emit('audio:toserver:new', {
         trackID: trackID,
@@ -77,12 +88,37 @@ function playMusic(el){
     });
 }
 
-masterPlayPuaseButton.onclick   = function (e) {
+masterPlayPuaseButton.onclick = function (e) {
     if(audio.paused) {
         playTheAudio();
     }else{
         pauseTheAudio();
     }
+}
+
+audio.ontimeupdate = function () {
+    var currentTime = audio.currentTime;
+    masterPlayerTimeStamp.value = currentTime;
+    io.emit('audio:toserver:timeupdate', {
+        token: token,
+        id: io.id,
+        playtime: {
+            currentTime: audio.currentTime,
+            duration: audio.duration,
+        }
+    });
+}
+
+masterPlayerTimeStamp.oninput = function () {
+    audio.currentTime = masterPlayerTimeStamp.value;
+    io.emit('audio:toserver:timeupdate', {
+        token: token,
+        id: io.id,
+        playtime: {
+            currentTime: audio.currentTime,
+            duration: audio.duration,
+        }
+    });
 }
 
 function pauseTheAudio(e) {
@@ -96,6 +132,9 @@ function pauseTheAudio(e) {
 
 function playTheAudio(e) {
     audio.play();
+    audio.onloadedmetadata = function () {
+        masterPlayerTimeStamp.max = audio.duration;
+    }
     masterPlayPuaseButton.innerHTML = 'pause';
     io.emit('audio:toserver:play', {
         token: token,

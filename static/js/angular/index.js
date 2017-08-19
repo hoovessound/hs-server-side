@@ -1,4 +1,4 @@
-angular.module('hs', [
+var hsAngular = angular.module('hs', [
     'hsRoutes',
     'hsSearch',
     'hsEditTracks',
@@ -8,3 +8,9 @@ angular.module('hs', [
     'getMoreContent',
     'uploadTrack',
 ]);
+
+hsAngular.run(function($rootScope) {
+    $rootScope.$on("$locationChangeStart", function(event, next, current) {
+        localPlayList.clearTrack();
+    });
+});

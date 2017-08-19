@@ -112,6 +112,11 @@
 }
 
 @media (max-width: 415px) {
+
+    .masterPlayer{
+        text-align: center;
+    }
+
     .coverImage{
         width: 20em;
         height: 20em;
@@ -139,8 +144,12 @@
     }
     
     .masterPlayer .playPuaseButton{
-        position: absolute;
-        right: 0.5em;
-        bottom: 0.5em;
+        position: relative;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .timeStamp {
+        display: block;
     }
 }

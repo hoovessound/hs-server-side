@@ -66,10 +66,21 @@ router.get('*', (req, res) => {
                                     token,
                                     totalPage: 0,
                                     offset: 10,
-                                    isFave: false,
                                     year: new Date().getFullYear(),
                                     initAudioSource: `${full_address}/api/listen/${this.lastTrack._id}`,
                                     volume: 100,
+                                });
+                            }else{
+                                res.render('index', {
+                                    loginUser: user,
+                                    track: track,
+                                    full_address,
+                                    token,
+                                    totalPage: 0,
+                                    offset: 10,
+                                    year: new Date().getFullYear(),
+                                    initAudioSource: `${full_address}/api/listen/${track._id}`,
+                                    volume: user.lastPlay.volume,
                                 });
                             }
                         })
@@ -81,7 +92,6 @@ router.get('*', (req, res) => {
                             token,
                             totalPage: 0,
                             offset: 10,
-                            isFave: false,
                             year: new Date().getFullYear(),
                             initAudioSource: `${full_address}/api/listen/${track._id}`,
                             volume: 100,

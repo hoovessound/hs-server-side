@@ -1,62 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <%if(profile === null){%>
-        <title>HoovesSound | No Such A User</title>
-    <%}else{%>
-        <title>HoovesSound | <%=profile.fullName%></title>
-    <%}%>
+<div class="container">
     <link rel="stylesheet" href="/static/css/profile.css">
-</head>
-<body>
     <%if(profile === null){%>
-        <div class="container">
-            <p>There not such a user :/</p>
-        </div>
+    <div class="container">
+        <p>There not such a user :/</p>
+    </div>
     <%}else{%>
 
-        <div class="container">
-            <div id="userInfo" style="background-image: url('<%=profile.banner%>')">
-                <img src="<%=profile.icon%>" alt="" class="profilePicture">
-                <div id="roles">
-                    <%profile.roles.forEach(role => {%>
-                        <%const title = Object.keys(role)[0];%>
-                        <%const fsIcon = role[title];%>
-                        <div class="role <%=title%> fa fa-<%=fsIcon%>" title="<%=title%>"></div>
-                    <%});%>
-                </div>
-                <h1 id="username"><%=profile.fullName%></h1>
-                <%if(profile.username === loginUser.username){%>
-                    <a class="btn btn-success" href="/settings">Settings</a>
-                <%}%>
+    <div class="container">
+        <div id="userInfo" style="background-image: url('<%=profile.banner%>')">
+            <img src="<%=profile.icon%>" alt="" class="profilePicture">
+            <div id="roles">
+                <%profile.roles.forEach(role => {%>
+                <%const title = Object.keys(role)[0];%>
+                <%const fsIcon = role[title];%>
+                <div class="role <%=title%> fa fa-<%=fsIcon%>" title="<%=title%>"></div>
+                <%});%>
             </div>
-
-            <hr>
-            <h1 class="title">Users' tracks</h1>
-            <%if(tracks.length <= 0){%>
-                <p>Looks like this user never upload an track yet :/</p>
-            <%}else{%>
-                <%tracks.forEach(track => {%>
-                    <div class="tracks">
-                        <div id="<%=track._id%>" style="background-image: url(<%=track.coverImage%>);" class="trackContainer">
-                            <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
-                            <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" class="trackName"><%=track.author.fullName%> - <%=track.title%></a>
-                        </div>
-                    </div>
-                <%})%>
+            <h1 id="username"><%=profile.fullName%></h1>
+            <%if(profile.username === loginUser.username){%>
+            <a class="btn btn-success" href="/settings">Settings</a>
             <%}%>
         </div>
-        <script>
-            <%if(tracks.length > 0){%>
-                if(audio.paused){
-                    audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>?token=<%=token%>";
-                }
-            <%}%>
-        </script>
-        <script src="/static/js/profile.js"></script>
+
+        <hr>
+        <h1 class="title">Users' tracks</h1>
+        <%if(tracks.length <= 0){%>
+        <p>Looks like this user never upload an track yet :/</p>
+        <%}else{%>
+        <%tracks.forEach(track => {%>
+        <div class="tracks">
+            <div id="<%=track._id%>" style="background-image: url(<%=track.coverImage%>);" class="trackContainer">
+                <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>" onclick="playMusic(this)">play_arrow</div>
+                <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" class="trackName"><%=track.author.fullName%> - <%=track.title%></a>
+            </div>
+        </div>
+        <%})%>
+        <%}%>
+    </div>
+    <script>
+        <%if(tracks.length > 0){%>
+        if(audio.paused){
+            audio.src = "<%=full_address%>/api/listen/<%=tracks[0]._id%>?token=<%=token%>";
+        }
+        <%}%>
+    </script>
     <%}%>
-</body>
-</html>
+</div>

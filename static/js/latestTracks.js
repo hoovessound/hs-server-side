@@ -29,23 +29,22 @@ io.on('audio:fromserver:change', function(payload) {
 io.on('audio:fromserver:pause', function(payload) {
     masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'play_arrow';
-    if(!audio.paused){
-        audio.pause();
-    }
 });
 
 io.on('audio:fromserver:play', function(payload) {
     masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'pause';
-    if(audio.paused){
-        audio.play();
-    }
 });
 
 io.on('audio:fromserver:volume', function(payload) {
     masterPlayer.classList.add('remotePlay');
     audio.volume = payload.volume / 100;
     volumeBar.value = payload.volume;
+});
+
+io.on('audio:fromserver:timeupdate', function (payload) {
+    masterPlayerTimeStamp.value = payload.playtime.currentTime;
+    audio.currentTime = payload.playtime.currentTime;
 });
 
 // volume bar control
@@ -97,19 +96,21 @@ masterPlayPuaseButton.onclick = function (e) {
 }
 
 audio.ontimeupdate = function () {
-    var currentTime = audio.currentTime;
-    masterPlayerTimeStamp.value = currentTime;
-    io.emit('audio:toserver:timeupdate', {
-        token: token,
-        id: io.id,
-        playtime: {
-            currentTime: audio.currentTime,
-            duration: audio.duration,
-        }
-    });
+    if(!masterPlayer.classList.contains('remotePlay')){
+        var currentTime = audio.currentTime;
+        masterPlayerTimeStamp.value = currentTime;
+        io.emit('audio:toserver:timeupdate', {
+            token: token,
+            id: io.id,
+            playtime: {
+                currentTime: audio.currentTime,
+                duration: audio.duration,
+            }
+        });
+    }
 }
 
-masterPlayerTimeStamp.oninput = function () {
+masterPlayerTimeStamp.oninput = function (e) {
     audio.currentTime = masterPlayerTimeStamp.value;
     io.emit('audio:toserver:timeupdate', {
         token: token,

@@ -117,4 +117,32 @@ module.exports = function (socket) {
             console.log(error);
         })
     });
+
+    socket.on('audio:toserver:timeupdate', (payload) => {
+        // Get the payload, and we sent it out the all the user's socket channel
+        Users.findOne({
+            token: payload.token,
+        })
+        .then(user => {
+            const socketConnection = require('../index').socketConnection[user.username];
+            for(let key in socketConnection){
+                if(key){
+                    if(socketConnection[key].id !== payload.id){
+                        socketConnection[key].emit('audio:fromserver:timeupdate', payload)
+                    }
+                }
+            }
+
+            user.lastPlay.playtime.currentTime = payload.playtime.currentTime;
+            user.lastPlay.playtime.duration = payload.playtime.duration;
+
+            return Users.update({
+                _id: user._id
+            }, user);
+
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    });
 }

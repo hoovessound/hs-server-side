@@ -45,11 +45,9 @@ angular.module('hsRoutes', ['ngRoute'])
             .when(`/notification`, {
                 templateUrl: '/render/notification',
             })
-
-            // .otherwise({
-            //     redirectTo: '/home',
-            // });
-
+            .otherwise({
+                redirectTo: '/home?404=true',
+            });
         $locationProvider.html5Mode({
             enabled: true,
             requireBase: false

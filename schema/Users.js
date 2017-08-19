@@ -25,6 +25,10 @@ const usersSchema = new Schema({
         isPlaying: {
             type: Boolean,
             default: false,
+        },
+        playtime: {
+            currentTime: Number,
+            duration: Number,
         }
     },
 });

@@ -47,36 +47,44 @@
     <%- include('includes/adsense')%>
 </head>
 <body>
-    <div id="app" ng-app="hs">
-        <%- include('includes/nav')%>
-        <div id="view" ng-view></div>
-            <%if(loginUser.lastPlay.isPlaying){%>
-            <div class="masterPlayer remotePlay">
-            <%}else{%>
-            <div class="masterPlayer">
-            <%}%>
-            <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track._id%>">
-                <%if(loginUser.lastPlay.isPlaying){%>
-                    pause
-                <%}else{%>
-                  play_arrow
-                <%}%>
+<div id="app" ng-app="hs">
+    <%- include('includes/nav') %>
+    <div id="view" ng-view></div>
+    <% if(loginUser.lastPlay.isPlaying){ %>
+    <div class="masterPlayer remotePlay">
+        <% }else{ %>
+        <div class="masterPlayer">
+            <% } %>
+            <input type="range" class="timeStamp" value="0" max="100">
+            <div class="playPuaseButton material-icons" fullname="<%= track.author.fullName %>"
+                 username="<%= track.author.username %>" title="<%= track.title %>" trackid="<%= track._id %>">
+                <% if(loginUser.lastPlay.isPlaying){ %>
+                pause
+                <% }else{ %>
+                play_arrow
+                <% } %>
             </div>
-            <a username="<%=track.author.username%>" title="<%=track.title%>" ng-click="masterPlayerTitle($event)" ng-controller="masterPlayerTitle" class="title" href="/track/<%=track.author.username%>/<%=track.title%>"><%=track.author.fullName%> - <%=track.title%></a>
+            <a username="<%= track.author.username %>" title="<%= track.title %>" ng-click="masterPlayerTitle($event)"
+               ng-controller="masterPlayerTitle" class="title"
+               href="/track/<%= track.author.username %>/<%= track.title %>"><%= track.author.fullName %>
+                - <%= track.title %>
+            </a>
+
             <div class="volume">
                 <i class="material-icons">volume_up</i>
                 <input type="range" value="100" max="100" id="volumeBar">
-                <%if(volume){%>
+                <% if(volume){ %>
                 <script>
-                    audio.volume = <%=volume%> / 100;
-                    volumeBar.value = <%=volume%>;
+                    audio.volume = <%= volume %> /
+                    100;
+                    volumeBar.value = <%= volume %>;
                 </script>
-                <%}%>
+                <% } %>
             </div>
         </div>
         <div id="footer">
             <hr>
-            &copy; <%=year%> HoovesSound <br>
+            &copy; <%= year %> HoovesSound <br>
             <a href="https://github.com/hoovessound">GitHub</a> <br><br>
             <a id="donate" href="https://www.patreon.com/felixfong227">
                 <p class="text">patreon</p>
@@ -86,5 +94,16 @@
     <script src="/static/js/hotkey.js"></script>
     <script src="/static/js/latestTracks.js"></script>
     <script src="/static/js/notification.js"></script>
+    <script src="/static/js/localPlayList.js"></script>
+
+
+    <%if(loginUser.lastPlay.playtime){%>
+    <script>
+        audio.currentTime = <%=loginUser.lastPlay.playtime.currentTime%>
+        masterPlayerTimeStamp.max = <%=loginUser.lastPlay.playtime.duration%>
+        masterPlayerTimeStamp.value = <%=loginUser.lastPlay.playtime.currentTime%>
+    </script>
+    <%}%>
+</div>
 </body>
 </html>

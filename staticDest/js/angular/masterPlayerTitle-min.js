@@ -1,0 +1,1 @@
+"use strict";angular.module("masterPlayerTitle",["ngRoute"]).controller("masterPlayerTitle",function(t,e,r){t.masterPlayerTitle=function(t){t.preventDefault();var l=t.currentTarget,a="/track/"+l.getAttribute("username")+"/"+l.getAttribute("title");e.url(a),r({method:"GET",url:a})}});

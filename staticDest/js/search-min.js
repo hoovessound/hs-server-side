@@ -1,0 +1,1 @@
+"use strict";var form=document.querySelector("#searchForm"),formInput=document.querySelector("#searchForm [name=query]");angular.module("hsSearch",["ngRoute"]).controller("search",function(e,r,t){form.addEventListener("submit",function(e){e.preventDefault();var u=formInput.value.trim();u.length>0&&(r.url("/search/"+u),t({method:"GET",url:"api//search/"+u}))})});

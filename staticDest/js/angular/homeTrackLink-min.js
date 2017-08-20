@@ -1,0 +1,1 @@
+"use strict";angular.module("homeTrackLink",["ngRoute"]).controller("homeTrackLink",function(t,e,r){t.homeTrackLink=function(t){t.preventDefault();var n=t.currentTarget,u=n.getAttribute("username"),a=n.getAttribute("title");e.url("/track/"+u+"/"+a),r({method:"GET",url:"/track/"+u+"/"+a})}});

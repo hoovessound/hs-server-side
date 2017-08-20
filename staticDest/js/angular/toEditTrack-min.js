@@ -1,0 +1,1 @@
+"use strict";angular.module("toEditLink",["ngRoute"]).controller("toEditLink",function(t,e,r){t.toEditLink=function(t,i){t.preventDefault();var n,u=t.currentTarget,o=u.getAttribute("username"),a=u.getAttribute("title");n=(i=void 0===i)?"/track/"+o+"/"+a+"/edit":"/track/"+o+"/"+a+"/",e.url(n),r({method:"GET",url:n})}});

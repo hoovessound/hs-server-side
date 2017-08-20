@@ -6,9 +6,9 @@
 
 .notificationButton{
     cursor: pointer;
-}
 
-.notificationButton.raining{
-    background: skyblue;
-    border-radius: 50%;
+    &.raining{
+        background: skyblue;
+        border-radius: 50%;
+    }
 }

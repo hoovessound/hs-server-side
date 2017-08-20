@@ -1,3 +1,5 @@
+'use strict';
+
 var masterTitle = document.querySelector('.masterPlayer .title');
 var masterPlayPuaseButton = document.querySelector('.masterPlayer .playPuaseButton');
 var masterPlayer = document.querySelector('.masterPlayer');
@@ -8,7 +10,7 @@ var container = document.querySelector('.container');
 var ajax = new XMLHttpRequest();
 var ajaxing = false;
 var initPlay = true;
-audio.addEventListener('ended', e => {
+audio.addEventListener('ended', function (e) {
     // When the audio is ended, try to fetch an other track automatically
     masterPlayPuaseButton.innerHTML = 'play_arrow';
     setTimeout(function () {
@@ -17,26 +19,26 @@ audio.addEventListener('ended', e => {
     }, 1000);
 });
 
-io.on('audio:fromserver:change', function(payload) {
-    masterTitle.innerHTML = `${payload.fullName} - ${payload.title}`;
+io.on('audio:fromserver:change', function (payload) {
+    masterTitle.innerHTML = payload.fullName + ' - ' + payload.title;
     masterPlayer.classList.add('remotePlay');
-    masterTitle.href = `${$full_address}/track/${payload.username}/${payload.title}`;
-    audio.src = `${$full_address}/api/listen/${payload.trackID}?token=${$token}`;
+    masterTitle.href = $full_address + '/track/' + payload.username + '/' + payload.title;
+    audio.src = $full_address + '/api/listen/' + payload.trackID + '?token=' + $token;
     audio.pause();
     masterPlayPuaseButton.innerHTML = 'pause';
 });
 
-io.on('audio:fromserver:pause', function(payload) {
+io.on('audio:fromserver:pause', function (payload) {
     masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'play_arrow';
 });
 
-io.on('audio:fromserver:play', function(payload) {
+io.on('audio:fromserver:play', function (payload) {
     masterPlayer.classList.add('remotePlay');
     masterPlayPuaseButton.innerHTML = 'pause';
 });
 
-io.on('audio:fromserver:volume', function(payload) {
+io.on('audio:fromserver:volume', function (payload) {
     masterPlayer.classList.add('remotePlay');
     audio.volume = payload.volume / 100;
     volumeBar.value = payload.volume;
@@ -48,18 +50,18 @@ io.on('audio:fromserver:timeupdate', function (payload) {
 });
 
 // volume bar control
-volumeBar.addEventListener('input', e => {
+volumeBar.addEventListener('input', function (e) {
     // Thanks https://stackoverflow.com/a/31927281/6511655
     var volume = parseInt(e.target.value);
-    audio.volume = volume/ 100;
+    audio.volume = volume / 100;
     io.emit('audio:toserver:volume', {
         token: token,
         id: io.id,
-        volume: volume,
+        volume: volume
     });
 });
 
-function playMusic(el){
+function playMusic(el) {
     masterPlayerTimeStamp.value = 0;
     audio.currentTime = 0;
     masterPlayer.classList.remove('remotePlay');
@@ -68,13 +70,13 @@ function playMusic(el){
     var title = el.getAttribute('title');
     var fullName = el.getAttribute('fullname');
     var username = el.getAttribute('username');
-    masterTitle.innerHTML = `${fullName} - ${title}`;
-    masterTitle.href = `${$full_address}/track/${username}/${title}`;
-    audio.src = `${$full_address}/api/listen/${trackID}`;
+    masterTitle.innerHTML = fullName + ' - ' + title;
+    masterTitle.href = $full_address + '/track/' + username + '/' + title;
+    audio.src = $full_address + '/api/listen/' + trackID;
     audio.play();
     audio.onloadedmetadata = function () {
         masterPlayerTimeStamp.max = audio.duration;
-    }
+    };
     masterPlayPuaseButton.innerHTML = 'pause';
     io.emit('audio:toserver:new', {
         trackID: trackID,
@@ -83,20 +85,20 @@ function playMusic(el){
         username: username,
         token: token,
         id: io.id,
-        volume: volumeBar.value,
+        volume: volumeBar.value
     });
 }
 
 masterPlayPuaseButton.onclick = function (e) {
-    if(audio.paused) {
+    if (audio.paused) {
         playTheAudio();
-    }else{
+    } else {
         pauseTheAudio();
     }
-}
+};
 
 audio.ontimeupdate = function () {
-    if(!masterPlayer.classList.contains('remotePlay')){
+    if (!masterPlayer.classList.contains('remotePlay')) {
         var currentTime = audio.currentTime;
         masterPlayerTimeStamp.value = currentTime;
         io.emit('audio:toserver:timeupdate', {
@@ -104,11 +106,11 @@ audio.ontimeupdate = function () {
             id: io.id,
             playtime: {
                 currentTime: audio.currentTime,
-                duration: audio.duration,
+                duration: audio.duration
             }
         });
     }
-}
+};
 
 masterPlayerTimeStamp.oninput = function (e) {
     audio.currentTime = masterPlayerTimeStamp.value;
@@ -117,17 +119,17 @@ masterPlayerTimeStamp.oninput = function (e) {
         id: io.id,
         playtime: {
             currentTime: audio.currentTime,
-            duration: audio.duration,
+            duration: audio.duration
         }
     });
-}
+};
 
 function pauseTheAudio(e) {
     audio.pause();
     masterPlayPuaseButton.innerHTML = 'play_arrow';
     io.emit('audio:toserver:pause', {
         token: token,
-        id: io.id,
+        id: io.id
     });
 }
 
@@ -135,10 +137,10 @@ function playTheAudio(e) {
     audio.play();
     audio.onloadedmetadata = function () {
         masterPlayerTimeStamp.max = audio.duration;
-    }
+    };
     masterPlayPuaseButton.innerHTML = 'pause';
     io.emit('audio:toserver:play', {
         token: token,
-        id: io.id,
+        id: io.id
     });
 }

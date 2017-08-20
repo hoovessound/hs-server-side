@@ -6,6 +6,7 @@
         "tracks/",
         "usersContent/",
         ".git/",
-        ".gitignroe"
+        ".gitignroe",
+        "staticDest/"
     ]
 }

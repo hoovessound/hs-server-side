@@ -1,0 +1,1 @@
+"use strict";var hsAngular=angular.module("hs",["hsRoutes","hsSearch","hsEditTracks","homeTrackLink","toEditLink","masterPlayerTitle","getMoreContent","uploadTrack"]);hsAngular.run(function(a){a.$on("$locationChangeStart",function(a,t,r){localPlayList.clearTrack()})});

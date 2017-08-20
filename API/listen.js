@@ -25,9 +25,11 @@ router.get('/:id?', (req, res) => {
                 // Check if the file is extened or not
                 if(track.file.extend){
                     // Get the sound track from GCS
+                    res.set('Cache-Control', 'public, max-age=31557600');
+                    res.set('Transfer-Encoding', 'chunked');
                     request(track.file.location).pipe(res);
                 }else{
-                    // Send back the autio file
+                    // Send back the audio file
                     const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);
                     res.sendFile(trackPath);
                 }

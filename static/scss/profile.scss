@@ -9,57 +9,23 @@
     background-repeat: no-repeat;
 }
 
-.masterPlayer .playPuaseButton{
-    background: #CCC;
-    padding: 0.5em;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 0.5em;
-}
-
-.masterPlayer{
-    position: fixed;
-    lefet: 0em;
-    bottom: 0em;
-    background: skyblue;
-    width: 100vw;
-    padding: 1.1em;
-}
-
-.volume{
-    width: 30vw;
-    position: relative;
-    float: right;
-}
-
-.volume .volumeBar{
-    background: skyblue;
-    position: absolute;
-    top: 0em;
-    left: 0em;
-    height: 100%;
-    width: 100%;
-}
-
-.playPuaseButton{
-    background: #CCC;
-    padding: 0.1em;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 .container{
     margin-bottom: 10em;
     text-align: center;
-}
 
-.container .title{
-    text-align: left;
+    & .title{
+        text-align: left;
+    }
 }
 
 .coverImage{
     width: 30em;
     height: 30em;
+}
+
+#roles{
+    font-size: 1.5em;
+    margin-top: 0.5em;
 }
 
 @media (max-width: 415px) {
@@ -79,9 +45,4 @@
     .playPuaseButton{
         margin: 0.5em 0em;
     }
-}
-
-#roles{
-    font-size: 1.5em;
-    margin-top: 0.5em;
 }

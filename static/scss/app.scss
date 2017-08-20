@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css?family=Anton');
-@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+@import 'https://fonts.googleapis.com/css?family=Anton';
+@import 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css';
 
 .trackContainer{
     width: 30em;
@@ -9,62 +9,65 @@
     background-size: cover;
 }
 
-.masterPlayer .playPuaseButton{
-    background: #CCC;
-    padding: 0.5em;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 0.5em;
-}
-
 .masterPlayer{
+
     position: fixed;
     lefet: 0em;
     bottom: 0em;
     background: skyblue;
     width: 100vw;
     padding: 1.1em;
+
+    .playPuaseButton{
+        background: #CCC;
+        padding: 0.5em;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 0.5em;
+    }
+
+    &.remotePlay{
+        background: #bbff72;
+    }
 }
 
-.masterPlayer.remotePlay{
-    background: #bbff72;
-}
+.trackContainer {
+    .playPuaseButton{
+        background: skyblue;
+        padding: 0.5em;
+        border-radius: 50%;
+        cursor: pointer;
+        color: #FFF;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
 
-.trackContainer .playPuaseButton{
-    background: skyblue;
-    padding: 0.5em;
-    border-radius: 50%;
-    cursor: pointer;
-    color: #FFF;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.trackContainer .trackName{
-    width: auto;
-    position: absolute;
-    left: 0em;
-    bottom: 0em;
-    background: #FFF;
-    padding: 0.5em;
-    box-shadow: 3px -2px 5px rgba(255,255,255, 0.8);
+    .trackName{
+        width: auto;
+        position: absolute;
+        left: 0em;
+        bottom: 0em;
+        background: #FFF;
+        padding: 0.5em;
+        box-shadow: 3px -2px 5px rgba(255,255,255, 0.8);
+    }
 }
 
 .volume{
     width: 30vw;
     position: relative;
     float: right;
-}
 
-.volume .volumeBar{
-    background: skyblue;
-    position: absolute;
-    top: 0em;
-    left: 0em;
-    height: 100%;
-    width: 100%;
+    .volumeBar{
+        background: skyblue;
+        position: absolute;
+        top: 0em;
+        left: 0em;
+        height: 100%;
+        width: 100%;
+    }
 }
 
 .fave{
@@ -73,10 +76,10 @@
     font-size: 1.5em;
     color: #000;
     cursor: pointer;
-}
 
-.fave.isFave{
-    color: red;
+    &.isFave{
+        color: red;
+    }
 }
 
 .coverImage{
@@ -87,10 +90,11 @@
 .container{
     margin-bottom: 10em;
     text-align: center;
-}
 
-.container .title{
-    text-align: left;
+    & .title{
+        text-align: left;
+    }
+
 }
 
 #footer{
@@ -137,12 +141,13 @@
     .trackContainer{
         width: 20em;
         height: 20em;
+
+        .trackName{
+            width: 100%;
+        }
+
     }
 
-    .trackContainer .trackName{
-        width: 100%;
-    }
-    
     .masterPlayer .playPuaseButton{
         position: relative;
         display: block;

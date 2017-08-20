@@ -8,3 +8,5 @@ gcsAuth/gcsAuthToken.json
 encrypt_pack.tar
 .well-known
 gcsAuth
+.gulp-scss-cache
+.sass-cache

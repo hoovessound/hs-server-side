@@ -4,10 +4,11 @@ angular.module('uploadTrack', ['ngRoute'])
     var fileInput = document.querySelector('#file');
     var coverImage = document.querySelector('#image');
     var uploadForm = document.querySelector('#uploadForm');
-    var progressBar = document.querySelector('#progress');
+    var progressBar = document.querySelector('.progress .progress-bar');
     var errorMessgae = document.querySelector('.error');
     var title = document.querySelector('#title');
-
+    var description = document.querySelector('#description');
+    var uploadAjax = new XMLHttpRequest();
     fileInput.addEventListener('change', e => {
         const file = e.target.files[0];
         // Set the title
@@ -25,15 +26,16 @@ angular.module('uploadTrack', ['ngRoute'])
         if(fileInput.files[0]){
             const file = fileInput.files[0];
             const form = new FormData();
-            ajax.open('POST', '/api/upload');
+            uploadAjax.open('POST', '/api/upload');
             form.append('audio', file);
             form.append('title', title.value);
+            form.append('description', description.value);
             form.append('image', coverImage.files[0]);
-            ajax.setRequestHeader('token', $token);
-            ajax.send(form);
-            ajax.onload = function() {
-                if(ajax.readyState === 4 && ajax.status === 200) {
-                    const response = JSON.parse(ajax.response);
+            uploadAjax.setRequestHeader('token', $token);
+            uploadAjax.send(form);
+            uploadAjax.onload = function() {
+                if(uploadAjax.readyState === 4 && uploadAjax.status === 200) {
+                    const response = JSON.parse(uploadAjax.response);
                     if(response.error){
                         errorMessgae.innerHTML = response.msg;
                     }else{
@@ -45,6 +47,11 @@ angular.module('uploadTrack', ['ngRoute'])
                     }
                 }
             }
+
+            uploadAjax.upload.addEventListener("progress", function (evt) {
+                var percentLoaded = (evt.loaded / evt.total) * 100;
+                progressBar.style.width = `${percentLoaded}%`;
+            }, false);
         }
     };
 

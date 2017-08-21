@@ -13,7 +13,7 @@ const tracksSchema = new Schema({
     uploadDate: Date,
     coverImage: {
         type: String,
-        default: 'https://images.discordapp.net/attachments/333151306736730115/333680672264945664/missing_song_cover.jpg?width=570&height=570',
+        default: 'https://images.discordapp.net/attachments/333151306736730115/333680672264945664/missing_song_cover.jpg?width=500&height=500',
     },
     comments: Array,
     fave: Array,

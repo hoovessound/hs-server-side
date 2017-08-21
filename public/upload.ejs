@@ -1,33 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HoovesSound | Upload</title>
-</head>
-<body>
-    <div class="container">
-        <%if(error){%>
-            <div class="error">
-                <%=error%>
+
+<div class="container" ng-controller="uploadTrack">
+    <%if(error){%>
+        <div class="error">
+            <%=error%>
+        </div>
+    <%}else{%>
+        <div class="error">
+        </div>
+    <%}%>
+    <h1>Upload</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0"
+                 aria-valuemin="0" aria-valuemax="100" style="width:0%">
             </div>
-        <%}else{%>
-            <div class="error">
-            </div>
-        <%}%>
-        <h1>Upload</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm" ng-controller="uploadTrack">
-            <p>Title: <input type="text" name="title" id="title" autocomplete="false"></p>
-            <p>Please drag or choose one of your AUDIO file</p>
-            <p><input type="file" name="file" id="file"></p>
-            <p>Description: <textarea name="description" id="description"></textarea></p>
-            <p>Cover Image</p>
-            <p>Please drag or choose one of your IMAGE file(Option)</p>
-            <p><input type="file" name="image" id="image"></p>
-            <progress value="0" max="100" id="progress"></progress>
-            <button type="submit">Upload</button>
-        </form>
-    </div>
-</body>
-</html>
+        </div>
+        <p>Title: <input type="text" name="title" id="title" autocomplete="false"></p>
+        <p>Please drag or choose one of your AUDIO file</p>
+        <p><input type="file" name="file" id="file"></p>
+        <p>Description: <textarea name="description" id="description"></textarea></p>
+        <p>Cover Image</p>
+        <p>Please drag or choose one of your IMAGE file(Option)</p>
+        <p><input type="file" name="image" id="image"></p>
+        <progress value="0" max="100" id="progress"></progress>
+        <button type="submit">Upload</button>
+    </form>
+</div>

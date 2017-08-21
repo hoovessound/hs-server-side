@@ -34,7 +34,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "node src/index.js",
+    "start": "gulp javascript && gulp scss && node src/index.js",
     "build": "gulp default"
   },
   "devDependencies": {

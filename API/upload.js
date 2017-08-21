@@ -35,214 +35,166 @@ router.post('/', (req, res) => {
                 uploadDir: path.join(`${__dirname}/../tracks`),
             });
             form.encoding = 'utf-8';
-            form.parse(req, (error, fields, files) => {
-                if(error){
-                    console.log(error);
-                }else{
-                    // Check if the request contain the 'audio' fields
-                    if(typeof files.audio === 'undefined') {
-                        res.json({
-                            error: true,
-                            msg: 'Missing the audio field',
-                            code: 'missing_require_fields',
-                        });
-                        return false;
-                    }
 
-                    // Check if the audio fields is an file
-                    if(typeof files.audio !== 'object'){
+            form.parse(req, (error, fields, files) => {
+                if(typeof files.audio === 'undefined'){
+                    res.json({
+                        error: true,
+                        msg: 'Missing audio field',
+                        code: 'missing_require_fields',
+                    });
+                    return false;
+                }
+                const coverImage = files.image;
+
+                if(coverImage){
+                    if(!coverImage.type.includes('image')){
                         res.json({
                             error: true,
-                            msg: 'Audio fields is not an file',
+                            msg: 'The image fields is not an image file',
                             code: 'not_valid_file_object',
                         });
                         return false;
                     }
-                    file = files.audio;
-                    let coverImage = files.image;
-                    const description = fields.description || null;
-                    // Check if there a cover image
-                    if(typeof coverImage !== 'undefined'){
-                        // There is a cover image
-                        if(!coverImage.type.includes('image')){
-                            res.json({
-                                error: true,
-                                msg: 'Please upload an image file',
-                                code: 'not_valid_file_type',
-                            });
-                            return false;
-                        }
+                }
 
-                        // Is a valid image file
+                const description = fields.description || null;
 
-                        // Read to upload to GCS
-                        const ext = path.extname(coverImage.name);
-                        const newID = sha256(randomstring.generate(10));
-                        let fileID = newID + ext;
-                        const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
-                        const gcsCoverImage = gcs.bucket('hs-cover-image');
-                        fsp.rename(coverImage.path, coverImagePath)
-                        .then(() => {
-                            // Resize the image first
-                            return easyimage.resize({
-                                src: coverImagePath,
-                                dst: coverImagePath,
-                                width: 500,
-                                height: 500,
-                                ignoreAspectRatio: true,
-                            }).then(processedImage => {
-                                return gcsCoverImage.upload(coverImagePath).then(file => {
-                                    file = file[0];
-                                    return file.getSignedUrl({
-                                        action: 'read',
-                                        expires: '03-09-2491',
-                                    }).then(url => {
-                                        coverImage = url[0];
-                                        fsp.unlinkSync(coverImagePath);
-                                        uploadAudio();
-                                    })
-                                })
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        })
-
-                    }else{
-                        uploadAudio();
-                    }
-
-                    function uploadAudio() {
-                        // MIME type checking
-                        if(!file.type.includes('audio')){
-                            res.json({
-                                error: true,
-                                msg: 'Please upload an audio file',
-                                code: 'not_valid_file_type',
-                            });
-                            return false;
-                        }
-
-                        const ext = path.extname(file.name);
-                        // Remvoe the ext first
-                        file.name = file.name.replace(ext, '');
-                        // Traim down the file name
-                        file.name = file.name.replace(/\W/igm, '');
-                        file.name = file.name.replace(/ /igm, '-');
-                        let title = fields.title || file.name;
-                        // Check for the same title
-                        Tracks.findOne({
-                            title,
-                        })
-                        .then(track => {
-                            // Gen a new title, cuz someone else is using that title as well :/
-                            if(track !== null){
-                                title = `${title}(${randomstring.generate(10)})`;
-                            }
-                            const newID = sha256(randomstring.generate(10));
-                            let fileID = newID + ext;
-                            const filePath = path.join(`${__dirname}/../tracks/${fileID}`);
-                            // Write the file into the disk
-                            fs.rename(file.path, filePath, error => {
-                                if(error){
-                                    console.log(error);
-                                }else{
-                                    // Save the track info into the track collection
-
-                                    // Redirect the user: Using the local tracks first
-                                    const newTracks = new Tracks({
-                                        title: title,
-                                        file: {
-                                            location: fileID,
-                                            extend: false,
-                                        },
-                                        author: {
-                                            username: user.username,
-                                            fullName: user.fullName,
-                                        },
-                                        uploadDate: new Date(),
-                                        coverImage,
-                                        description,
-                                        private: true,
-                                    }).save().then(track => {
-                                        // Save the track id into the user object
-                                        user.tracks.push(track._id);
-                                        this.track = track;
-                                        return Users.update({
-                                            _id: user._id,
-                                        }, user).then(() => {
-                                            let newResponse = JSON.parse(JSON.stringify(this.track));
-                                            delete newResponse.file;
-                                            res.json({
-                                                track: newResponse,
-                                                url: full_address + `/track/${user.username}/${title}`,
-                                            });
-                                            return rp({
-                                                url: `${full_address}/api/notification`,
-                                                headers: {
-                                                    token,
-                                                },
-                                                method: 'post',
-                                                json: true,
-                                                body: {
-                                                    to: user._id,
-                                                    title: 'Your Track Is Been Processing',
-                                                    body: `${title} Is Been Processing, And In The Mean Time Please Visit Our Latest Track Page :D`,
-                                                    link: `${full_address}/home`,
-                                                }
-                                            })
-                                        });
-                                    })
-                                    .catch(error => {
-                                        console.log(error)
+                // Upload the audio first
+                const tmp_audioFile = files.audio.path;
+                const newAudioId = sha256(randomstring.generate(20));
+                const file = files.audio;
+                const ext = path.extname(file.name);
+                fsp.rename(tmp_audioFile, path.join(`${__dirname}/../tracks/${newAudioId}${ext}`))
+                .then(() => {
+                    // Save the track details to the database
+                    // Remove the ext first
+                    file.name = file.name.replace(ext, '');
+                    // Trim down the file name
+                    file.name = file.name.replace(/\W/igm, '');
+                    file.name = file.name.replace(/ /igm, '-');
+                    let title = fields.title || file.name;
+                    // Check for the same title
+                    return Tracks.findOne({
+                        title,
+                    })
+                    .then(track => {
+                        // Gen a new title, cuz someone else is using that title as well :/
+                        if(track !== null){
+                            title = `${title}(${randomstring.generate(10)})`;
+                        }else{
+                            return new Tracks({
+                                title: title,
+                                file: {
+                                    location: path.join(`${__dirname}/../tracks/${newAudioId}`),
+                                    extend: false,
+                                },
+                                author: {
+                                    username: user.username,
+                                    fullName: user.fullName,
+                                },
+                                uploadDate: new Date(),
+                                description,
+                                private: true,
+                            }).save()
+                            .then(track => {
+                                // Save the track id into the user object
+                                user.tracks.push(track._id);
+                                this.track = track;
+                                return Users.update({
+                                    _id: user._id,
+                                }, user)
+                                .then(() => {
+                                    let newResponse = JSON.parse(JSON.stringify(this.track));
+                                    delete newResponse.file;
+                                    res.json({
+                                        track: newResponse,
+                                        url: full_address + `/track/${user.username}/${title}`,
                                     });
 
-                                    // Upload the file to Google Cloud Storage
+                                    // Upload the audio to Google Cloud Storage
                                     const gcsTracks = gcs.bucket('hs-track');
-                                    gcsTracks.upload(filePath)
-                                        .then(file => {
-                                            file = file[0];
-                                            // Get the download url
-                                            return file.getSignedUrl({
-                                                action: 'read',
-                                                expires: '03-09-2491',
-                                            })
-                                            .then(url => {
-                                                url = url[0];
-                                                this.track.file.location = url;
-                                                this.track.file.extend = true;
-                                                this.track.private = false;
-                                                Tracks.update({
-                                                    _id: this.track._id,
-                                                }, this.track).then(() => {
-                                                    // Remove the local track from the disk
-                                                    fs.unlinkSync(filePath);
-                                                    // Send a notification to the user
-                                                    return rp({
-                                                        url: `${full_address}/api/notification`,
-                                                        headers: {
-                                                            token,
-                                                        },
-                                                        method: 'post',
-                                                        json: true,
-                                                        body: {
-                                                            to: user._id,
-                                                            title: 'Track Is Uploaded!',
-                                                            body: `${title} Is Uploaded`,
-                                                            link: `${full_address}/track/${user.username}/${title}`,
-                                                        }
-                                                    })
+                                    gcsTracks.upload(path.join(`${__dirname}/../tracks/${newAudioId}${ext}`))
+                                    .then(file => {
+                                        file = file[0];
+                                        // Get the download url
+                                        return file.makePublic()
+                                        .then(() => {
+                                            track.file.location = `https://storage.googleapis.com/hs-track/${newAudioId}${ext}`;
+                                            track.file.extend = true;
+                                            track.private = false;
+                                            Tracks.update({
+                                                _id: track._id,
+                                            }, track)
+                                            .then(() => {
+                                                // Remove the local track from the disk
+                                                fs.unlinkSync(path.join(`${__dirname}/../tracks/${newAudioId}${ext}`));
+                                                // Send a notification to the user
+                                                return rp({
+                                                    url: `${full_address}/api/notification`,
+                                                    headers: {
+                                                        token,
+                                                    },
+                                                    method: 'post',
+                                                    json: true,
+                                                    body: {
+                                                        to: user._id,
+                                                        title: 'Track Is Uploaded!',
+                                                        body: `${title} Is Uploaded`,
+                                                        link: `${full_address}/track/${user.username}/${title}`,
+                                                    }
                                                 })
                                             })
                                         })
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                    });
+
+                                    // Upload the cover image if they have any of those
+                                    if(coverImage){
+                                        const gcsCoverImage = gcs.bucket('hs-cover-image');
+                                        const newImageId = sha256(randomstring.generate(20));
+                                        const extImage = path.extname(coverImage.name);
+                                        fsp.rename(coverImage.path, path.join(`${__dirname}/../usersContent/${newImageId}${extImage}`))
+                                        .then(() => {
+                                            // Resize the image first
+                                            return easyimage.resize({
+                                                src: path.join(`${__dirname}/../usersContent/${newImageId}${extImage}`),
+                                                dst: path.join(`${__dirname}/../usersContent/${newImageId}${extImage}`),
+                                                width: 500,
+                                                height: 500,
+                                                ignoreAspectRatio: true,
+                                            })
+                                            .then(processedImage => {
+                                                // Upload the image to Google Cloud Storage
+                                                return gcsCoverImage.upload(processedImage.path)
+                                                .then(file => {
+                                                    file = file[0];
+                                                    return file.makePublic()
+                                                    .then(() => {
+                                                        // Update the track's cover image
+                                                        track.coverImage = `https://storage.googleapis.com/hs-cover-image/${newImageId}${extImage}`;
+                                                        return Tracks.update({
+                                                            _id: track._id,
+                                                        }, track);
+                                                    })
+                                                })
+                                            });
+                                        })
                                         .catch(error => {
                                             console.log(error);
-                                        });
-                                }
+                                        })
+                                    }
+
+                                });
                             });
-                        });
-                    }
-                }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                })
             });
         }
     });

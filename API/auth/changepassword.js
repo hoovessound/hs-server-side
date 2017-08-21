@@ -1,12 +1,12 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const Users = require('../../schema/Users');
-const Changepassword = require('../../schema/Changepassword');
-const nodemailer = require('nodemailer');
-const randomstring = require('randomstring');
-const mg = require('nodemailer-mailgun-transport');
-const authFile = require('../../src/index');
+import bcrypt from 'bcryptjs';
+import Users from '../../schema/Users';
+import Changepassword from '../../schema/Changepassword';
+import nodemailer from 'nodemailer';
+import randomstring from 'randomstring';
+import mg from 'nodemailer-mailgun-transport';
+import authFile from '../../src/index';
 
 router.get('/', (req, res) => {
     const token = req.query.token;

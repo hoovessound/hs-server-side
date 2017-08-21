@@ -1,6 +1,6 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import Tracks from '../schema/Tracks';
+const Tracks = require('../schema/Tracks');
 
 router.get('/:id?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;

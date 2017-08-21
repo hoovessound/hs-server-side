@@ -1,10 +1,10 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import Tracks from '../schema/Tracks';
-import path from 'path';
-import fs from 'fs';
-import https from 'https';
-import request from 'request';
+const Tracks = require('../schema/Tracks');
+const path = require('path');
+const fs = require('fs');
+const https = require('https');
+const request = require('request');
 
 router.get('/:id?', (req, res) => {
     const id = req.params.id;

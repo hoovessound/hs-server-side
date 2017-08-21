@@ -1,19 +1,19 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import Users from '../schema/Users';
-import Tracks from '../schema/Tracks';
-import formidable from 'formidable';
-import randomstring from 'randomstring';
-import sha256 from 'sha256';
+const Users = require('../schema/Users');
+const Tracks = require('../schema/Tracks');
+const formidable = require('formidable');
+const randomstring = require('randomstring');
+const sha256 = require('sha256');
 const fs =require('fs');
-import path from 'path';
+const path = require('path');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
 });
-import fullurl from 'fullurl';
-import fp from 'fs-promise';
-import easyimage from 'easyimage';
+const fullurl = require('fullurl');
+const fp = require('fs-promise');
+const easyimage = require('easyimage');
 
 // save the normal settings
 router.post('/', (req, res) => {

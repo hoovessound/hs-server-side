@@ -1,20 +1,20 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import Tracks from '../schema/Tracks';
-import Users from '../schema/Users';
-import mongoose from 'mongoose';
+const Tracks = require('../schema/Tracks');
+const Users = require('../schema/Users');
+const mongoose = require('mongoose');
 let status;
-import formidable from 'formidable';
-import path from 'path';
+const formidable = require('formidable');
+const path = require('path');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
 });
-import sha256 from 'sha256';
-import randomstring from 'randomstring';
-import fsp from 'fs-promise';
-import easyimage from 'easyimage';
-import request from 'request';
+const sha256 = require('sha256');
+const randomstring = require('randomstring');
+const fsp = require('fs-promise');
+const easyimage = require('easyimage');
+const request = require('request');
 
 async function authUser(res, token) {
     const user = await Users.findOne({token});

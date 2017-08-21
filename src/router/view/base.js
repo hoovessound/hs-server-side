@@ -1,9 +1,9 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import Users from '../../../schema/Users';
-import Tracks from '../../../schema/Tracks';
-import fullurl from 'fullurl';
-import randomstring from 'randomstring';
+const fullurl = require('fullurl');
+const Users = require('../../../schema/Users');
+const Tracks = require('../../../schema/Tracks');
+
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
 

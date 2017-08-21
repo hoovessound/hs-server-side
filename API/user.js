@@ -1,7 +1,7 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import Users from '../schema/Users';
-import Tracks from '../schema/Tracks';
+const Users = require('../schema/Users');
+const Tracks = require('../schema/Tracks');
 
 async function authUser(res, token) {
     const user = await Users.findOne({token});

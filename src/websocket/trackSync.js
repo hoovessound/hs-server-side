@@ -1,4 +1,4 @@
-const Users = require('../../schema/Users');
+import Users from '../../schema/Users';
 module.exports = function (socket) {
     // When someone play a new track
     socket.on('audio:toserver:new', (payload) => {

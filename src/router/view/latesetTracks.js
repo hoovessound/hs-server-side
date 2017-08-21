@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const rp = require('request-promise');
-const fullurl = require('fullurl');
-const Users = require('../../../schema/Users');
-const Tracks = require('../../../schema/Tracks');
+import rp from 'request-promise';
+import fullurl from 'fullurl';
+import Users from '../../../schema/Users';
+import Tracks from '../../../schema/Tracks';
 
 router.get('/', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;

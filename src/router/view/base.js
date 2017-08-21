@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Users = require('../../../schema/Users');
-const Tracks = require('../../../schema/Tracks');
-const fullurl = require('fullurl');
-const randomstring = require('randomstring');
+import Users from '../../../schema/Users';
+import Tracks from '../../../schema/Tracks';
+import fullurl from 'fullurl';
+import randomstring from 'randomstring';
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
 
@@ -51,7 +51,8 @@ router.get('*', (req, res) => {
                 }).limit(1).sort({
                     uploadDate: -1
                 }).then(track => {
-                    this.lastTrack = track;
+                    console.log(track)
+                    const lastTrack = track;
                     if(typeof user.lastPlay.trackID !== 'undefined'){
                         // Fetch the last track object
                         return Tracks.findOne({
@@ -61,13 +62,13 @@ router.get('*', (req, res) => {
                             if(track === null){
                                 res.render('index', {
                                     loginUser: user,
-                                    track: this.lastTrack,
+                                    track: lastTrack,
                                     full_address,
                                     token,
                                     totalPage: 0,
                                     offset: 10,
                                     year: new Date().getFullYear(),
-                                    initAudioSource: `${full_address}/api/listen/${this.lastTrack._id}`,
+                                    initAudioSource: `${full_address}/api/listen/${lastTrack._id}`,
                                     volume: 100,
                                 });
                             }else{

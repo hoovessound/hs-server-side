@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const Users = require('../../schema/Users');
+import bcrypt from 'bcryptjs';
+import Users from '../../schema/Users';
 
 router.get('/', (req, res) => {
     // rende th login page

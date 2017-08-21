@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Users = require('../schema/Users');
-const randomstring = require('randomstring');
+import Users from '../schema/Users';
+import randomstring from 'randomstring';
 
 router.get('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;

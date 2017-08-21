@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Users = require('../schema/Users');
-const Tracks = require('../schema/Tracks');
+import Users from '../schema/Users';
+import Tracks from '../schema/Tracks';
 
 router.post('/:query?', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;

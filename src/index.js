@@ -178,6 +178,11 @@ io.on('connection', (socket) => {
     })
     .then(user => {
 
+        if(user === null){
+            socket.emit('error:reload');
+            return false;
+        }
+
         if(typeof socketConnection[user.username] === 'undefined'){
             socketConnection[user.username] = {};
         }

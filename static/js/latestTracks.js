@@ -8,6 +8,7 @@ var container = document.querySelector('.container');
 var ajax = new XMLHttpRequest();
 var ajaxing = false;
 var initPlay = true;
+
 audio.addEventListener('ended', e => {
     // When the audio is ended, try to fetch an other track automatically
     masterPlayPuaseButton.innerHTML = 'play_arrow';

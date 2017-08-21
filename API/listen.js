@@ -26,6 +26,7 @@ router.get('/:id?', (req, res) => {
                 if(track.file.extend){
                     // Get the sound track from GCS
                     res.set('Cache-Control', 'public, max-age=31557600');
+                    res.set('Transfer-Encoding', 'chunked');
                     request(track.file.location).pipe(res);
                 }else{
                     // Send back the audio file

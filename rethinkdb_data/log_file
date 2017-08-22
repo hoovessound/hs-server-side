@@ -1,0 +1,23 @@
+2017-08-23T02:20:04.640721000 0.432237s notice: Recursively removing directory /Users/felixfong/Desktop/NodeJS/hoovessound/rethinkdb_data/tmp
+2017-08-23T02:20:04.644219000 0.435740s notice: Initializing directory /Users/felixfong/Desktop/NodeJS/hoovessound/rethinkdb_data
+2017-08-23T02:20:04.644390000 0.435905s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory '/Users/felixfong/Desktop/NodeJS/hoovessound/rethinkdb_data' did not already exist or is empty.)
+2017-08-23T02:20:04.644491000 0.436006s notice: Running rethinkdb 2.3.5 (CLANG 7.3.0 (clang-703.0.31))...
+2017-08-23T02:20:04.654835000 0.446351s notice: Running on Darwin 15.6.0 x86_64
+2017-08-23T02:20:04.654894000 0.446409s notice: Loading data from directory /Users/felixfong/Desktop/NodeJS/hoovessound/rethinkdb_data
+2017-08-23T02:20:04.955084000 0.746600s info: Automatically using cache size of 100 MB
+2017-08-23T02:20:04.955097000 0.746612s warn: Cache size does not leave much memory for server and query overhead (available memory: 357 MB).
+2017-08-23T02:20:04.955107000 0.746622s warn: Cache size is very low and may impact performance.
+2017-08-23T02:20:04.959010000 0.750525s notice: Listening for intracluster connections on port 29015
+2017-08-23T02:20:04.961272000 0.752787s notice: Listening for client driver connections on port 28015
+2017-08-23T02:20:04.961457000 0.752972s notice: Listening for administrative HTTP connections on port 8080
+2017-08-23T02:20:04.961461000 0.752976s notice: Listening on cluster addresses: 127.0.0.1, ::1
+2017-08-23T02:20:04.961467000 0.752981s notice: Listening on driver addresses: 127.0.0.1, ::1
+2017-08-23T02:20:04.961469000 0.752984s notice: Listening on http addresses: 127.0.0.1, ::1
+2017-08-23T02:20:04.961474000 0.752989s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2017-08-23T02:20:04.961480000 0.752994s notice: Server ready, "Felixs_MacBook_Air_local_gxb" 4b2760d4-89cd-4cca-951c-3252dd4552d3
+2017-08-23T02:20:06.592415000 2.383872s notice: A newer version of the RethinkDB server is available: 2.3.6. You can read the changelog at <https://github.com/rethinkdb/rethinkdb/releases>.
+2017-08-23T02:20:41.051548000 36.841791s notice: Server got SIGINT from pid 579, uid 501; shutting down...
+2017-08-23T02:20:41.052595000 36.842838s notice: Shutting down client connections...
+2017-08-23T02:20:41.053553000 36.843796s notice: All client connections closed.
+2017-08-23T02:20:41.053828000 36.844071s notice: Shutting down storage engine... (This may take a while if you had a lot of unflushed data in the writeback cache.)
+2017-08-23T02:20:41.066190000 36.856433s notice: Storage engine shut down.

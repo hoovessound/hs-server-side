@@ -26,7 +26,9 @@ router.get('/:id?', (req, res) => {
                 if(track.file.extend){
                     // Get the sound track from GCS
                     res.set('Cache-Control', 'public, max-age=31557600');
-                    request(track.file.location).pipe(res);
+                    res.set('Transfer-Encoding', 'chunked');
+                    fs.createWriteStream(path.join(`${__dirname}/test.ogg`)).pipe(request(track.file.location))
+                    // request(track.file.location).pipe(res);
                 }else{
                     // Send back the audio file
                     const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);

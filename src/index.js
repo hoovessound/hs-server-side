@@ -23,12 +23,12 @@ let socketConnection = {};
 module.exports.socketConnection = socketConnection;
 
 cli
-    .version('1.0.0')
-    .option('--port [number]', 'The port that HoovesSound will running on')
-    .parse(process.argv);
+.version('1.0.0')
+.option('--port [number]', 'The port that HoovesSound will running on')
+.parse(process.argv);
 
 // Settings up MongoDB
-if(process.env.DB){
+if (process.env.DB) {
     module.exports.db = {
         url: process.env.DB,
     }
@@ -39,10 +39,10 @@ if(process.env.DB){
 }
 
 // Settings up Google Cloud Platform
-if(process.env.GCS_AUTH){
+if (process.env.GCS_AUTH) {
     const gcsAuth = JSON.parse(process.env.GCS_AUTH);
     // Create that file
-    if(!fsp.existsSync(path.join(`${__dirname}/../gcsAuth`))){
+    if (!fsp.existsSync(path.join(`${__dirname}/../gcsAuth`))) {
         console.log('Creating the gcsAuth directory');
         fsp.mkdirSync(path.join(`${__dirname}/../gcsAuth`));
     }
@@ -56,18 +56,18 @@ if(process.env.GCS_AUTH){
 }
 
 // Settings up Mailgun
-if(process.env.MAILGUN_KEY){
+if (process.env.MAILGUN_KEY) {
     module.exports.mailgun = {
         key: process.env.MAILGUN_KEY,
     }
-}else{
+} else {
     console.log(`Please set up the  ${color.yellow('$MAILGUN_KEY')} environmental variable`);
     process.exit();
 }
 
-if(process.env.MAILGUN_DOMAIN){
+if (process.env.MAILGUN_DOMAIN) {
     module.exports.mailgun = {
-        domain:  process.env.MAILGUN_DOMAIN,
+        domain: process.env.MAILGUN_DOMAIN,
     }
     console.log(`Mailgun services status: ${color.green('OK')}`);
 }else{
@@ -91,7 +91,7 @@ const port = process.env.PORT || cli.port || 3000;
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
-    if(!exists){
+    if (!exists) {
         fsp.mkdir(path.join(`${__dirname}/../usersContent`), () => {
             console.log('usersContent directory created');
             return false;
@@ -102,7 +102,7 @@ fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
 });
 
 fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
-    if(!exists){
+    if (!exists) {
         fsp.mkdir(path.join(`${__dirname}/../tracks`), () => {
             console.log('tracks directory created');
         });
@@ -126,7 +126,7 @@ server.listen(port, () => {
 app.use(helmet());
 
 // using some middleware
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // express static
@@ -149,20 +149,20 @@ app.use(cookieSession({
 }));
 
 // Productions only settings
-if(process.env.NODE_ENV === 'production'){
+if (process.env.NODE_ENV === 'production') {
     // Using GZIP
     app.use(compression());
 
     app.use((req, res, next) => {
         // HTTP to HTTPS
-        if(req.secure){
+        if (req.secure) {
             return next();
-        }else{
+        } else {
             res.redirect(301, 'https://' + req.hostname + req.url);
         }
     });
 
-}else{
+} else {
     // using the morgan dev server log
     app.use(morgan('dev'));
 }
@@ -190,12 +190,12 @@ io.on('connection', (socket) => {
     })
     .then(user => {
 
-        if(user === null){
+        if (user === null) {
             socket.emit('error:reload');
             return false;
         }
 
-        if(typeof socketConnection[user.username] === 'undefined'){
+        if (typeof socketConnection[user.username] === 'undefined') {
             socketConnection[user.username] = {};
         }
         socketConnection[user.username][socket.id] = socket;
@@ -204,7 +204,7 @@ io.on('connection', (socket) => {
         socket.on('disconnect', () => {
             delete socketConnection[user.username][socket.id];
             module.exports.socketConnection = socketConnection;
-            if(socketConnection[user.username].length <= 0){
+            if (socketConnection[user.username].length <= 0) {
                 // No more connected client
                 user.lastPlay.isPlaying = false;
                 Users.update({

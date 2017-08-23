@@ -133,7 +133,7 @@ router.post('/', (req, res) => {
                                     // Get the download url
                                     return file.makePublic()
                                     .then(() => {
-                                        if(files.audio.type.includes('mp3')){
+                                        if(files.audio.type.includes('ogg')){
                                             return rp({
                                                 url: `${full_address}/api/notification`,
                                                 headers: {
@@ -144,7 +144,7 @@ router.post('/', (req, res) => {
                                                 body: {
                                                     to: user._id,
                                                     title: 'Processing your track',
-                                                    body: `We are currently converting your track ${title}`,
+                                                    body: `We are currently converting your track ${title} to MP3 formet`,
                                                 }
                                             })
                                             .then(() => {
@@ -156,7 +156,7 @@ router.post('/', (req, res) => {
                                                         token: filezizgag.key,
                                                     },
                                                     body: {
-                                                        target: 'aac',
+                                                        target: 'mp3',
                                                         category: 'audio',
                                                         source: `https://storage.googleapis.com/hs-track/${newAudioId}${ext}`,
                                                     }
@@ -181,7 +181,7 @@ router.post('/', (req, res) => {
                                                                 uploadOggFile(response.Getfile.FileURL);
                                                             }
                                                         })
-                                                    }, 20000);
+                                                    }, 30000);
 
                                                     function uploadOggFile(downloadUrl){
                                                         clearInterval(waitingStatusCode);
@@ -190,7 +190,7 @@ router.post('/', (req, res) => {
                                                         const download = require('download-file');
                                                         download(downloadUrl, {
                                                             directory: '../tracks',
-                                                            filename: `${newAudioId}-converted.aac`
+                                                            filename: `${newAudioId}-converted.mp3`
                                                         }, error => {
                                                             if(error){
                                                                 console.log(error);
@@ -204,7 +204,7 @@ router.post('/', (req, res) => {
                                                                     return file.makePublic()
                                                                 })
                                                                 .then(() => {
-                                                                    track.file.location = `https://storage.googleapis.com/hs-track/${newAudioId}-converted.OGG`;
+                                                                    track.file.location = `https://storage.googleapis.com/hs-track/${newAudioId}-converted.mp3`;
                                                                     track.file.extend = true;
                                                                     track.private = false;
                                                                     return Tracks.update({

@@ -32,8 +32,8 @@ if (process.env.DB) {
     module.exports.db = {
         url: process.env.DB,
     }
-    console.log(`Using DB: ${color.yellow(process.env.DB)}`)
-} else {
+    console.log(`MongoDB status: ${color.green('OK')}`);
+}else{
     console.log(`Please set up the  ${color.yellow('$DB')} environmental variable`);
     process.exit();
 }
@@ -49,8 +49,8 @@ if (process.env.GCS_AUTH) {
     const gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
     fsp.writeFileSync(gcsPath, process.env.GCS_AUTH);
     module.exports.gcsPath = gcsPath;
-    console.log(`GCS Project ID: ${color.yellow(gcsAuth.project_id)}`);
-} else {
+    console.log(`Google Cloud Storage status: ${color.green('OK')}`);
+}else{
     console.log(`Please set up the  ${color.yellow('$GCS_AUTH')} environmental variable`);
     process.exit();
 }
@@ -69,8 +69,20 @@ if (process.env.MAILGUN_DOMAIN) {
     module.exports.mailgun = {
         domain: process.env.MAILGUN_DOMAIN,
     }
-} else {
+    console.log(`Mailgun services status: ${color.green('OK')}`);
+}else{
     console.log(`Please set up the  ${color.yellow('$MAILGUN_DOMAIN')} environmental variable`);
+    process.exit();
+}
+
+// Settings up FileZigZag
+if(process.env.FILEZIGZAG_TOKEN){
+    module.exports.filezizgag = {
+        key:  process.env.FILEZIGZAG_TOKEN,
+    }
+    console.log(`FileZiZgag services status: ${color.green('OK')}`);
+}else{
+    console.log(`Please set up the  ${color.yellow('$FILEZIGZAG_TOKEN')} environmental variable`);
     process.exit();
 }
 

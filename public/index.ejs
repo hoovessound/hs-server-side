@@ -109,7 +109,7 @@
     <script src="/static/js/localPlayList.js"></script>
 
 
-    <%if(loginUser.lastPlay.playtime){%>
+    <%if(typeof playTimeValue !== 'undefined'){%>
     <script>
         audio.currentTime = <%=loginUser.lastPlay.playtime.currentTime%>
         masterPlayerTimeStamp.max = <%=loginUser.lastPlay.playtime.duration%>

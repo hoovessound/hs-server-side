@@ -81,6 +81,7 @@ router.get('*', (req, res) => {
                                     year: new Date().getFullYear(),
                                     initAudioSource: `${full_address}/api/listen/${track._id}`,
                                     volume: user.lastPlay.volume,
+                                    playTimeValue: true,
                                 });
                             }
                         })

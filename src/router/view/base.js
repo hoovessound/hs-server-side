@@ -51,7 +51,6 @@ router.get('*', (req, res) => {
                 }).limit(1).sort({
                     uploadDate: -1
                 }).then(track => {
-                    console.log(track)
                     const lastTrack = track;
                     if(typeof user.lastPlay.trackID !== 'undefined'){
                         // Fetch the last track object

@@ -18,6 +18,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const Users = require('../schema/Users');
 const cookie = require('cookie');
+const request = require('request');
 
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
@@ -171,6 +172,12 @@ if (process.env.NODE_ENV === 'production') {
 app.use((req, res, next) => {
     res.io = io;
     next();
+});
+
+app.all('/favicon.ico', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=31557600');
+    res.set('Transfer-Encoding', 'chunked');
+    request('https://storage.googleapis.com/hs-static/favicon.png').pipe(res);
 });
 
 module.exports.io = io;

@@ -13,7 +13,7 @@ const usersSchema = new Schema({
     },
     "banner": {
         type: String,
-        default: 'http://vignette4.wikia.nocookie.net/mlp/images/1/15/Ponyville_as_seen_from_Twilight_and_Spike%27s_chariot_S1E01.png/revision/latest?cb=20120904164855'
+        default: 'https://storage.googleapis.com/hs-static/banner.png'
     },
     fave: Array,
     roles: Array,

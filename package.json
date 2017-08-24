@@ -35,9 +35,8 @@
   },
   "private": true,
   "scripts": {
-    "start": "gulp javascript && gulp scss && babel-node src/index.js",
+    "start": "gulp javascript && gulp scss && node src/index.js",
     "build": "gulp default",
-    "dev": "nodemon src/index.js --exec babel-node"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

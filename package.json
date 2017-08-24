@@ -36,7 +36,7 @@
   "private": true,
   "scripts": {
     "start": "gulp javascript && gulp scss && node src/index.js",
-    "build": "gulp default",
+    "build": "gulp default"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

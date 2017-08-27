@@ -46,7 +46,7 @@ angular.module('hsRoutes', ['ngRoute'])
                 templateUrl: '/render/notification',
             })
             .otherwise({
-                redirectTo: '/home?404=true',
+                templateUrl: '/error/404',
             });
         $locationProvider.html5Mode({
             enabled: true,

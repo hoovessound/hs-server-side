@@ -23,6 +23,10 @@ router.use('/render/tracks', require('./latesetTracks'));
 
 router.use('/render/notification', require('./notification'));
 
+router.all('/error/404', (req, res) => {
+    res.send('<h1>404</h1><br><p>Page not find :/</p>')
+});
+
 router.get('*', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const token = req.cookies['oauth-token'];

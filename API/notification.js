@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const randomstring = require('randomstring');
+const escape = require('escape-html');
 
 router.get('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
@@ -63,7 +64,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
-    let body = req.body.body;
+    let body = escape(req.body.body);
     Users.findOne({
         token: token,
     })
@@ -77,11 +78,11 @@ router.post('/', (req, res) => {
             return false;
         }else{
             // Search for that user
-            const to = req.body.to;
+            const to = escape(req.body.to);
             return Users.findById(to)
             .then(user => {
                 // Settings up the user's notification stack
-                let payload = req.body;
+                let payload = escape(req.body);
                 const date = new Date();
                 const ID = `${randomstring.generate(255)}${date.getHours()}${date.getMilliseconds()}`;
                 payload.id = ID;
@@ -167,7 +168,7 @@ router.post('/remove', (req, res) => {
             return false;
         }else{
             // Search for that user
-            const id = req.body.id;
+            const id = escape(req.body.id);
             let findMsg = false;
             let index;
             user.notification.forEach((msg, i) => {

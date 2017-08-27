@@ -14,6 +14,7 @@ const gcs = require('@google-cloud/storage')({
 const fullurl = require('fullurl');
 const fp = require('fs-promise');
 const easyimage = require('easyimage');
+const escape = require('escape-html');
 
 // save the normal settings
 router.post('/', (req, res) => {
@@ -63,7 +64,7 @@ router.post('/', (req, res) => {
             }
             
             // Update the DB
-            user.fullName = req.body.settings.full_name;
+            user.fullName = escape(req.body.settings.full_name);
             return Users.update({
                 _id: user._id,
             }, user)

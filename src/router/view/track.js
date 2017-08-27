@@ -14,6 +14,7 @@ const sha256 = require('sha256');
 const randomstring = require('randomstring');
 const fsp = require('fs-promise');
 const easyimage = require('easyimage');
+const escape = require('escape-html');
 
 const TextFormattign = {
     url: (text) => {
@@ -254,10 +255,10 @@ router.post('/:username?/:title?/edit', (req, res) => {
                             }
 
                             function updateTitle() {
-                                let newTitle = fields.title;
+                                let newTitle = escape(fields.title);
                                 function writeDB() {
                                     if(fields.description){
-                                        track.description = fields.description;
+                                        track.description = escape(fields.description);
                                     }
 
                                     return Tracks.update({
@@ -284,7 +285,7 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                 }
 
                                 if(track.private){
-                                    track.title = `${fields.title || track.title}-private:${randomstring.generate(50)}`;
+                                    track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
                                     writeDB();
                                     return false;
                                 }
@@ -294,12 +295,12 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                     if(fields.title !== track.title){
                                         // Is not the same
                                         return Tracks.findOne({
-                                            title: fields.title,
+                                            title: escape(fields.title),
                                         }).then(authTrack => {
                                             if(authTrack !== null){
-                                                    track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                                    track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
                                             }else{
-                                                track.title = fields.title;
+                                                track.title = escape(fields.title);
                                             }
                                             writeDB();
                                         });

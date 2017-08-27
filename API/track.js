@@ -15,6 +15,7 @@ const randomstring = require('randomstring');
 const fsp = require('fs-promise');
 const easyimage = require('easyimage');
 const request = require('request');
+const escape = require('escape-html');
 
 async function authUser(res, token) {
     const user = await Users.findOne({token});
@@ -342,13 +343,13 @@ router.post('/edit/:id?', (req, res) => {
                                 }
 
                                 if(track.private){
-                                    track.title = `${fields.title || track.title}-private:${randomstring.generate(50)}`;
+                                    track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
                                     writeDB();
                                     return false;
                                 }
 
                                 if(fields.description){
-                                    track.description = fields.description;
+                                    track.description = escape(fields.description);
                                 }
 
                                 if(fields.title){
@@ -356,12 +357,12 @@ router.post('/edit/:id?', (req, res) => {
                                     if(fields.title !== track.title){
                                         // Is not the same
                                         return Tracks.findOne({
-                                            title: fields.title,
+                                            title: escape(fields.title),
                                         }).then(authTrack => {
                                             if(authTrack !== null){
-                                                    track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                                    track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
                                             }else{
-                                                track.title = fields.title;
+                                                track.title = escape(fields.title);
                                             }
                                             writeDB();
                                         });

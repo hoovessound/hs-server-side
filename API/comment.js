@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
+const escape = require('escape-html');
 
 router.post('/add', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
@@ -19,7 +20,7 @@ router.post('/add', (req, res) => {
             return false;
         }else{
             // success
-            const comment = req.body.comment;
+            const comment = escape(req.body.comment);
             const trackid = req.body.trackid;
 
             if(typeof comment === 'undefined') {

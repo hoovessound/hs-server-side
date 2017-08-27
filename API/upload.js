@@ -18,6 +18,7 @@ const gcs = require('@google-cloud/storage')({
 const easyimage = require('easyimage');
 const filezizgag = require('../src/index').filezizgag;
 const https = require('https');
+const escape = require('escape-html');
 
 router.post('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
@@ -61,7 +62,7 @@ router.post('/', (req, res) => {
                     }
                 }
 
-                const description = fields.description || null;
+                const description = escape(fields.description) || null;
 
                 // Upload the audio first
                 const tmp_audioFile = files.audio.path;
@@ -76,7 +77,7 @@ router.post('/', (req, res) => {
                     // Trim down the file name
                     file.name = file.name.replace(/\W/igm, '');
                     file.name = file.name.replace(/ /igm, '-');
-                    let title = fields.title || file.name;
+                    let title = escape(fields.title) || file.name;
                     // Check for the same title
 
                     return Tracks.findOne({

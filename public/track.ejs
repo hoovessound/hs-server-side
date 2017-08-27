@@ -16,10 +16,14 @@
 </head>
 <body>
     <div class="container">
+        <%if(typeof error !== 'undefined'){%>
+        <h1>Error</h1>
+        <p><%=error%></p>
+        <%}else{%>
         <%if(track !== null){%>
-            <%if(track.author.username === loginUser.username){%>
-                <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>/edit" class="btn btn-default" ng-controller="toEditLink" ng-click="toEditLink($event); $event.stopPropagation();" username="<%=track.author.username%>" title="<%=track.title%>">Edit</a>
-            <%}%>
+        <%if(track.author.username === loginUser.username){%>
+        <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>/edit" class="btn btn-default" ng-controller="toEditLink" ng-click="toEditLink($event); $event.stopPropagation();" username="<%=track.author.username%>" title="<%=track.title%>">Edit</a>
+        <%}%>
         <div class="fa fa-heart fave <%=isFave%>"></div>
         <h1 id="title"><%=track.title%></h1>
         <a style="display: block;" href="<%=full_address%>/user/<%=track.author.username%>"><%=track.author.username%></a>
@@ -43,27 +47,30 @@
             <button type="submit" id="post">Post</button>
             <div id="comments">
                 <%if(comments){%>
-                    <%comments.forEach(comment => {%>
-                        <div class="comment">
-                            <a href="/user/<%=comment.author.username%>">
-                                <%=comment.author.fullName%>
-                            </a>
-                            <p><%-comment.comment%></p>
-                        </div>
-                    <%})%>
+                <%comments.forEach(comment => {%>
+                <div class="comment">
+                    <a href="/user/<%=comment.author.username%>">
+                        <%=comment.author.fullName%>
+                    </a>
+                    <p><%-comment.comment%></p>
+                </div>
+                <%})%>
                 <%}else{%>
-                    <h1>No body have comment yet, will ya?</h1>
+                <h1>No body have comment yet, will ya?</h1>
                 <%}%>
             </div>
         </div>
         <%}else{%>
-            <h1 id="notracks">Didn't have any tracks yet</h1>
+        <h1 id="notracks">Didn't have any tracks yet</h1>
+        <%}%>
+        <script>
+            var trackid = "<%=track._id%>";
+        </script>
         <%}%>
     </div>
-    <script>
-        var trackid = "<%=track._id%>";
-    </script>
+
     <script src="/static/js/comment.js"></script>
     <script src="/static/js/track.js"></script>
+
 </body>
 </html>

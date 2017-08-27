@@ -29,8 +29,8 @@ router.post('/', (req, res) => {
     }
 
     // find the username
-    if(typeof req.body.username === 'undefined'){
-        let msg = 'Please enter the username';
+    if(typeof req.body.email === 'undefined'){
+        let msg = 'Please enter your email address';
         if(response === 'json'){
             res.json({
                 error: true,
@@ -68,11 +68,12 @@ router.post('/', (req, res) => {
 
 
     Users.findOne({
-        username: req.body.username,
+        email: req.body.email,
     })
     .then(user => {
+        console.log(user)
         if(user === null){
-            let msg = 'Incorrect username or password';
+            let msg = 'Incorrect email or password';
             if(response === 'json'){
                 res.json({
                     error: true,
@@ -120,7 +121,7 @@ router.post('/', (req, res) => {
 
                 }else{
                     // Incorrect username or password
-                    let msg = 'Incorrect username or password';
+                    let msg = 'Incorrect email or password';
                     if(response === 'json'){
                         res.json({
                             error: true,

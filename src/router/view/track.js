@@ -49,6 +49,18 @@ router.get('/:username?/:title?', (req, res) => {
                 'author.username': username,
                 title: title,
             }).then(track => {
+                if(track === null){
+                    res.render('track', {
+                        loginUser: user,
+                        track: null,
+                        comments: null,
+                        full_address,
+                        token,
+                        isFave: 'notFave',
+                        error: `Can't not find your track :/`
+                    });
+                    return false;
+                }
                 // Find out if the user fave this track or not
 
                 track.description = TextFormattign.url(track.description);

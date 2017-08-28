@@ -76,6 +76,7 @@ router.get('/fave', (req, res) => {
                         }).then(track => {
                             tracks.push(track);
                             if(tracks.length === user.fave.length){
+                                console.log(tracks)
                                 res.render('fave', {
                                     loginUser: user,
                                     tracks: {

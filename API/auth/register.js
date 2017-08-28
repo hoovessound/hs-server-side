@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const randomstring = require('randomstring');
+const crypto = require('crypto');
 
 router.get('/', (req, res) => {
     res.send('<h1>You will be <a href="https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link">Redirect</a> to sign up as a open beta tester in 5 seconds later</h1><script>setTimeout(function(){window.open("https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link", "_self")}, 5000)</script>')
@@ -131,14 +132,15 @@ router.post('/', (req, res) => {
             // Hash the password
             bcrypt.genSalt(10, (error, salt) => {
                 bcrypt.hash(req.body.password, salt, (error, hashedPassword) => {
-                    let token = randomstring.generate(255);
+                    const randomBytes = crypto.randomBytes(50);
+                    let token = randomBytes.toString('hex');
                     // Making sure there no one else using the same token
                     return Users.findOne({
                         token,
                     })
                     .then(user => {
                         // Gen a new token, cuz someone else is using that token as well :/
-                        token = randomstring.generate(255);
+                        token = randomBytes.toString('hex');
                         // Save the hashed password into the db     
                         const newUser = new Users({
                             username: req.body.username,

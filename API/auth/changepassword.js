@@ -8,6 +8,7 @@ const randomstring = require('randomstring');
 const mg = require('nodemailer-mailgun-transport');
 const authFile = require('../../src/index');
 const rp = require('request-promise');
+const crypto = require('crypto');
 
 router.get('/', (req, res) => {
     const token = req.query.token;
@@ -64,16 +65,17 @@ router.post('/', (req, res) => {
                                             bcrypt.hash(req.body.password, salt, (error, hashedPassword) => {
                                                 user.password = hashedPassword;
                                                 // re-new the user's token
-                                                user.token = randomstring.generate(255);
+                                                const randomBytes = crypto.randomBytes(50);
+                                                user.token = randomBytes.toString('hex');
                                                 return Users.update({
                                                     _id: this.user._id,
                                                 }, user)
-                                                    .then(() => {
-                                                        res.redirect('/api/auth/login?changepassword=true');
-                                                    })
-                                                    .catch(error => {
-                                                        console.log(error);
-                                                    })
+                                                .then(() => {
+                                                    res.redirect('/api/auth/login?changepassword=true');
+                                                })
+                                                .catch(error => {
+                                                    console.log(error);
+                                                })
                                             })
                                         });
                                     })

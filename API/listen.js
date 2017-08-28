@@ -40,7 +40,6 @@ router.get('/:id?', (req, res) => {
                                 break;
                         }
                         res.set('Cache-Control', 'public, max-age=31557600');
-                        res.set('Transfer-Encoding', 'chunked');
                         request(track.file.location).pipe(res);
                     }else{
                         res.end(`${extName} is not an valid audio file type`);

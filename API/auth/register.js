@@ -6,8 +6,11 @@ const randomstring = require('randomstring');
 const crypto = require('crypto');
 
 router.get('/', (req, res) => {
-    res.send('<h1>You will be <a href="https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link">Redirect</a> to sign up as a open beta tester in 5 seconds later</h1><script>setTimeout(function(){window.open("https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link", "_self")}, 5000)</script>')
-    return false;
+    const sudo = req.query.sudo;
+    if(!sudo){
+        res.send('<h1>You will be <a href="https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link">Redirect</a> to sign up as a open beta tester in 5 seconds later</h1><script>setTimeout(function(){window.open("https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link", "_self")}, 5000)</script>')
+        return false;
+    }
     res.render('auth/register', {
         error: false,
         message: null,
@@ -15,13 +18,16 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    res.json({
-        error: true,
-        msg: 'Please sign up as a open beta tester at https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
-        code: 'service_lock_down',
-        url: 'https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
-    })
-    return false;
+    const sudo = req.query.sudo;
+    if(!sudo){
+        res.json({
+            error: true,
+            msg: 'Please sign up as a open beta tester at https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
+            code: 'service_lock_down',
+            url: 'https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
+        })
+        return false;
+    }
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
     const response = req.query.response;
 
@@ -33,6 +39,44 @@ router.post('/', (req, res) => {
             code: 'invalid_http_request',
         })
         return false;
+    }
+
+    // Check the password policy
+
+    const policy = [
+        {
+            query: new RegExp(/[A-Z]/g),
+            msg: 'At less one uppercase latter',
+        },
+        {
+            query: new RegExp(/[a-z]/g),
+            msg: 'At less one lowercase latter',
+        },
+        {
+            query: new RegExp(/.{8,}/g),
+            msg: 'At less have 8 characters',
+        }
+    ]
+
+    for(let key in policy){
+        if(!req.body.password.match(policy[key].query)){
+
+            if(response === 'json'){
+                res.json({
+                    error: true,
+                    msg: policy[key].msg,
+                    code: 'against_security_policy',
+                });
+                return false;
+            }else{
+                res.render('auth/register', {
+                    error: true,
+                    message: policy[key].msg,
+                    code: 'against_security_policy',
+                });
+                return false;
+            }
+        }
     }
 
     // Check require fields

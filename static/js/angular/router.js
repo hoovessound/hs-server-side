@@ -45,6 +45,11 @@ angular.module('hsRoutes', ['ngRoute'])
             .when(`/notification`, {
                 templateUrl: '/render/notification',
             })
+            .when('/@:username', {
+                templateUrl: function(params){
+                    return `/render/user/${params.username}`;
+                },
+            })
             .otherwise({
                 templateUrl: '/error/404',
             });

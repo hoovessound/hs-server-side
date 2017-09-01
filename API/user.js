@@ -138,7 +138,7 @@ router.get('/:method?/:username?', (req, res) => {
             if(method === 'token'){
                 userClass.findByToken();
             }else{
-                userclass.findByUsername();
+                userClass.findByUsername();
             }
         }
     })

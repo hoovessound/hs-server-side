@@ -11,6 +11,8 @@ router.use('/auth/login', require('../../../API/auth/login'));
 
 router.use('/auth/changepassword', require('../../../API/auth/changepassword'));
 
+router.use('/listen', require('../../../API/listen'));
+
 // Basic API auth
 router.use((req, res, next) => {
     const id = req.headers['client_id'];
@@ -99,8 +101,6 @@ router.use('/tracks', require('../../../API/home'));
 router.use('/me', require('../../../API/me'));
 
 router.use('/upload', require('../../../API/upload'));
-
-router.use('/listen', require('../../../API/listen'));
 
 router.use('/user', require('../../../API/user'));
 

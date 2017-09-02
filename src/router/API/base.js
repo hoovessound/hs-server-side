@@ -72,19 +72,10 @@ router.use((req, res, next) => {
             })
         ])
         .then(data => {
-            if(data[0] === null){
+            if(data[0] === null || data[1] === null){
                 res.json({
                     error: true,
-                    msg: 'Bad client ID',
-                    code: 'bad_authentication'
-                });
-                return false;
-            }
-
-            if(data[1] === null){
-                res.json({
-                    error: true,
-                    msg: 'Bad client secret',
+                    msg: 'Bad client ID or secret',
                     code: 'bad_authentication'
                 });
                 return false;

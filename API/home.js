@@ -4,29 +4,10 @@ const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
 
 router.get('/', (req, res) => {
-    // Check for access token
-    const token = req.headers.token || req.query.token;
+
     const offset = parseInt(req.query.offset) || 0;
 
     class TracksClass {
-        async authUser(){
-            try{
-                const user = await Users.findOne({token});
-                if(user === null) {
-                    res.json({
-                        error: true,
-                        msg: 'Can not find your token',
-                        code: 'token_not_found',
-                    });
-                    return false;
-                }else{
-                    this.findTracksAndResponse();
-                }
-            }
-            catch(error){
-                console.log(error);
-            }
-        }
         async findTracksAndResponse(){
             try{
                 // Find the the latest 10 tracks order by the upload date
@@ -60,7 +41,7 @@ router.get('/', (req, res) => {
     }
 
     const tracks = new TracksClass();
-    tracks.authUser();
+    tracks.findTracksAndResponse();
 
 });
 module.exports = router;

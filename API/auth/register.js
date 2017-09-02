@@ -4,8 +4,11 @@ const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const randomstring = require('randomstring');
 const crypto = require('crypto');
+const csurf = require('csurf');
 
-router.get('/', (req, res) => {
+router.use(csurf());
+
+router.get('/', csurf(), (req, res) => {
     const sudo = req.query.sudo;
     if(!sudo){
         res.send('<h1>You will be <a href="https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link">Redirect</a> to sign up as a open beta tester in 5 seconds later</h1><script>setTimeout(function(){window.open("https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link", "_self")}, 5000)</script>')
@@ -14,10 +17,11 @@ router.get('/', (req, res) => {
     res.render('auth/register', {
         error: false,
         message: null,
+        csrfToken: req.csrfToken(),
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', csurf(), (req, res) => {
     const sudo = req.query.sudo;
     if(!sudo){
         res.json({

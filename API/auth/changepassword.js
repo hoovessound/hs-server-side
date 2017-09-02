@@ -9,18 +9,22 @@ const mg = require('nodemailer-mailgun-transport');
 const authFile = require('../../src/index');
 const rp = require('request-promise');
 const crypto = require('crypto');
+const csurf = require('csurf');
 
-router.get('/', (req, res) => {
+router.use(csurf());
+
+router.get('/', csurf(),  (req, res) => {
     const token = req.query.token;
     // render the change password page
     res.render('auth/changepassword', {
         error: null,
         message: null,
         token,
+        csrfToken: req.csrfToken(),
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', csurf(),  (req, res) => {
     const response = req.query.response;
     const full_address = req.protocol + "://" + req.headers.host;
     const token = req.query.token;
@@ -36,6 +40,7 @@ router.post('/', (req, res) => {
                     error: true,
                     message: 'Can not found your token',
                     token,
+                    csrfToken: req.csrfToken(),
                 });
                 return false;
             }else{
@@ -45,6 +50,7 @@ router.post('/', (req, res) => {
                         error: true,
                         message: 'Token used before',
                         token,
+                        csrfToken: req.csrfToken(),
                     });
                     return false;
                 }else{
@@ -116,6 +122,7 @@ router.post('/', (req, res) => {
                         message: 'Incorrect email',
                         code: 'unauthorized_action',
                         token,
+                        csrfToken: req.csrfToken(),
                     });
                     return false;
                 }
@@ -171,6 +178,7 @@ router.post('/', (req, res) => {
                                 message: 'Are you a bot',
                                 code: 'not_a_human',
                                 token: null,
+                                csrfToken: req.csrfToken(),
                             });
                             return false;
                         }

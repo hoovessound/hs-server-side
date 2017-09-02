@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const csurf = require('csurf');
 
+router.use(csurf());
+
 router.get('/', csurf(), (req, res) => {
     // rende th login page
     res.render('auth/login', {

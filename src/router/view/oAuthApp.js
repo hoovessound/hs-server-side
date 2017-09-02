@@ -9,6 +9,8 @@ const mg = require('nodemailer-mailgun-transport');
 const authFile = require('../../../src/index');
 const nodemailer = require('nodemailer');
 
+router.use(csurf());
+
 router.get('/', csurf(), (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const token = req.cookies['oauth-token'];

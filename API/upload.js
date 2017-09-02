@@ -21,7 +21,7 @@ const https = require('https');
 const escape = require('escape-html');
 
 router.post('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const full_address = req.protocol + "://" + req.headers.host;
     Users.findOne({
         token: token,

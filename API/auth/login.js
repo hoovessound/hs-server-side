@@ -75,7 +75,6 @@ router.post('/', csurf(), (req, res) => {
         email: req.body.email,
     })
     .then(user => {
-        console.log(user)
         if(user === null){
             let msg = 'Incorrect email or password';
             if(response === 'json'){

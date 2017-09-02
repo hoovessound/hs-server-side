@@ -4,7 +4,7 @@ const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
 
 router.post('/:query?', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const query = req.params.query || req.query.query;
     Users.find({
         token: token,

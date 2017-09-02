@@ -5,7 +5,7 @@ const Tracks = require('../schema/Tracks');
 
 router.get('/', (req, res) => {
     // Check for access token
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const offset = parseInt(req.query.offset) || 0;
 
     class TracksClass {

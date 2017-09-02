@@ -114,32 +114,13 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
 // GCS Auth Token Path
 module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
 
-server.listen(port, () => {
-    console.log(`HoovesSound are running on port ${color.green(port)}`);
-    // connect to the db
-    mongoose.connect(process.env.DB, {
-        useMongoClient: true,
-    });
-});
-
-// boost up the security
 app.use(helmet());
-
-// using some middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-
-// express static
 app.use('/static', express.static(path.join(`${__dirname}/../staticDest`)));
 app.use('/usersContent', express.static(path.join(`${__dirname}/../usersContent`)));
-// Statis HTML website
-app.use('/web', express.static(path.join(`${__dirname}/../web`)));
-
-// Set up the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(`${__dirname}/../public`));
-
-// set up the cookie stuff
 app.set('trust proxy', 1);
 app.use(cookieParser());
 app.use(cookieSession({
@@ -147,6 +128,14 @@ app.use(cookieSession({
     keys: [randomstring.generate(30)],
     maxAge: 365 * 24 * 60 * 60,
 }));
+
+server.listen(port, () => {
+    console.log(`HoovesSound are running on port ${color.green(port)}`);
+    // connect to the db
+    mongoose.connect(process.env.DB, {
+        useMongoClient: true,
+    });
+});
 
 // Productions only settings
 if (process.env.NODE_ENV === 'production') {
@@ -167,19 +156,20 @@ if (process.env.NODE_ENV === 'production') {
     app.use(morgan('dev'));
 }
 
-// Using Socket.io
-app.use((req, res, next) => {
-    res.io = io;
-    next();
-});
-
 app.all('/favicon.ico', (req, res) => {
     res.set('Cache-Control', 'public, max-age=31557600');
     res.set('Transfer-Encoding', 'chunked');
     request('https://storage.googleapis.com/hs-static/favicon.png').pipe(res);
 });
 
-module.exports.io = io;
+// Using Socket.io
+app.use((req, res, next) => {
+    res.io = io;
+    next();
+});
+
+// No CSRF check
+app.use('/api', require('./router/API/base'));
 
 io.on('connection', (socket) => {
     const clientCookie = cookie.parse(socket.handshake.headers.cookie);
@@ -231,7 +221,18 @@ io.on('connection', (socket) => {
     })
 });
 
-// Using the API
-app.use('/api', require('./router/API/base'));
+app.use(csurf());
+app.use(function (err, req, res, next) {
+    if (err.code !== 'EBADCSRFTOKEN') return next(err)
+    // Someone just try to CSRF attack my app lol
+    const links = [
+        'https://www.youtube.com/watch?v=dv13gl0a-FA', // Deja Vu
+        'https://www.youtube.com/watch?v=XCiDuy4mrWU', // Running in The 90s
+        'https://www.youtube.com/watch?v=atuFSv2bLa8', // Gas Gas Gas
+    ];
+    const link = links[Math.floor(Math.random()*links.length)];
+    res.redirect(link);
+});
 
-app.use('/', require('./router/view/base'));
+const view = require('./router/view/base');
+app.use('/', view);

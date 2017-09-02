@@ -13,8 +13,8 @@
         <%apps.map(app => {%>
         <div class="app">
             <p><%=app.name%></p>
-            <p>Client ID: <input type="text" value="<%=app.clientId%>" onmouseenter="this.select()" onmouseleave="this.blur()"></p>
-            <p>Client Secret: <input type="password" value="<%=app.clientSecret%>" onmouseenter="this.select(); this.type = 'text';" onmouseleave="this.blur(); this.type = 'password';"></p>
+            <p>Client ID: <input type="text" value="<%=app.clientId%>" onmouseenter="this.select()" onmouseleave="this.blur()" readonly></p>
+            <p>Client Secret: <input type="password" value="<%=app.clientSecret%>" onmouseenter="this.select(); this.type = 'text';" onmouseleave="this.blur(); this.type = 'password';" readonly></p>
         </div>
         <%})%>
         <%}else{%>

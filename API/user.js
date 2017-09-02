@@ -109,7 +109,7 @@ class UserClass {
 }
 
 router.get('/:method?/:username?', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const username = req.params.username;
     const method = req.params.method;
     const userClass = new UserClass(res, token);

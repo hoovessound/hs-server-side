@@ -49,7 +49,7 @@ class Me {
 }
 
 router.get('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const me = new Me(res, token, req);
     me.findThisUserTracks();
 });

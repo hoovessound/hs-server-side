@@ -5,7 +5,7 @@ const Tracks = require('../schema/Tracks');
 const escape = require('escape-html');
 
 router.post('/add', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     // find the users
 
     Users.findOne({

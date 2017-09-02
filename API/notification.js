@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const randomstring = require('randomstring');
-const escape = require('escape-html');
 
 router.get('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const id = req.query.id;
     Users.findOne({
         token: token,
@@ -63,8 +62,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    let body = escape(req.body.body);
+    const token = req.headers.token || req.query.token;
+    const id = req.query.id;
     Users.findOne({
         token: token,
     })
@@ -78,11 +77,11 @@ router.post('/', (req, res) => {
             return false;
         }else{
             // Search for that user
-            const to = escape(req.body.to);
+            const to = req.body.to;
             return Users.findById(to)
             .then(user => {
                 // Settings up the user's notification stack
-                let payload = escape(req.body);
+                let payload = req.body;
                 const date = new Date();
                 const ID = `${randomstring.generate(255)}${date.getHours()}${date.getMilliseconds()}`;
                 payload.id = ID;
@@ -92,49 +91,15 @@ router.post('/', (req, res) => {
 
                 user.notification.push(payload);
 
-                // Message environment variables
-                function envRender(string, args){
-                    const regex = new RegExp(/{(.*?)}/igm);
-                    // Find an array of the {} thing
-                    if(string.match(regex)){
-                        // Need env variable
-                        string.match(regex).forEach(variable => {
-                            const varName = variable.replace(/{|}/g, '');
-                            const evalString = `args${varName}`;
-                            const varVal = typeof eval(evalString) !== 'undefined' ? eval(evalString) : '';
-                            string = string.replace(variable, varVal);
-                        });
-                    }
-                    return string;
-                }
-
-                const envData = {
-                    user: {
-                        full_name: user.fullName,
-                        username: user.username,
-                        uid: user._id,
-                    },
-                    message: {
-                        push_date: date,
-                    }
-                }
-                payload.body = envRender(payload.body, envData);
                 // Save the message to the DB
+
                 return Users.update({
                     _id: user._id,
                 }, user)
                 .then(() => {
+                    // Send the payload via the socket
+                    res.io.emit('notification:new', payload);
                     res.json(payload);
-                    const socketConnection = require('../src/index').socketConnection[user.username];
-                    // Send the payload via the web socket
-                    for(let key in socketConnection){
-                        if(key){
-                            socketConnection[key].emit('notification:new', payload)
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
                 })
             });
         }
@@ -154,7 +119,8 @@ router.post('/', (req, res) => {
 });
 
 router.post('/remove', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
+    const id = req.query.id;
     Users.findOne({
         token: token,
     })
@@ -168,7 +134,7 @@ router.post('/remove', (req, res) => {
             return false;
         }else{
             // Search for that user
-            const id = escape(req.body.id);
+            const id = req.body.id;
             let findMsg = false;
             let index;
             user.notification.forEach((msg, i) => {

@@ -187,7 +187,7 @@ class FindTrack {
 }
 
 router.get('/:username?/:title?', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const username = req.params.username || req.headers.username;
     const title = req.params.title || req.headers.title;
     const ID = req.query.id;
@@ -202,7 +202,7 @@ router.get('/:username?/:title?', (req, res) => {
 
 router.post('/fave/:id?', (req, res) => {
     const id = req.params.id;
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const findTrack = new FindTrack(res, token, req);
     if (typeof id === 'undefined') {
         res.json({
@@ -216,7 +216,7 @@ router.post('/fave/:id?', (req, res) => {
 });
 
 router.get('/fave/isfave/:id?', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const id = req.params.id;
     const findTrack = new FindTrack(res, token, req);
     if (typeof id === 'undefined') {
@@ -231,7 +231,7 @@ router.get('/fave/isfave/:id?', (req, res) => {
 });
 
 router.post('/edit/:id?', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     const id = req.params.id;
     const full_address = req.protocol + "://" + req.headers.host;
     if (typeof id === 'undefined') {

@@ -18,7 +18,7 @@ const escape = require('escape-html');
 
 // save the normal settings
 router.post('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     
     Users.findOne({
         token: token,
@@ -107,7 +107,7 @@ router.post('/', (req, res) => {
 // Upload the profile picture
 router.post('/profilepicture/upload', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
-    const token = req.body.token || req.headers.token || req.query.token;
+    const token = req.headers.token || req.query.token;
     
     if(typeof token === 'undefined'){
         res.json({

@@ -49,7 +49,6 @@ router.post('/', csurf(), (req, res) => {
 
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const grecaptchaResponse = req.body['g-recaptcha-response'];
-        // TODO: Can't not get the grecaptchaResponse thing
         if(typeof grecaptchaResponse !== 'undefined'){
             return rp({
                 url: 'https://www.google.com/recaptcha/api/siteverify',

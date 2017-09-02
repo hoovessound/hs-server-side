@@ -19,6 +19,7 @@ const morgan = require('morgan');
 const Users = require('../schema/Users');
 const cookie = require('cookie');
 const request = require('request');
+const csurf = require('csurf');
 
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
@@ -67,9 +68,7 @@ if (process.env.MAILGUN_KEY) {
 }
 
 if (process.env.MAILGUN_DOMAIN) {
-    module.exports.mailgun = {
-        domain: process.env.MAILGUN_DOMAIN,
-    }
+    module.exports.mailgun.domain = process.env.MAILGUN_DOMAIN;
     console.log(`Mailgun services status: ${color.green('OK')}`);
 }else{
     console.log(`Please set up the  ${color.yellow('$MAILGUN_DOMAIN')} environmental variable`);
@@ -172,6 +171,22 @@ if (process.env.NODE_ENV === 'production') {
 app.use((req, res, next) => {
     res.io = io;
     next();
+});
+
+// Setting up the CSRF token
+
+app.use(csurf());
+
+app.use(function (err, req, res, next) {
+    if (err.code !== 'EBADCSRFTOKEN') return next(err)
+    // Someone just try to CSRF attack my app lol
+    const links = [
+        'https://www.youtube.com/watch?v=dv13gl0a-FA', // Deja Vu
+        'https://www.youtube.com/watch?v=XCiDuy4mrWU', // Running in The 90s
+        'https://www.youtube.com/watch?v=atuFSv2bLa8', // Gas Gas Gas
+    ];
+    const link = links[Math.floor(Math.random()*links.length)];
+    res.redirect(link);
 });
 
 app.all('/favicon.ico', (req, res) => {

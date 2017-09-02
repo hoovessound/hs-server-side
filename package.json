@@ -12,6 +12,7 @@
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.2",
     "cors": "^2.8.4",
+    "csurf": "^1.9.0",
     "download-file": "^0.1.5",
     "easyimage": "^2.1.0",
     "ejs": "^2.5.6",

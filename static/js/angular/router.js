@@ -50,6 +50,13 @@ angular.module('hsRoutes', ['ngRoute'])
                     return `/render/user/${params.username}`;
                 },
             })
+            .when('/me/apps', {
+
+                templateUrl: function () {
+                    const queryRawString= window.location.href.substr(window.location.href.indexOf("?") + 1);
+                    return `/render/oauth-app?${queryRawString}`;
+                },
+            })
             .otherwise({
                 templateUrl: '/error/404',
             });

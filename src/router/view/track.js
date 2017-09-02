@@ -33,7 +33,7 @@ const TextFormattign = {
 router.get('/:username?/:title?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
         const username = req.params.username;
         const title = req.params.title;
@@ -43,7 +43,7 @@ router.get('/:username?/:title?', (req, res) => {
             token,
         }).then(user => {
             if(user === null){
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }
             return Tracks.findOne({
                 'author.username': username,

@@ -7,7 +7,7 @@ const Users = require('../../../schema/Users');
 router.get('/', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
         const token = req.cookies['oauth-token'];
 
@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
             token: token,
         }).then(user => {
             if (user === null) {
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }else{
                 res.render('settings', {
                     loginUser: user,

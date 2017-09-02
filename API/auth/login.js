@@ -2,16 +2,18 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
+const csurf = require('csurf');
 
-router.get('/', (req, res) => {
+router.get('/', csurf(), (req, res) => {
     // rende th login page
     res.render('auth/login', {
         error: null,
-        message: null
+        message: null,
+        csrfToken: req.csrfToken(),
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', csurf(), (req, res) => {
 
     // check the oauth requirement
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;

@@ -19,7 +19,6 @@ router.post('/', csurf(), (req, res) => {
 
     // check the oauth requirement
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
-    const response = req.query.response;
     const service = req.query.service;
 
     // Check the content type

@@ -33,7 +33,6 @@ router.post('/', csurf(), (req, res) => {
         return false;
     }
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
-    const response = req.query.response;
 
     // Check the content type
     if(req.headers['content-type'] !== 'application/x-www-form-urlencoded'){
@@ -65,95 +64,50 @@ router.post('/', csurf(), (req, res) => {
     for(let key in policy){
         if(!req.body.password.match(policy[key].query)){
 
-            if(response === 'json'){
-                res.json({
-                    error: true,
-                    msg: policy[key].msg,
-                    code: 'against_security_policy',
-                });
-                return false;
-            }else{
-                res.render('auth/register', {
-                    error: true,
-                    message: policy[key].msg,
-                    code: 'against_security_policy',
-                });
-                return false;
-            }
+            res.render('auth/register', {
+                error: true,
+                message: policy[key].msg,
+                code: 'against_security_policy',
+            });
+            return false;
         }
     }
 
     // Check require fields
     if(typeof req.body.username == 'undefined'){
         let msg = 'Missing the username fields';
-        if(response === 'json'){
-            res.json({
-                error: true,
-                msg: msg,
-                code: 'missing_require_fields',
-            });
-            return false;
-        }else{
-            res.render('auth/register', {
-                error: true,
-                message: msg,
-            });
-            return false;
-        }
+        res.render('auth/register', {
+            error: true,
+            message: msg,
+        });
+        return false;
     }
 
     if(typeof req.body.password == 'undefined'){
         let msg = 'Missing the password fields';
-        if(response === 'json'){
-            res.json({
-                error: true,
-                msg: msg,
-                code: 'missing_require_fields',
-            });
-            return false;
-        }else{
-            res.render('auth/register', {
-                error: true,
-                message: msg,
-            });
-            return false;
-        }
+        res.render('auth/register', {
+            error: true,
+            message: msg,
+        });
+        return false;
     }
 
     if(typeof req.body.fullname == 'undefined'){
         let msg = 'Missing the fullname fields';
-        if(response === 'json'){
-            res.json({
-                error: true,
-                msg: msg,
-                code: 'missing_require_fields',
-            });
-            return false;
-        }else{
-            res.render('auth/register', {
-                error: true,
-                message: msg,
-            });
-            return false;
-        }
+        res.render('auth/register', {
+            error: true,
+            message: msg,
+        });
+        return false;
     }
 
     if(typeof req.body.email == 'undefined'){
         let msg = 'Missing the email fields';
-        if(response === 'json'){
-            res.json({
-                error: true,
-                msg: msg,
-                code: 'missing_require_fields',
-            });
-            return false;
-        }else{
-            res.render('auth/register', {
-                error: true,
-                message: msg,
-            });
-            return false;
-        }
+        res.render('auth/register', {
+            error: true,
+            message: msg,
+        });
+        return false;
     }
 
     // look for existing users
@@ -162,20 +116,11 @@ router.post('/', csurf(), (req, res) => {
     }).then(user => {
         if(user !== null){
             let msg = 'Username is already taken';
-            if(response === 'json'){
-                res.json({
-                    error: true,
-                    msg: msg,
-                    code: 'unauthorized_action',
-                });
-                return false;
-            }else{
-                res.render('auth/register', {
-                    error: true,
-                    message: msg,
-                });
-                return false;
-            }
+            res.render('auth/register', {
+                error: true,
+                message: msg,
+            });
+            return false;
         }else{
             // Hash the password
             bcrypt.genSalt(10, (error, salt) => {
@@ -206,15 +151,8 @@ router.post('/', csurf(), (req, res) => {
                                     httpOnly: true,
                                 });
                             }
-                            if(response === 'json') {
-                                // response with a JSON format
-                                res.json({
-                                    token,
-                                });
-                            }else{
-                                // redirect the user into the redirect url
-                                res.redirect(`${redirect}?success=true&token=${token}`);
-                            }
+                            // redirect the user into the redirect url
+                            res.redirect(`${redirect}?success=true&token=${token}`);
                         })
                         .catch(error => {
                             console.log(error);

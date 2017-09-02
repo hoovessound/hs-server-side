@@ -5,25 +5,31 @@ const Tracks = require('../schema/Tracks');
 const escape = require('escape-html');
 
 router.post('/add', (req, res) => {
-    const token = req.headers.token || req.query.token;
-    // find the users
+    const userId = req.body['user_id'];
+    if(!userId){
+        res.json({
+            error: true,
+            msg: 'Missing the user ID',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
 
+    // find the users
     Users.findOne({
-        token: token,
+        _id: userId,
     }).then(user => {
         if(user === null){
             res.json({
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'Can not find your user ID',
+                code: 'user_id_not_found',
             });
             return false;
         }else{
             // success
-            const comment = escape(req.body.comment);
-            const trackid = req.body.trackid;
 
-            if(typeof comment === 'undefined') {
+            if(!req.body.comment) {
                 res.json({
                     error: true,
                     msg: 'Missing the comment field',
@@ -32,10 +38,13 @@ router.post('/add', (req, res) => {
                 return false;
             }
 
-            if(typeof trackid === 'undefined') {
+            const comment = escape(req.body.comment);
+            const trackid = req.body['track_id'];
+
+            if(!trackid) {
                 res.json({
                     error: true,
-                    msg: 'Missing the trackid field',
+                    msg: 'Missing the track id field',
                     code: 'missing_require_fields',
                 });
                 return false;
@@ -48,7 +57,7 @@ router.post('/add', (req, res) => {
                 if(track === null){
                     res.json({
                         error: true,
-                        msg: 'Your trackid might be incorrect',
+                        msg: 'Your track id might be incorrect',
                     });
                     return false;
                 }

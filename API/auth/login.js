@@ -35,39 +35,21 @@ router.post('/', csurf(), (req, res) => {
     // find the username
     if(typeof req.body.email === 'undefined'){
         let msg = 'Please enter your email address';
-        if(response === 'json'){
-            res.json({
-                error: true,
-                message: msg,
-                code: 'unauthorized_action',
-            });
-            return false;
-        }else{
-            res.render('auth/login', {
-                error: true,
-                message: msg,
-            });
-            return false;
-        }
+        res.render('auth/login', {
+            error: true,
+            message: msg,
+        });
+        return false;
     }
 
     if(typeof req.body.password === 'undefined'){
         let msg = 'Please enter the password';
-        if(response === 'json'){
-            res.json({
-                error: true,
-                message: msg,
-                code: 'missing_require_fields',
-            });
-            return false;
-        }else{
-            res.render('auth/login', {
-                error: true,
-                message: msg,
-                code: 'missing_require_fields',
-            });
-            return false;
-        }
+        res.render('auth/login', {
+            error: true,
+            message: msg,
+            code: 'missing_require_fields',
+        });
+        return false;
     }
 
 
@@ -77,21 +59,12 @@ router.post('/', csurf(), (req, res) => {
     .then(user => {
         if(user === null){
             let msg = 'Incorrect email or password';
-            if(response === 'json'){
-                res.json({
-                    error: true,
-                    message: msg,
-                    code: 'unauthorized_action',
-                });
-                return false;
-            }else{
-                res.render('auth/login', {
-                    error: true,
-                    message: msg,
-                    code: 'unauthorized_action',
-                });
-                return false;
-            }
+            res.render('auth/login', {
+                error: true,
+                message: msg,
+                code: 'unauthorized_action',
+            });
+            return false;
         }else{
             // Check for the password
             return bcrypt.compare(req.body.password, user.password).then(same => {
@@ -106,38 +79,21 @@ router.post('/', csurf(), (req, res) => {
                     // save the token into the session
                     req.session.token = token;
 
-                    if(response === 'json') {
-                        // response with a JSON format
-                        res.json({
-                           token,
-                        });
+                    // redirect the user into the redirect url
+
+                    if(service === 'hs_service_login') {
+                        res.redirect(redirect);
                     }else{
-                        // redirect the user into the redirect url
-
-                        if(service === 'hs_service_login') {
-                            res.redirect(redirect);
-                        }else{
-                            res.redirect(`${redirect}?success=true&token=${token}`);
-                        }
-
+                        res.redirect(`${redirect}?success=true&token=${token}`);
                     }
 
                 }else{
                     // Incorrect username or password
                     let msg = 'Incorrect email or password';
-                    if(response === 'json'){
-                        res.json({
-                            error: true,
-                            message: msg,
-                            code: 'unauthorized_action',
-                        });
-                        return false;
-                    }else{
-                        res.render('auth/login', {
-                            error: true,
-                            message: msg,
-                        });
-                    }
+                    res.render('auth/login', {
+                        error: true,
+                        message: msg,
+                    });
                 }
             });
         }

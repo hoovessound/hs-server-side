@@ -5,25 +5,36 @@ const Tracks = require('../schema/Tracks');
 const escape = require('escape-html');
 
 router.post('/add', (req, res) => {
-    const userId = req.body['user_id'];
-    if(!userId){
-        res.json({
-            error: true,
-            msg: 'Missing the user ID',
-            code: 'missing_require_fields',
-        });
-        return false;
+    const userId = req.body.userid;
+    const token = req.hsAuth.token;
+    let queryObject = {};
+    if(req.query.bypass === 'true'){
+        queryObject = {
+            token,
+        }
+    }else{
+        if(!userId){
+            res.json({
+                error: true,
+                msg: 'Missing the user ID',
+                code: 'missing_require_fields',
+            });
+            return false;
+        }
+
+        queryObject = {
+            _id: userId,
+        }
     }
 
     // find the users
-    Users.findOne({
-        _id: userId,
-    }).then(user => {
+    Users.findOne(queryObject)
+    .then(user => {
         if(user === null){
             res.json({
                 error: true,
                 msg: 'Can not find your user ID',
-                code: 'user_id_not_found',
+                code: 'unexpected_result',
             });
             return false;
         }else{
@@ -39,7 +50,7 @@ router.post('/add', (req, res) => {
             }
 
             const comment = escape(req.body.comment);
-            const trackid = req.body['track_id'];
+            const trackid = req.body.trackid;
 
             if(!trackid) {
                 res.json({
@@ -52,7 +63,8 @@ router.post('/add', (req, res) => {
 
             return Tracks.findOne({
                 _id: trackid
-            }).then(track => {
+            })
+            .then(track => {
 
                 if(track === null){
                     res.json({
@@ -82,9 +94,31 @@ router.post('/add', (req, res) => {
                     });
                 });
             })
+            .catch(error => {
+                if(error.message.includes('Cast to ObjectId failed for value')){
+                    res.json({
+                        error: true,
+                        msg: 'Can\'t not found your track id',
+                        code: 'unexpected_result',
+                    });
+                    return false;
+                }else{
+                    console.log(error)
+                }
+            })
         }
-    }).catch(error => {
-        console.log(error);
+    })
+    .catch(error => {
+        if(error.message.includes('Cast to ObjectId failed for value')){
+            res.json({
+                error: true,
+                msg: 'Can\'t not found your user id',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            console.log(error)
+        }
     });
 });
 

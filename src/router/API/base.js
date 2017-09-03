@@ -40,6 +40,7 @@ router.use((req, res, next) => {
                 }else{
                     req.hsAuth = {
                         token,
+                        user,
                     }
                     next();
                 }

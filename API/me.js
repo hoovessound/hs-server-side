@@ -43,7 +43,16 @@ class Me {
         }
         catch(error){
             if(!error.code && !error.msg){
-                console.log(error)
+                if(error.message.includes('Cast to ObjectId failed for value')){
+                    this.res.json({
+                        error: true,
+                        msg: 'Can\'t not that user id',
+                        code: 'unexpected_result',
+                    });
+                    return false;
+                }else{
+                    console.log(error);
+                }
             }
         }
     }

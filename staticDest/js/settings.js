@@ -22,7 +22,6 @@ iconInput.addEventListener('change', function (e) {
             var response = JSON.parse(ajax.response);
             if (response.success) {
                 iconInput.value = null;
-                window.open('/home', '_self');
             } else {
                 document.querySelector('.error').innerHTML = response.msg;
             }

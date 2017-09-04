@@ -2,6 +2,7 @@ var profilePicture = document.querySelector('#profilePicture .icon');
 var iconInput = document.querySelector('#profilePicture #iconInput');
 var fullname = document.querySelector('#fullname input');
 const navUsername = document.querySelector('nav .container-fluid #bs-example-navbar-collapse-1 .nav.navbar-nav.navbar-right .dropdown .dropdown-toggle');
+const navImg = const navUsername = document.querySelector('nav .container-fluid #bs-example-navbar-collapse-1 .nav.navbar-nav.navbar-right .dropdown .dropdown-toggle img');
 
 profilePicture.addEventListener('click', e => {
     iconInput.click();
@@ -20,7 +21,7 @@ iconInput.addEventListener('change', e => {
             var response = JSON.parse(ajax.response);
             if(response.success){
                 iconInput.value = null;
-                window.open('/home', '_self');
+                navImg.src = response.icon;
             }else{
                 document.querySelector('.error').innerHTML = response.msg;
             }

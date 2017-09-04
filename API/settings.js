@@ -19,7 +19,15 @@ const escape = require('escape-html');
 // save the normal settings
 router.post('/', (req, res) => {
     const token = req.headers.token || req.query.token;
-    
+    if(req.query.bypass !== 'true'){
+        res.json({
+            error: true,
+            msg: 'Internal API',
+            code: 'services_lock_down',
+        })
+        return false;
+    }
+
     Users.findOne({
         token: token,
     })

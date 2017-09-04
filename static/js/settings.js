@@ -1,6 +1,7 @@
 var profilePicture = document.querySelector('#profilePicture .icon');
 var iconInput = document.querySelector('#profilePicture #iconInput');
 var fullname = document.querySelector('#fullname input');
+const navUsername = document.querySelector('nav .container-fluid #bs-example-navbar-collapse-1 .nav.navbar-nav.navbar-right .dropdown .dropdown-toggle');
 
 profilePicture.addEventListener('click', e => {
     iconInput.click();
@@ -11,7 +12,7 @@ iconInput.addEventListener('change', e => {
     var file = e.target.files[0];
     var form = new FormData();
     form.append('image', file);
-    ajax.open('POST', '/api/settings/profilepicture/upload');
+    ajax.open('POST', '/api/settings/profilepicture/upload?bypass=true');
     ajax.setRequestHeader('token', token);
     ajax.send(form);
     ajax.onload = function(){
@@ -40,7 +41,7 @@ fullname.addEventListener('focusout', e => {
 
 function updateFullName(e) {
     e.preventDefault();
-    ajax.open('POST', '/api/settings');
+    ajax.open('POST', '/api/settings?bypass=true');
     ajax.setRequestHeader('token', token);
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.send(JSON.stringify({
@@ -49,4 +50,5 @@ function updateFullName(e) {
         }
     }));
     fullname.blur();
+    navUsername.innerHTML = fullname.value;
 }

@@ -12,7 +12,7 @@ angular.module('hsSearch', ['ngRoute']).controller('search', function ($scope, $
             $location.url('/search/' + query);
             $http({
                 method: 'GET',
-                url: 'api//search/' + query
+                url: 'api/search/' + query
             });
         }
     });

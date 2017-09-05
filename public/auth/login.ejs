@@ -20,6 +20,9 @@
 
         <div class="icon"></div>
         <h1>Login</h1>
+        <%if(typeof appName !== 'undefined'){%>
+          <p class="appName">Application: <%=appName%></p>
+        <%}%>
         <form id="loginForm" action="" method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <p><input type="email" class="username" value="" name="email" placeholder="Email Address"></p>

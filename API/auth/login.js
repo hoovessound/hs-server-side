@@ -3,16 +3,56 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const csurf = require('csurf');
+const oAuthApps = require('../../schema/oAuthApps');
 
 router.use(csurf());
 
 router.get('/', csurf(), (req, res) => {
-    // rende th login page
-    res.render('auth/login', {
-        error: null,
-        message: null,
-        csrfToken: req.csrfToken(),
-    });
+    // render th login page
+    const service = req.query.service;
+    const clientId = req.query.client_id;
+    if(!service){
+        if(!clientId){
+            res.render('auth/login', {
+                error: null,
+                message: 'Please pass in your client ID or your client secret',
+                csrfToken: req.csrfToken(),
+            });
+            return false;
+        }else{
+            Promise.all([
+                oAuthApps.findOne({
+                    clientId,
+                })
+            ])
+            .then(data => {
+                if(data[0] === null){
+                    res.render('auth/login', {
+                        error: null,
+                        message: 'Bad client ID',
+                        csrfToken: req.csrfToken(),
+                    });
+                    return false;
+                }else{
+                    res.render('auth/login', {
+                        error: null,
+                        message: null,
+                        csrfToken: req.csrfToken(),
+                        appName: data[0].name,
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        }
+    }else{
+        res.render('auth/login', {
+            error: null,
+            message: null,
+            csrfToken: req.csrfToken(),
+        });
+    }
 });
 
 router.post('/', csurf(), (req, res) => {
@@ -20,6 +60,8 @@ router.post('/', csurf(), (req, res) => {
     // check the oauth requirement
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
     const service = req.query.service;
+    const clientId = req.query.client_id;
+    let app;
 
     // Check the content type
     if(req.headers['content-type'] !== 'application/x-www-form-urlencoded'){
@@ -37,6 +79,7 @@ router.post('/', csurf(), (req, res) => {
         res.render('auth/login', {
             error: true,
             message: msg,
+            csrfToken: req.csrfToken(),
         });
         return false;
     }
@@ -47,59 +90,68 @@ router.post('/', csurf(), (req, res) => {
             error: true,
             message: msg,
             code: 'missing_require_fields',
+            csrfToken: req.csrfToken(),
         });
         return false;
     }
 
-
-    Users.findOne({
-        email: req.body.email,
+    oAuthApps.findOne({
+        clientId,
     })
-    .then(user => {
-        if(user === null){
-            let msg = 'Incorrect email or password';
-            res.render('auth/login', {
-                error: true,
-                message: msg,
-                code: 'unauthorized_action',
-            });
-            return false;
-        }else{
-            // Check for the password
-            return bcrypt.compare(req.body.password, user.password).then(same => {
-                if(same){
-                    // generate the token
-                    const token = user.token;
-                    // save the token into the cookie
-                    res.cookie('oauth-token', token, {
-                        maxAge: 365 * 24 * 60 * 60,
-                        httpOnly: true,
-                    });
-                    // save the token into the session
-                    req.session.token = token;
+    .then(dbApp => {
+        app = dbApp;
+        return Users.findOne({
+            email: req.body.email,
+        })
+        .then(user => {
+            if(user === null){
+                let msg = 'Incorrect email or password';
+                res.render('auth/login', {
+                    error: true,
+                    message: msg,
+                    csrfToken: req.csrfToken(),
+                    appName: app.name,
+                });
+                return false;
+            }else{
+                // Check for the password
+                return bcrypt.compare(req.body.password, user.password).then(same => {
+                    if(same){
+                        // generate the token
+                        const token = user.token;
+                        // save the token into the cookie
+                        res.cookie('oauth-token', token, {
+                            maxAge: 365 * 24 * 60 * 60,
+                            httpOnly: true,
+                        });
+                        // save the token into the session
+                        req.session.token = token;
 
-                    // redirect the user into the redirect url
+                        // redirect the user into the redirect url
 
-                    if(service === 'hs_service_login') {
-                        res.redirect(redirect);
+                        if(service === 'hs_service_login') {
+                            res.redirect(redirect);
+                        }else{
+                            res.redirect(`${redirect}?success=true`);
+                        }
+
                     }else{
-                        res.redirect(`${redirect}?success=true&token=${token}`);
+                        // Incorrect username or password
+                        let msg = 'Incorrect email or password';
+                        res.render('auth/login', {
+                            error: true,
+                            message: msg,
+                            csrfToken: req.csrfToken(),
+                            appName: app.name,
+                        });
                     }
-
-                }else{
-                    // Incorrect username or password
-                    let msg = 'Incorrect email or password';
-                    res.render('auth/login', {
-                        error: true,
-                        message: msg,
-                    });
-                }
-            });
-        }
+                });
+            }
+        })
     })
     .catch(error => {
         console.log(error);
-    })
+    });
 });
 
 module.exports = router;

@@ -6,29 +6,11 @@ const escape = require('escape-html');
 
 router.post('/add', (req, res) => {
     const userId = req.body.userid;
-    const token = req.hsAuth.token;
-    let queryObject = {};
-    if(req.query.bypass === 'true'){
-        queryObject = {
-            token,
-        }
-    }else{
-        if(!userId){
-            res.json({
-                error: true,
-                msg: 'Missing the user ID',
-                code: 'missing_require_fields',
-            });
-            return false;
-        }
-
-        queryObject = {
-            _id: userId,
-        }
-    }
 
     // find the users
-    Users.findOne(queryObject)
+    Users.findOne({
+        _id: req.hsAuth.user._id,
+    })
     .then(user => {
         if(user === null){
             res.json({

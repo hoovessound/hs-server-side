@@ -4,12 +4,6 @@ const oAuthAppsSchema = new Schema({
     author: Schema.Types.ObjectId,
     createDate: Date,
     name: String,
-    permission: {
-        type: Array,
-        default: [
-            'basic-user-info'
-        ]
-    },
     clientId: String,
     clientSecret: String,
     description: {

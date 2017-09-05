@@ -23,6 +23,7 @@
     "fullurl": "^1.0.0",
     "helmet": "^3.8.0",
     "jimp": "^0.2.28",
+    "moment": "^2.18.1",
     "mongoose": "^4.11.1",
     "morgan": "^1.8.2",
     "mpromise": "^0.5.5",

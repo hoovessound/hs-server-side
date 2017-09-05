@@ -115,7 +115,7 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
 module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
 
 app.use(helmet());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use('/static', express.static(path.join(`${__dirname}/../staticDest`)));
 app.use('/usersContent', express.static(path.join(`${__dirname}/../usersContent`)));

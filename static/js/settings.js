@@ -2,7 +2,7 @@ var profilePicture = document.querySelector('#profilePicture .icon');
 var iconInput = document.querySelector('#profilePicture #iconInput');
 var fullname = document.querySelector('#fullname input');
 const navUsername = document.querySelector('nav .container-fluid #bs-example-navbar-collapse-1 .nav.navbar-nav.navbar-right .dropdown .dropdown-toggle');
-const navImg = const navUsername = document.querySelector('nav .container-fluid #bs-example-navbar-collapse-1 .nav.navbar-nav.navbar-right .dropdown .dropdown-toggle img');
+const navImg = document.querySelector('nav .container-fluid #bs-example-navbar-collapse-1 .nav.navbar-nav.navbar-right .dropdown .dropdown-toggle img');
 
 profilePicture.addEventListener('click', e => {
     iconInput.click();

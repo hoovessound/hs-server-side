@@ -17,14 +17,26 @@ const easyimage = require('easyimage');
 const request = require('request');
 const escape = require('escape-html');
 
-async function authUser(res, token) {
-    const user = await Users.findOne({token});
+async function authUser(req, res, authArgument) {
+    let queryObject = {};
+    const bypass = req.query.bypass;
+    if(bypass){
+        queryObject = {
+            token: authArgument,
+        }
+    }else{
+        queryObject = {
+            _id: authArgument,
+        }
+    }
+    const user = await Users.findOne(queryObject);
+
     return new Promise((ref, rej) => {
         if(user === null){
             const object = {
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'can\'t not find your user ID',
+                code: 'unexpected_result',
             };
             res.json(object);
             rej(object);
@@ -36,58 +48,59 @@ async function authUser(res, token) {
 
 class FindTrack {
 
-    constructor(res, token, req){
+    constructor(res, req){
         this.res = res;
-        this.token = token;
         this.req = req;
-    }
-
-    async findByUsernameAndTitle(username, title){
-        try{
-            const user = await authUser(this.res, this.token);
-            if(user){
-                const track = await Tracks.findOne({
-                    'author.username': username,
-                    title: title
-                }, {
-                    file: 0,
-                });
-                this.res.json(track);
-            }
-        }
-        catch(error){
-            console.log(error);
-        }
     }
 
     async findById(id){
         try{
-            const user = await authUser(this.res, this.token);
-            if(user){
-                const track = await Tracks.findOne({
-                    _id: id,
-                }, {
-                    file: 0,
-                })
-                this.res.json(track);
-            }
+            const track = await Tracks.findOne({
+                _id: id,
+            }, {
+                file: 0,
+            })
+            this.res.json(track);
         }
         catch(error){
-            console.log(error);
+            if(error.message.includes('Cast to ObjectId failed for value')){
+                this.res.json({
+                    error: true,
+                    msg: 'Can\'t not that track id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else{
+                console.log(error)
+            }
         }
     }
 
     async faveOrUnfave(id){
 
         try{
+            const authArgument = this.req.body.userid || this.req.headers.token;
+            const bypass = this.req.query.bypass;
+
+            if(!bypass){
+                if(!id){
+                    this.res.json({
+                        error: true,
+                        msg: 'Missing the user id',
+                        code: 'missing_require_fields',
+                    });
+                    return false;
+                }
+            }
+
             let findFave = false;
-            const user = await authUser(this.res, this.token);
+            const user = await authUser(this.req, this.res, authArgument, this.req);
             const full_address = this.req.protocol + "://" + this.req.headers.host;
             if(user){
-                const track = await Tracks.findOne({_id: id});
+                const track = await Tracks.findOne({_id: this.req.params.id});
 
                 if (track === null) {
-                    res.json({
+                    this.res.json({
                         error: true,
                         msg: 'Can not found your track',
                         code: 'missing_result_object',
@@ -140,17 +153,26 @@ class FindTrack {
             }
         }
         catch(error){
-            console.log(error);
+            if(error.message.includes('Cast to ObjectId failed for value')){
+                this.res.json({
+                    error: true,
+                    msg: 'Can\'t not that user id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else{
+                console.log(error)
+            }
         }
     }
 
-    async isFave(id){
+    async isFave(trackId, userId){
         try{
-            const user = await authUser(this.res, this.token);
+            const user = await authUser(this.req, this.res, userId);
             let findFave = false;
             if(user){
                 const track = await Tracks.findOne({
-                    _id: id,
+                    _id: trackId,
                 });
 
                 if (track === null) {
@@ -163,7 +185,7 @@ class FindTrack {
                 }
                 // If the user already fave the track, just remove it, if not add one
                 user.fave.forEach(faveStackID => {
-                    if (faveStackID.toString() == id) {
+                    if (faveStackID.toString() == trackId) {
                         findFave = true;
                     }
                 });
@@ -186,24 +208,23 @@ class FindTrack {
     }
 }
 
-router.get('/:username?/:title?', (req, res) => {
-    const token = req.headers.token || req.query.token;
-    const username = req.params.username || req.headers.username;
-    const title = req.params.title || req.headers.title;
-    const ID = req.query.id;
-    const findTrack = new FindTrack(res, token);
-
+router.get('/:id', (req, res) => {
+    const ID = req.params.id;
+    const findTrack = new FindTrack(res,req);
     if(!ID){
-        findTrack.findByUsernameAndTitle(username, title);
-    }else{
-        findTrack.findById(ID);
+        res.json({
+            error: true,
+            msg: 'Missing the ID field',
+            code: 'missing_require_fields',
+        });
+        return false;
     }
+    findTrack.findById(ID);
 });
 
-router.post('/fave/:id?', (req, res) => {
+router.post('/fave/id?', (req, res) => {
     const id = req.params.id;
-    const token = req.headers.token || req.query.token;
-    const findTrack = new FindTrack(res, token, req);
+    const findTrack = new FindTrack(res, req);
     if (typeof id === 'undefined') {
         res.json({
             error: true,
@@ -215,71 +236,91 @@ router.post('/fave/:id?', (req, res) => {
     findTrack.faveOrUnfave(id);
 });
 
-router.get('/fave/isfave/:id?', (req, res) => {
-    const token = req.headers.token || req.query.token;
-    const id = req.params.id;
-    const findTrack = new FindTrack(res, token, req);
-    if (typeof id === 'undefined') {
+router.get('/fave/isfave/:trackid?/:userid?', (req, res) => {
+    const trackid = req.params.trackid;
+    const userid = req.params.userid;
+    const findTrack = new FindTrack(res, req);
+    if (!trackid) {
         res.json({
             error: true,
-            msg: 'Missing the id field',
+            msg: 'Missing the trackid field',
             code: 'missing_require_fields',
         });
         return false;
     }
-    findTrack.isFave(id);
+
+    if (!userid) {
+        res.json({
+            error: true,
+            msg: 'Missing the userid field',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+    findTrack.isFave(trackid, userid);
 });
 
 router.post('/edit/:id?', (req, res) => {
-    const token = req.headers.token || req.query.token;
     const id = req.params.id;
-    const full_address = req.protocol + "://" + req.headers.host;
-    if (typeof id === 'undefined') {
+    if (!id) {
         res.json({
             error: true,
-            msg: 'Missing the id field',
+            msg: 'Missing the trackid field',
             code: 'missing_require_fields',
         });
         return false;
     }
 
-    Users.findOne({
-        token,
-    }).then(user => {
-        if (user === null) {
-            res.json({
-                error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
-            });
-            return false;
-        }else{
-            // Check if the track exist
-            return Tracks.findById(id, {
-                file: 0,
-            }).then(track => {
-                if(track.author.username !== user.username){
+    const form = formidable.IncomingForm({
+        uploadDir: path.join(`${__dirname}/../usersContent`),
+    });
+    form.encoding = 'utf-8';
+    form.parse(req, (error, fields, files) => {
+        if (error) {
+            console.log(error);
+        } else {
+
+            const userId = fields.userid;
+
+            if (!userId) {
+                res.json({
+                    error: true,
+                    msg: 'Missing the userid field',
+                    code: 'missing_require_fields',
+                });
+                return false;
+            }
+
+            Users.findOne({
+                _id: userId,
+            }).then(user => {
+                if (user === null) {
                     res.json({
                         error: true,
-                        msg: 'You are unauthorized to perform this action',
-                        code: 'unauthorized_action',
+                        msg: 'Can not find your user id',
+                        code: 'unexpected_result',
                     });
                     return false;
                 }else{
-                    const form = formidable.IncomingForm({
-                        uploadDir: path.join(`${__dirname}/../usersContent`),
-                    });
-                    form.encoding = 'utf-8';
-                    form.parse(req, (error, fields, files) => {
-                        if (error) {
-                            console.log(error);
-                        } else {
+                    // Check if the track exist
+                    return Tracks.findById(id, {
+                        file: 0,
+                    }).then(track => {
+                        if(track.author.username !== user.username){
+                            res.json({
+                                error: true,
+                                msg: 'You are unauthorized to perform this action',
+                                code: 'unauthorized_action',
+                            });
+                            return false;
+                        }else{
+
                             if(fields.private === 'true'){
                                 track.private = true;
                             }else{
                                 track.private = false;
                             }
-                            
+
                             // Check if the user submit an cover image
                             if(files.image){
                                 if(files.image.size > 0){
@@ -307,13 +348,11 @@ router.post('/edit/:id?', (req, res) => {
                                             }).then(processedImage => {
                                                 return gcsCoverImage.upload(coverImagePath).then(file => {
                                                     file = file[0];
-                                                    return file.getSignedUrl({
-                                                        action: 'read',
-                                                        expires: '03-09-2491',
-                                                    }).then(url => {
+                                                    return file.makePublic()
+                                                    .then(url => {
                                                         coverImage = url[0];
                                                         fsp.unlinkSync(coverImagePath);
-                                                        track.coverImage = coverImage;
+                                                        track.coverImage = `https://storage.googleapis.com/hs-track/${fileID}`;
                                                         updateTitle();
                                                     })
                                                 })
@@ -360,7 +399,7 @@ router.post('/edit/:id?', (req, res) => {
                                             title: escape(fields.title),
                                         }).then(authTrack => {
                                             if(authTrack !== null){
-                                                    track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
+                                                track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
                                             }else{
                                                 track.title = escape(fields.title);
                                             }
@@ -383,22 +422,22 @@ router.post('/edit/:id?', (req, res) => {
                                     writeDB();
                                 }
                             }
-
                         }
-                    });
+                    })
                 }
-            })
-        }
-    }).catch(error => {
-        if(error.message.includes('Cast to ObjectId failed for value')){
-            res.json({
-                error: true,
-                msg: 'Can\'t not found your track',
-                code: 'unexpected_result',
+            }).catch(error => {
+                if(error.message.includes('Cast to ObjectId failed for value')){
+                    res.json({
+                        error: true,
+                        msg: 'Can\'t not found your user id',
+                        code: 'unexpected_result',
+                    });
+                    return false;
+                }else{
+                    console.log(error)
+                }
             });
-            return false;
-        }else{
-            console.log(error)
+
         }
     });
 });

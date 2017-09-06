@@ -27,8 +27,9 @@ router.use((req, res, next) => {
     if(bypass === 'true'){
         // Check for the host name
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        const origin = req.get('origin');
         const token = req.headers.token;
-        if(ip === '68.71.34.33' || ip === '68.71.34.33' || ip === '::1'){
+        if(origin === 'http://localhost:3000' || origin === 'https://hoovessound.ml'){
             Users.findOne({
                 token,
             })
@@ -63,7 +64,7 @@ router.use((req, res, next) => {
         }else{
             res.json({
                 error: true,
-                msg: `Not authenticated IP address: ${ip}`,
+                msg: `Not authenticated domain: ${origin}`,
                 code: 'bad_authentication',
             });
             return false;
@@ -86,7 +87,6 @@ router.use((req, res, next) => {
             return Users.findOne({_id: rightAccess.author.user});
         })
         .then(user => {
-            console.log(user);
             req.hsAuth = {
                 user,
             }

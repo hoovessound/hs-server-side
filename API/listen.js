@@ -6,6 +6,10 @@ const fs = require('fs');
 const https = require('https');
 const request = require('request');
 const { URL } = require('url');
+const gcs = require('@google-cloud/storage')({
+    projectId: 'hoovessound',
+    keyFilename: require('../src/index').gcsPath,
+});
 
 router.get('/:id?', (req, res) => {
     const id = req.params.id;
@@ -28,6 +32,7 @@ router.get('/:id?', (req, res) => {
                     const myUrl = new URL(track.file.location);
                     const baseName = path.basename(myUrl.pathname)
                     const extName = path.extname(baseName);
+                    console.log(baseName)
                     if(extName.endsWith('.ogg') || extName.endsWith('mp3')){
                         // Go stream the audio to the user
 
@@ -40,7 +45,12 @@ router.get('/:id?', (req, res) => {
                                 break;
                         }
                         res.set('Cache-Control', 'public, max-age=31557600');
-                        request(track.file.location).pipe(res);
+                        // Stream the audio from GCS
+                        gcs.bucket('hs-track')
+                        .file(baseName)
+                        .createReadStream()
+                        .pipe(res)
+
                     }else{
                         res.end(`${extName} is not an valid audio file type`);
                     }

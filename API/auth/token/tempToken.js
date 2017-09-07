@@ -14,7 +14,6 @@ router.get('/', csurf(), (req, res) => {
     // render th login page
     const service = req.query.service;
     const clientId = req.query.client_id;
-    console.log(clientId)
     if(service !== 'hs_service_login'){
         if(!clientId){
             res.render('auth/login', {
@@ -30,11 +29,7 @@ router.get('/', csurf(), (req, res) => {
             })
             .then(app =>{
                 if(app === null) {
-                    res.render('auth/login', {
-                        error: null,
-                        message: 'Bad client ID',
-                        csrfToken: req.csrfToken(),
-                    });
+                    mi
                     return false;
                 }
 
@@ -62,10 +57,18 @@ router.get('/', csurf(), (req, res) => {
 router.post('/', csurf(), (req, res) => {
 
     // check the oauth requirement
-    const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
+    const redirect = req.query.redirect;
     const service = req.query.service;
     const clientId = req.query.client_id;
     let app;
+
+    if(!redirect){
+        res.render('auth/login', {
+            error: null,
+            message: 'Missing the redirect query',
+            csrfToken: req.csrfToken(),
+        });
+    }
 
     // Check the content type
     if(req.headers['content-type'] !== 'application/x-www-form-urlencoded'){
@@ -75,6 +78,17 @@ router.post('/', csurf(), (req, res) => {
             code: 'invalid_http_request',
         })
         return false;
+    }
+
+    if(!clientId){
+        res.render('auth/login', {
+            error: null,
+            message: 'Please pass in your client ID',
+            csrfToken: req.csrfToken(),
+        });
+        return false;
+    }else{
+
     }
 
     // find the username
@@ -103,6 +117,14 @@ router.post('/', csurf(), (req, res) => {
         clientId,
     })
     .then(dbApp => {
+        if(app === null) {
+            res.render('auth/login', {
+                error: null,
+                message: 'Bad client ID',
+                csrfToken: req.csrfToken(),
+            });
+            return false;
+        }
         app = dbApp;
         return Users.findOne({
             email: req.body.email,
@@ -135,7 +157,7 @@ router.post('/', csurf(), (req, res) => {
                         }else{
 
                             // Save the temporary token to the DB
-                            const currentTime = console.log(moment()._d);
+                            const currentTime = moment()._d;
                             const endTime = moment(currentTime).add(5, 'minutes');
                             return new TempTokes({
                                 token: tempToken,

@@ -63,23 +63,22 @@ router.post('/', (req, res) => {
             return false;
         }
 
-        if(rightAccess.timestamp.end > moment()._d ){
+        if(moment(rightAccess.timestamp.end).isBefore(moment()._d)){
             res.json({
                 error: true,
                 msg: 'Your temporary token has expired',
                 code: 'service_lock_down',
             });
-            TempTokes.remove({
+            return TempTokes.remove({
                 token,
-            });
-            return false;
+            })
         }
 
         // Give this application an access token
         const accessToken = crypto.randomBytes(255).toString('hex');
 
         // Save the new access token and remove the temporary token
-        const currentTime = console.log(moment()._d);
+        const currentTime = moment()._d;
         const endTime = moment(currentTime).add(1, 'minutes');
         return new AccessTokes({
             token: accessToken,

@@ -29,6 +29,8 @@ router.use((req, res, next) => {
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const sessionToken = req.headers.sessiontoken;
         const token = req.headers.token;
+        console.log(sessionToken);
+        console.log(req.session)
         if(sessionToken === req.session.sessionToken){
             Users.findOne({
                 token,

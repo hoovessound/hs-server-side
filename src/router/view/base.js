@@ -44,8 +44,15 @@ router.get('*', (req, res) => {
                 res.redirect('/api/auth/login?redirect=' + fullurl(req));
                 return false;
             } else {
-                const sessionToken = randomstring.generate(30);
-                req.session.sessionToken = sessionToken;
+                let sessionToken = null;
+
+                if(!req.session.sessionToken){
+                    sessionToken = randomstring.generate(30);
+                    req.session.sessionToken = sessionToken;
+                }else{
+                    sessionToken = req.session.sessionToken;
+                }
+
                 return Tracks.findOne({
                     $or: [
                         {

@@ -10,7 +10,7 @@ angular.module('hsEditTracks', ['ngRoute']).controller('editTrack', function ($s
         formData.append('description', document.querySelector('textarea[name=description]').value);
         formData.append('image', document.querySelector('input[name=image]').files[0]);
         formData.append('private', document.querySelector('input[name=private]').checked);
-        ajax.open('POST', '/api/track/edit/' + trackid);
+        ajax.open('POST', '/api/track/edit/' + trackid + '?bypass=true');
         ajax.setRequestHeader('token', token);
         ajax.send(formData);
         ajax.onload = function () {

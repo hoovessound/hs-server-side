@@ -280,6 +280,10 @@ router.post('/edit/:id?', (req, res) => {
             console.log(error);
         } else {
 
+            if(req.query.bypass){
+                fields.userid = req.hsAuth.user._id;
+            }
+
             const userId = fields.userid;
 
             if (!userId) {

@@ -38,6 +38,7 @@ router.get('/:username?/:title?', (req, res) => {
         const username = req.params.username;
         const title = req.params.title;
         const token = req.cookies['oauth-token'];
+        let comments = [];
 
         Users.findOne({
             token,
@@ -65,57 +66,57 @@ router.get('/:username?/:title?', (req, res) => {
 
                 track.description = TextFormattign.url(track.description);
 
-                return rp.get({
-                    url: `${full_address}/api/track/fave/isfave/${track._id}`,
-                    headers: {
-                        token,
-                    }
-                }).then(isFave => {
-                    isFave = JSON.parse(isFave);
-                    if(track.comments.length >= 1){
-                        let comments = [];
-                        track.comments.forEach(comment =>{
+                if(track.comments.length >= 1){
+                    track.comments.forEach(comment =>{
 
-                            // text formatting
-                            comment.comment = TextFormattign.url(comment.comment);
-                            // Find the user object
-                            return Users.findOne({
-                                _id: comment.author,
-                            }, {
-                                username: 1,
-                                fullName: 1,
-                            }).then(commentUser => {
-                                comments.push({
-                                    author: {
-                                        username: commentUser.username,
-                                        fullName: commentUser.fullName,
-                                    },
-                                    comment: comment.comment,
-                                });
-                                if(comments.length === track.comments.length){
-                                    res.render('track', {
-                                        loginUser: user,
-                                        track,
-                                        comments,
-                                        full_address,
-                                        token,
-                                        isFave: isFave.fave ? 'isFave': 'notFave',
-                                    });
-                                }
+                        // text formatting
+                        comment.comment = TextFormattign.url(comment.comment);
+                        // Find the user object
+                        return Users.findOne({
+                            _id: comment.author,
+                        }, {
+                            username: 1,
+                            fullName: 1,
+                        }).then(commentUser => {
+                            comments.push({
+                                author: {
+                                    username: commentUser.username,
+                                    fullName: commentUser.fullName,
+                                },
+                                comment: comment.comment,
                             });
+                            if(comments.length === track.comments.length){
+                                renderPage();
+                            }
+                        });
+                    });
+                }else{
+                    renderPage();
+                }
+
+                function renderPage() {
+                    if(user.fave.indexOf(track._id) >= 0){
+                        res.render('track', {
+                            loginUser: user,
+                            track,
+                            comments,
+                            full_address,
+                            token,
+                            isFave: 'isFave',
                         });
                     }else{
                         res.render('track', {
                             loginUser: user,
                             track,
-                            comments: [],
+                            comments,
                             full_address,
                             token,
-                            isFave: isFave.fave ? 'isFave': 'notFave',
-                            error: null,
+                            isFave: 'notFave',
                         });
                     }
-                })
+                }
+
+                return false;
             });
         }).catch(error => {
             console.log(error);

@@ -17,6 +17,7 @@ iconInput.addEventListener('change', function (e) {
     form.append('image', file);
     ajax.open('POST', '/api/settings/profilepicture/upload?bypass=true');
     ajax.setRequestHeader('token', token);
+    ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send(form);
     ajax.onload = function () {
         if (ajax.readyState === 4 && ajax.status === 200) {

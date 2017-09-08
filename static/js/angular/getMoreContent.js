@@ -11,6 +11,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
             url: `/api/tracks?offset=${offset}&bypass=true`,
             headers: {
                 token,
+                sessionToken,
             }
         })
         .then(data => {

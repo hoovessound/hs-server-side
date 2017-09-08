@@ -41,6 +41,7 @@ function removePayload(e) {
     ajax.open('POST', full_address + '/api/notification/remove?bypass=true');
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.setRequestHeader('token', token);
+    ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send(JSON.stringify({
         notificationId: id
     }));

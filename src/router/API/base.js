@@ -27,9 +27,9 @@ router.use((req, res, next) => {
     if(bypass === 'true' || service === 'hs_service_login'){
         // Check for the host name
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const origin = req.get('origin');
+        const sessionToken = req.headers.sessiontoken;
         const token = req.headers.token;
-        if(origin === 'http://localhost:3000' || origin === 'https://hoovessound.ml'){
+        if(sessionToken === req.session.sessionToken){
             Users.findOne({
                 token,
             })
@@ -64,7 +64,7 @@ router.use((req, res, next) => {
         }else{
             res.json({
                 error: true,
-                msg: `Not authenticated domain: ${origin}`,
+                msg: `Not authenticated domain`,
                 code: 'bad_authentication',
             });
             return false;

@@ -3,6 +3,7 @@ const router = express.Router();
 const fullurl = require('fullurl');
 const Users = require('../../../schema/Users');
 const Tracks = require('../../../schema/Tracks');
+const randomstring = require('randomstring');
 
 
 let socketConnection = {};
@@ -43,7 +44,8 @@ router.get('*', (req, res) => {
                 res.redirect('/api/auth/login?redirect=' + fullurl(req));
                 return false;
             } else {
-
+                const sessionToken = randomstring.generate(30);
+                req.session.sessionToken = sessionToken;
                 return Tracks.findOne({
                     $or: [
                         {
@@ -76,6 +78,7 @@ router.get('*', (req, res) => {
                                     year: new Date().getFullYear(),
                                     initAudioSource: `${full_address}/api/listen/${lastTrack._id}`,
                                     volume: 100,
+                                    sessionToken,
                                 });
                             }else{
                                 res.render('index', {
@@ -89,6 +92,7 @@ router.get('*', (req, res) => {
                                     initAudioSource: `${full_address}/api/listen/${track._id}`,
                                     volume: user.lastPlay.volume,
                                     playTimeValue: true,
+                                    sessionToken,
                                 });
                             }
                         })
@@ -103,6 +107,7 @@ router.get('*', (req, res) => {
                             year: new Date().getFullYear(),
                             initAudioSource: `${full_address}/api/listen/${track._id}`,
                             volume: 100,
+                            sessionToken,
                         });
                     }
                 })

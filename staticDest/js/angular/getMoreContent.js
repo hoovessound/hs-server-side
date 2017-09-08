@@ -11,7 +11,8 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
             method: 'GET',
             url: '/api/tracks?offset=' + offset + '&bypass=true',
             headers: {
-                token: token
+                token: token,
+                sessionToken: sessionToken
             }
         }).then(function (data) {
             offset += 10;

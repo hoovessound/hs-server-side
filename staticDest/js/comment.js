@@ -20,6 +20,7 @@ function postComment(text) {
     ajax.open('POST', '/api/comment/add?bypass=true');
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.setRequestHeader('token', token);
+    ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send(JSON.stringify({
         trackid: trackid,
         comment: text

@@ -26,12 +26,13 @@ angular.module('uploadTrack', ['ngRoute'])
         if(fileInput.files[0]){
             const file = fileInput.files[0];
             const form = new FormData();
-            uploadAjax.open('POST', '/api/upload');
+            uploadAjax.open('POST', '/api/upload?bypass=true');
             form.append('audio', file);
             form.append('title', title.value);
             form.append('description', description.value);
             form.append('image', coverImage.files[0]);
-            uploadAjax.setRequestHeader('token', $token);
+            uploadAjax.setRequestHeader('token', token);
+            ajax.setRequestHeader('sessionToken', sessionToken);
             uploadAjax.send(form);
             uploadAjax.onload = function() {
                 if(uploadAjax.readyState === 4 && uploadAjax.status === 200) {

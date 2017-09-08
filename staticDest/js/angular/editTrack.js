@@ -12,6 +12,7 @@ angular.module('hsEditTracks', ['ngRoute']).controller('editTrack', function ($s
         formData.append('private', document.querySelector('input[name=private]').checked);
         ajax.open('POST', '/api/track/edit/' + trackid + '?bypass=true');
         ajax.setRequestHeader('token', token);
+        ajax.setRequestHeader('sessionToken', sessionToken);
         ajax.send(formData);
         ajax.onload = function () {
             var response = JSON.parse(ajax.response).track;

@@ -21,10 +21,10 @@ router.use('/oauth1/token/access', require('../../../API/auth/token/accessToken'
 // Basic API auth
 router.use((req, res, next) => {
     const bypass = req.query.bypass;
-
+    const service = req.query.service;
     // In site use case
 
-    if(bypass === 'true'){
+    if(bypass === 'true' || service === 'hs_service_login'){
         // Check for the host name
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const origin = req.get('origin');

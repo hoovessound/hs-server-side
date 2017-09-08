@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HoovesSounds | Permission</title>
+</head>
+<body>
+<div id="app">
+    <%if(error){%>
+    <div id="messages" class="error">
+        <%}else{%>
+        <div id="messages">
+            <%}%>
+            <%=message%>
+        </div>
+
+        <div class="icon"></div>
+        <h1>Permission</h1>
+        <form id="loginForm" action="/api/oauth1/token/temporary/permission?<%-rawQuery%>" method="post" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+            <input type="hidden" name="uid" value="<%=uid%>">
+            <%if(typeof appName !== 'undefined'){%>
+            <h2>Will you allow <%=appName%> to have access to the following service in your HoovesSound account?</h2>
+            <ul>
+                <li>Seeing your basic information, like email address</li>
+                <li>Uploading track under your name</li>
+                <li>Posting comment under your name</li>
+            </ul>
+            <%}%>
+            <button class="btn btn-success" type="submit" name="allow" value="allow">Allow</button>
+            <button class="btn btn-danger" type="submit" name="denied" value="denied">Denied</button>
+        </form>
+    </div>
+</body>
+</html>

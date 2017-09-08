@@ -45,8 +45,20 @@ angular.module('hsRoutes', ['ngRoute'])
             .when(`/notification`, {
                 templateUrl: '/render/notification',
             })
+            .when('/@:username', {
+                templateUrl: function(params){
+                    return `/render/user/${params.username}`;
+                },
+            })
+            .when('/me/apps', {
+
+                templateUrl: function () {
+                    const queryRawString= window.location.href.substr(window.location.href.indexOf("?") + 1);
+                    return `/render/oauth-app?${queryRawString}`;
+                },
+            })
             .otherwise({
-                redirectTo: '/home?404=true',
+                templateUrl: '/error/404',
             });
         $locationProvider.html5Mode({
             enabled: true,

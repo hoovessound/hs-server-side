@@ -1,0 +1,37 @@
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<div id="oAuthApp" class="container">
+
+    <%if(typeof query.error !== 'undefined'){%>
+    <div class="errorMessage">
+        <p><%=query.error%></p>
+    </div>
+    <%}%>
+
+    <div class="myApps">
+        <h3>My apps</h3>
+        <%if(apps.length >= 1){%>
+        <%apps.map(app => {%>
+        <div class="app">
+            <p><%=app.name%></p>
+            <p>Client ID: <input type="text" value="<%=app.clientId%>" onmouseenter="this.select()" onmouseleave="this.blur()" readonly></p>
+            <p>Client Secret: <input type="password" value="<%=app.clientSecret%>" onmouseenter="this.select(); this.type = 'text';" onmouseleave="this.blur(); this.type = 'password';" readonly></p>
+        </div>
+        <%})%>
+        <%}else{%>
+          <p>Looks like you didn't have an app setup yet, you can do so by registering a new app using the form below</p>
+        <%}%>
+    </div>
+
+    <hr>
+
+    <form class="newApp" method="post" action="/render/oauth-app">
+        <h3>Create a new app</h3>
+        <input type="hidden" name="_csrf" value="<%-csrfToken%>">
+        <p>Name (*): <input type="text" name="name"></p>
+        <p>Description: <textarea name="description"></textarea></p>
+        <p>Callback URL (*): <input type="url" name="callbackurl"></p>
+        <div class="g-recaptcha" data-sitekey="6LcfXy4UAAAAAKmVgFA2Ol0OR9x_jKXRA1NI46-C"></div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+
+</div>

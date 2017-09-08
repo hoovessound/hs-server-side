@@ -14,11 +14,12 @@ const sha256 = require('sha256');
 const randomstring = require('randomstring');
 const fsp = require('fs-promise');
 const easyimage = require('easyimage');
+const escape = require('escape-html');
 
 const TextFormattign = {
     url: (text) => {
         const regex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/igm;
-        if(typeof text !== 'undefined'){
+        if(typeof text !== 'undefined' && text !== null){
             if(text.match(regex)){
                 const url = text.match(regex);
                 return text.replace(url, `<a href="${url}" target="_blank">${url}</a>`);
@@ -32,7 +33,7 @@ const TextFormattign = {
 router.get('/:username?/:title?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
         const username = req.params.username;
         const title = req.params.title;
@@ -42,12 +43,24 @@ router.get('/:username?/:title?', (req, res) => {
             token,
         }).then(user => {
             if(user === null){
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }
             return Tracks.findOne({
                 'author.username': username,
                 title: title,
             }).then(track => {
+                if(track === null){
+                    res.render('track', {
+                        loginUser: user,
+                        track: null,
+                        comments: null,
+                        full_address,
+                        token,
+                        isFave: 'notFave',
+                        error: `Can't not find your track :/`
+                    });
+                    return false;
+                }
                 // Find out if the user fave this track or not
 
                 track.description = TextFormattign.url(track.description);
@@ -254,10 +267,10 @@ router.post('/:username?/:title?/edit', (req, res) => {
                             }
 
                             function updateTitle() {
-                                let newTitle = fields.title;
+                                let newTitle = escape(fields.title);
                                 function writeDB() {
                                     if(fields.description){
-                                        track.description = fields.description;
+                                        track.description = escape(fields.description);
                                     }
 
                                     return Tracks.update({
@@ -284,7 +297,7 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                 }
 
                                 if(track.private){
-                                    track.title = `${fields.title || track.title}-private:${randomstring.generate(50)}`;
+                                    track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
                                     writeDB();
                                     return false;
                                 }
@@ -294,12 +307,12 @@ router.post('/:username?/:title?/edit', (req, res) => {
                                     if(fields.title !== track.title){
                                         // Is not the same
                                         return Tracks.findOne({
-                                            title: fields.title,
+                                            title: escape(fields.title),
                                         }).then(authTrack => {
                                             if(authTrack !== null){
-                                                    track.title = `${fields.title}(${randomstring.generate(10)})`;
+                                                    track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
                                             }else{
-                                                track.title = fields.title;
+                                                track.title = escape(fields.title);
                                             }
                                             writeDB();
                                         });

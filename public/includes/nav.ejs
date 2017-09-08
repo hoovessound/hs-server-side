@@ -30,13 +30,14 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown">
                         <img src="<%=loginUser.icon%>" alt="" id="userProfilePicture">
-                        <span><%=loginUser.fullName%></span>
+                        <span class="username"><%=loginUser.fullName%></span>
                         <span class="caret"></span>
                     </a>
 
                     <ul class="dropdown-menu">
                         <li><a href="/me">Profile</a></li>
                         <li><a href="/settings">Settings</a></li>
+                        <li><a href="/me/apps">My Apps</a></li>
                     </ul>
                 </li>
             </ul>

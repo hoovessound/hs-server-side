@@ -8,14 +8,14 @@ router.get('/', (req, res) => {
     const offset = req.query.offset || 0;
     const token = req.cookies['oauth-token'];
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
 
         Users.findOne({
             token: token,
         }).then(user => {
             if(user === null){
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
                 return false;
             }else{
                 res.render('notification', {

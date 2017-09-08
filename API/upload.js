@@ -18,32 +18,43 @@ const gcs = require('@google-cloud/storage')({
 const easyimage = require('easyimage');
 const filezizgag = require('../src/index').filezizgag;
 const https = require('https');
+const escape = require('escape-html');
 
 router.post('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
     const full_address = req.protocol + "://" + req.headers.host;
-    Users.findOne({
-        token: token,
-    })
-    .then(user => {
-        if(user === null){
+
+    const form = formidable.IncomingForm({
+        uploadDir: path.join(`${__dirname}/../tracks`),
+    });
+    form.encoding = 'utf-8';
+
+    form.parse(req, (error, fields, files) => {
+        const userid = fields.userid;
+        if(!userid){
             res.json({
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'Missing the userid',
+                code: 'missing_require_fields',
             });
             return false;
-        }else{
-            const form = formidable.IncomingForm({
-                uploadDir: path.join(`${__dirname}/../tracks`),
-            });
-            form.encoding = 'utf-8';
+        }
 
-            form.parse(req, (error, fields, files) => {
+        Users.findOne({
+            _id: userid,
+        })
+        .then(user => {
+            if(user === null){
+                res.json({
+                    error: true,
+                    msg: 'Can not find your userid',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else{
                 if(typeof files.audio === 'undefined'){
                     res.json({
                         error: true,
-                        msg: 'Missing audio field',
+                        msg: 'Missing the audio file',
                         code: 'missing_require_fields',
                     });
                     return false;
@@ -61,7 +72,7 @@ router.post('/', (req, res) => {
                     }
                 }
 
-                const description = fields.description || null;
+                const description = fields.description ? escape(fields.description) : null;
 
                 // Upload the audio first
                 const tmp_audioFile = files.audio.path;
@@ -76,7 +87,7 @@ router.post('/', (req, res) => {
                     // Trim down the file name
                     file.name = file.name.replace(/\W/igm, '');
                     file.name = file.name.replace(/ /igm, '-');
-                    let title = fields.title || file.name;
+                    let title = escape(fields.title) || file.name;
                     // Check for the same title
 
                     return Tracks.findOne({
@@ -262,7 +273,7 @@ router.post('/', (req, res) => {
                                                         link: `${full_address}/track/${user.username}/${title}`,
                                                     }
                                                 })
-                                                
+
                                             })
 
                                         }
@@ -313,11 +324,20 @@ router.post('/', (req, res) => {
 
                     });
                 })
-                .catch(error => {
-                    console.log(error);
-                })
-            });
-        }
+            }
+        })
+        .catch(error => {
+            if(error.message.includes('Cast to ObjectId failed for value')){
+                res.json({
+                    error: true,
+                    msg: 'Can\'t not that user id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else{
+                console.log(error)
+            }
+        })
     });
 });
 

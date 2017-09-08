@@ -8,7 +8,7 @@ const Tracks = require('../../../schema/Tracks');
 router.get('/:username?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
         const username = req.params.username;
         const rp = require('request-promise');
@@ -18,7 +18,7 @@ router.get('/:username?', (req, res) => {
             token,
         }).then(user => {
             if(user === null){
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }else{
                 return Users.findOne({
                     username,

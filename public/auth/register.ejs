@@ -20,6 +20,7 @@
     <div class="icon"></div>
     <h1>Register</h1>
     <form id="loginForm"  method="post" enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name="_csrf" value="<%=csrfToken%>">
         <p>Username: <input type="text" class="username" value="" name="username"></p>
         <p>Password: <input type="password" class="password" value="" name="password"></p>
         <p>Email: <input type="email" class="email" value="" name="email"></p>
@@ -27,5 +28,6 @@
         <button type="submit" class="btn waves-effect waves-default">Register</button>
     </form>
     <a href="/api/auth/login">Login</a>
+    <script src="/static/js/register.js"></script>
 </body>
 </html>

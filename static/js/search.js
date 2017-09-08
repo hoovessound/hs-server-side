@@ -11,7 +11,7 @@ angular.module('hsSearch', ['ngRoute'])
             $location.url(`/search/${query}`);
             $http({
                 method: 'GET',
-                url: `api//search/${query}`
+                url: `api/search/${query}`
             })
         }
     });

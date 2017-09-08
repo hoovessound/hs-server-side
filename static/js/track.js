@@ -1,19 +1,10 @@
-var volumeBar = document.querySelector('#volumeBar');
 var faveButton = document.querySelector('.fave');
 var shareURL = document.querySelector('.shareURL');
 var shareButton = document.querySelector('.share');
-var playPauseButton = document.querySelector('.playPuaseButton');
-
-// volume bar control
-volumeBar.addEventListener('input', e => {
-    // Thanks https://stackoverflow.com/a/31927281/6511655
-    let volume = parseInt(e.target.value);
-    audio.volume = volume/ 100;
-});
 
 faveButton.addEventListener('click', e => {
     var el = e.target;
-    ajax.open('POST', `/api/track/fave/${trackid}`);
+    ajax.open('POST', `/api/track/fave/${trackid}?bypass=true`);
     ajax.setRequestHeader('token', token);
     ajax.send();
     ajax.onload = function () {

@@ -4,6 +4,7 @@ const fullurl = require('fullurl');
 const Users = require('../../../schema/Users');
 const Tracks = require('../../../schema/Tracks');
 
+
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
 
@@ -22,6 +23,12 @@ router.use('/render/settings', require('./settings'));
 router.use('/render/tracks', require('./latesetTracks'));
 
 router.use('/render/notification', require('./notification'));
+
+router.use('/render/oauth-app', require('./oAuthApp'));
+
+router.all('/error/404', (req, res) => {
+    res.send('<h1>404</h1><br><p>Page not find :/</p>')
+});
 
 router.get('*', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;

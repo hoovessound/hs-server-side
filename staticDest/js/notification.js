@@ -38,11 +38,11 @@ function removePayload(e) {
     e.preventDefault();
     var target = e.target;
     var id = target.getAttribute('payloadId');
-    ajax.open('POST', full_address + '/api/notification/remove');
+    ajax.open('POST', full_address + '/api/notification/remove?bypass=true');
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.setRequestHeader('token', token);
     ajax.send(JSON.stringify({
-        id: id
+        notificationId: id
     }));
     ajax.onload = function () {
         if (ajax.status === 200 && ajax.readyState === 4) {
@@ -53,7 +53,7 @@ function removePayload(e) {
             };
 
             var response = JSON.parse(ajax.response);
-            remove(response.id);
+            remove(id);
         }
     };
 }

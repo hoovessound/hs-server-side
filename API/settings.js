@@ -11,14 +11,22 @@ const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
 });
-const fullurl = require('fullurl');
 const fp = require('fs-promise');
 const easyimage = require('easyimage');
+const escape = require('escape-html');
 
 // save the normal settings
 router.post('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    
+    const token = req.headers.token || req.query.token;
+    if(req.query.bypass !== 'true'){
+        res.json({
+            error: true,
+            msg: 'Internal API',
+            code: 'services_lock_down',
+        })
+        return false;
+    }
+
     Users.findOne({
         token: token,
     })
@@ -63,7 +71,7 @@ router.post('/', (req, res) => {
             }
             
             // Update the DB
-            user.fullName = req.body.settings.full_name;
+            user.fullName = escape(req.body.settings.full_name);
             return Users.update({
                 _id: user._id,
             }, user)
@@ -106,8 +114,17 @@ router.post('/', (req, res) => {
 // Upload the profile picture
 router.post('/profilepicture/upload', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
-    const token = req.body.token || req.headers.token || req.query.token;
-    
+    const token = req.headers.token || req.query.token;
+
+    if(req.query.bypass !== 'true'){
+        res.json({
+            error: true,
+            msg: 'Internal API',
+            code: 'services_lock_down',
+        })
+        return false;
+    }
+
     if(typeof token === 'undefined'){
         res.json({
             error: true,
@@ -166,9 +183,9 @@ router.post('/profilepicture/upload', (req, res) => {
                     }
 
                     const ext = path.extname(file.name);
-                    // Remvoe the ext first
+                    // Remove the ext first
                     file.name = file.name.replace(ext, '');
-                    // Traim down the file name
+                    // Trim down the file name
                     file.name = file.name.replace(/\W/igm, '');
                     file.name = file.name.replace(/ /igm, '-');
                     const title = fields.title || file.name;
@@ -180,12 +197,6 @@ router.post('/profilepicture/upload', (req, res) => {
                         if(error){
                             console.log(error);
                         }else{
-
-                            res.json({
-                                success: true,
-                                msg: 'Processing the image'
-                            });
-
                             // Resize the image to 50x50 Q: 50
 
                             return easyimage.resize({
@@ -201,17 +212,16 @@ router.post('/profilepicture/upload', (req, res) => {
                                         const gcsProfilePictures = gcs.bucket('hs-profile-picture');
                                         return gcsProfilePictures.upload(filePath).then(file => {
                                             file = file[0];
-                                            return file.getSignedUrl({
-                                                action: 'read',
-                                                expires: '03-09-2491',
-                                            }).then(url => {
+                                            return file.makePublic()
+                                            .then(url => {
                                                 // Update the new image URL to the DB
-                                                this.user.icon = url[0];
+                                                this.user.icon = `https://storage.googleapis.com/hs-profile-picture/${fileID}`;
                                                 return Users.update({
                                                     _id: this.user._id,
                                                 }, this.user).then(() => {
                                                     // Remove the icon from local disk
                                                     fp.unlinkSync(filePath);
+                                                    res.json(user);
                                                 });
                                             })
                                         });

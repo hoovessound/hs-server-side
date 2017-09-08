@@ -4,42 +4,23 @@ const Users = require('../schema/Users');
 const randomstring = require('randomstring');
 
 router.get('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    const id = req.query.id;
+    const id = req.query.userid;
     Users.findOne({
-        token: token,
+        _id: id,
     })
     .then(user => {
         if (user === null) {
             res.json({
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'can\'t not find your user ID',
+                code: 'unexpected_result',
             });
             return false;
         }else{
             // Find all the user's notification
-            if(!id){
-                res.json({
-                    notifications: user.notification.reverse(),
-                });
-            }else{
-                let findMsg = false;
-                user.notification.forEach(msg => {
-                    this.msg = msg;
-                    findMsg = true;
-                })
-                if(!findMsg){
-                    res.json({
-                        error: true,
-                        msg: 'Can\'t not that user id',
-                        code: 'unexpected_result',
-                    });
-                    return false;
-                }else{
-                    res.json(this.msg);
-                }
-            }
+            res.json({
+                notifications: user.notification.reverse(),
+            });
         }
     })
     .catch(error => {
@@ -51,33 +32,26 @@ router.get('/', (req, res) => {
             });
             return false;
         }else{
-            res.json({
-                error: true,
-                msg: 'Can\'t not that user id',
-                code: 'unexpected_result',
-            });
-            return false;
+            console.log(error);
         }
     });
 });
 
 router.post('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    let body = req.body.body;
+    const to = req.body.to;
     Users.findOne({
-        token: token,
+        _id: to,
     })
     .then(user => {
         if (user === null) {
             res.json({
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'can\'t not find your user ID',
+                code: 'unexpected_result',
             });
             return false;
         }else{
             // Search for that user
-            const to = req.body.to;
             return Users.findById(to)
             .then(user => {
                 // Settings up the user's notification stack
@@ -91,49 +65,15 @@ router.post('/', (req, res) => {
 
                 user.notification.push(payload);
 
-                // Message environment variables
-                function envRender(string, args){
-                    const regex = new RegExp(/{(.*?)}/igm);
-                    // Find an array of the {} thing
-                    if(string.match(regex)){
-                        // Need env variable
-                        string.match(regex).forEach(variable => {
-                            const varName = variable.replace(/{|}/g, '');
-                            const evalString = `args${varName}`;
-                            const varVal = typeof eval(evalString) !== 'undefined' ? eval(evalString) : '';
-                            string = string.replace(variable, varVal);
-                        });
-                    }
-                    return string;
-                }
-
-                const envData = {
-                    user: {
-                        full_name: user.fullName,
-                        username: user.username,
-                        uid: user._id,
-                    },
-                    message: {
-                        push_date: date,
-                    }
-                }
-                payload.body = envRender(payload.body, envData);
                 // Save the message to the DB
+
                 return Users.update({
                     _id: user._id,
                 }, user)
                 .then(() => {
+                    // Send the payload via the socket
+                    res.io.emit('notification:new', payload);
                     res.json(payload);
-                    const socketConnection = require('../src/index').socketConnection[user.username];
-                    // Send the payload via the web socket
-                    for(let key in socketConnection){
-                        if(key){
-                            socketConnection[key].emit('notification:new', payload)
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
                 })
             });
         }
@@ -153,47 +93,55 @@ router.post('/', (req, res) => {
 });
 
 router.post('/remove', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    Users.findOne({
-        token: token,
-    })
+    let id = req.body.userid;
+    const notificationId = req.body.notificationId;
+    let queryObject = {};
+    if(req.query.bypass === 'true'){
+        id = req.hsAuth.user._id;
+        queryObject = {
+            _id: req.hsAuth.user._id,
+        }
+    }else{
+        queryObject = {
+            _id: id,
+        }
+    }
+
+    Users.findOne(queryObject)
     .then(user => {
         if (user === null) {
             res.json({
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'can\'t not find your user ID',
+                code: 'unexpected_result',
             });
             return false;
         }else{
-            // Search for that user
-            const id = req.body.id;
-            let findMsg = false;
-            let index;
-            user.notification.forEach((msg, i) => {
-                this.msg = msg;
-                findMsg = true;
-                index = i;
-            });
-            if(!findMsg){
-                res.json({
-                    error: true,
-                    msg: 'Can\'t not that user id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }else {
-                // Remove the message from the user's notification stack
-                user.notification.splice(index, 1);
+            // Find that notification id
+            let findOne = false;
+            user.notification.map(object => {
+                if(object.id=== notificationId){
+                    findOne = true;
+                }
+            })
+            if(findOne){
+                user.notification.splice(user.notification.indexOf(notificationId), 1);
+                console.log(user.notification)
                 return Users.update({
-                    _id: user._id,
+                    _id: id,
                 }, user)
                 .then(() => {
                     res.json({
                         status: 'removed',
-                        id,
                     });
                 })
+            }else{
+                res.json({
+                    error: true,
+                    msg: 'can\'t not find your notification ID',
+                    code: 'unexpected_result',
+                });
+                return false;
             }
         }
     })

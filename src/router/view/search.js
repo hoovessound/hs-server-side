@@ -8,7 +8,7 @@ const Tracks = require('../../../schema/Tracks');
 router.get('/:query?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
         const token = req.cookies['oauth-token'];
         const query = req.params.query ? req.params.query.trim() : null;
@@ -16,7 +16,7 @@ router.get('/:query?', (req, res) => {
             token: token,
         }).then(user => {
             if (user === null) {
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }else{
                 if(query === null){
                     res.redirect('/');

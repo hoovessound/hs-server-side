@@ -2,27 +2,27 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
+const escape = require('escape-html');
 
 router.post('/add', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
-    // find the users
+    const userId = req.body.userid;
 
+    // find the users
     Users.findOne({
-        token: token,
-    }).then(user => {
+        _id: req.hsAuth.user._id,
+    })
+    .then(user => {
         if(user === null){
             res.json({
                 error: true,
-                msg: 'Can not find your token',
-                code: 'token_not_found',
+                msg: 'Can not find your user ID',
+                code: 'unexpected_result',
             });
             return false;
         }else{
             // success
-            const comment = req.body.comment;
-            const trackid = req.body.trackid;
 
-            if(typeof comment === 'undefined') {
+            if(!req.body.comment) {
                 res.json({
                     error: true,
                     msg: 'Missing the comment field',
@@ -31,10 +31,13 @@ router.post('/add', (req, res) => {
                 return false;
             }
 
-            if(typeof trackid === 'undefined') {
+            const comment = escape(req.body.comment);
+            const trackid = req.body.trackid;
+
+            if(!trackid) {
                 res.json({
                     error: true,
-                    msg: 'Missing the trackid field',
+                    msg: 'Missing the track id field',
                     code: 'missing_require_fields',
                 });
                 return false;
@@ -42,12 +45,13 @@ router.post('/add', (req, res) => {
 
             return Tracks.findOne({
                 _id: trackid
-            }).then(track => {
+            })
+            .then(track => {
 
                 if(track === null){
                     res.json({
                         error: true,
-                        msg: 'Your trackid might be incorrect',
+                        msg: 'Your track id might be incorrect',
                     });
                     return false;
                 }
@@ -72,9 +76,31 @@ router.post('/add', (req, res) => {
                     });
                 });
             })
+            .catch(error => {
+                if(error.message.includes('Cast to ObjectId failed for value')){
+                    res.json({
+                        error: true,
+                        msg: 'Can\'t not found your track id',
+                        code: 'unexpected_result',
+                    });
+                    return false;
+                }else{
+                    console.log(error)
+                }
+            })
         }
-    }).catch(error => {
-        console.log(error);
+    })
+    .catch(error => {
+        if(error.message.includes('Cast to ObjectId failed for value')){
+            res.json({
+                error: true,
+                msg: 'Can\'t not found your user id',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            console.log(error)
+        }
     });
 });
 

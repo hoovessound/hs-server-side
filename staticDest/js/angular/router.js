@@ -34,8 +34,18 @@ angular.module('hsRoutes', ['ngRoute']).config(function ($routeProvider, $locati
         }
     }).when('/notification', {
         templateUrl: '/render/notification'
+    }).when('/@:username', {
+        templateUrl: function templateUrl(params) {
+            return '/render/user/' + params.username;
+        }
+    }).when('/me/apps', {
+
+        templateUrl: function templateUrl() {
+            var queryRawString = window.location.href.substr(window.location.href.indexOf("?") + 1);
+            return '/render/oauth-app?' + queryRawString;
+        }
     }).otherwise({
-        redirectTo: '/home?404=true'
+        templateUrl: '/error/404'
     });
     $locationProvider.html5Mode({
         enabled: true,

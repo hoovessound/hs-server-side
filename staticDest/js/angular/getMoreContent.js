@@ -9,7 +9,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
         }
         $http({
             method: 'GET',
-            url: '/api/tracks?offset=' + offset,
+            url: '/api/tracks?offset=' + offset + '&bypass=true',
             headers: {
                 token: token
             }

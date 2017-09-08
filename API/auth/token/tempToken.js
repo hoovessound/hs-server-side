@@ -80,15 +80,15 @@ router.post('/', csurf(), (req, res) => {
         return false;
     }
 
-    if(!clientId){
-        res.render('auth/login', {
-            error: null,
-            message: 'Please pass in your client ID',
-            csrfToken: req.csrfToken(),
-        });
-        return false;
-    }else{
-
+    if(service !== 'hs_service_login'){
+        if(!clientId){
+            res.render('auth/login', {
+                error: null,
+                message: 'Please pass in your client ID',
+                csrfToken: req.csrfToken(),
+            });
+            return false;
+        }
     }
 
     // find the username
@@ -118,15 +118,17 @@ router.post('/', csurf(), (req, res) => {
         clientId,
     })
     .then(dbApp => {
-        if(dbApp === null) {
-            res.render('auth/login', {
-                error: null,
-                message: 'Bad client ID',
-                csrfToken: req.csrfToken(),
-            });
-            return false;
+        if(service !== 'hs_service_login') {
+            if (dbApp === null) {
+                res.render('auth/login', {
+                    error: null,
+                    message: 'Bad client ID',
+                    csrfToken: req.csrfToken(),
+                });
+                return false;
+            }
+            app = dbApp;
         }
-        app = dbApp;
         return Users.findOne({
             email: req.body.email,
         })
@@ -145,15 +147,23 @@ router.post('/', csurf(), (req, res) => {
                 return bcrypt.compare(req.body.password, user.password).then(same => {
                     if(same){
                         const rawQuery = require('url').parse(req.url).query;
-                        res.render('auth/permission', {
-                            appName: app.name,
-                            csrfToken: req.csrfToken(),
-                            error: null,
-                            message: null,
-                            rawQuery,
-                            uid: user._id,
-                        });
 
+                        if(service === 'hs_service_login'){
+                            res.cookie('oauth-token', user.token, {
+                                maxAge: 365 * 24 * 60 * 60,
+                                httpOnly: true,
+                            });
+                            res.redirect(redirect);
+                        }else{
+                            res.render('auth/permission', {
+                                appName: app.name,
+                                csrfToken: req.csrfToken(),
+                                error: null,
+                                message: null,
+                                rawQuery,
+                                uid: user._id,
+                            });
+                        }
                     }else{
                         // Incorrect username or password
                         let msg = 'Incorrect email or password';

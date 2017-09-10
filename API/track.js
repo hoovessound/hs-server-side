@@ -356,7 +356,7 @@ router.post('/edit/:id?', (req, res) => {
                                                     .then(url => {
                                                         coverImage = url[0];
                                                         fsp.unlinkSync(coverImagePath);
-                                                        track.coverImage = `https://storage.googleapis.com/hs-track/${fileID}`;
+                                                        track.coverImage = `https://storage.googleapis.com/hs-cover-image/${fileID}`;
                                                         updateTitle();
                                                     })
                                                 })

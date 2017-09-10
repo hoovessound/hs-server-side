@@ -16,11 +16,23 @@ angular.module('hsEditTracks', ['ngRoute']).controller('editTrack', function ($s
         ajax.send(formData);
         ajax.onload = function () {
             var response = JSON.parse(ajax.response).track;
-            $location.url('/track/' + response.author.username + '/' + response.title);
-            $http({
-                method: 'GET',
-                url: '/track/' + response.author.username + '/' + response.title
-            });
+            if (!response.error) {
+                $location.url('/track/' + response.author.username + '/' + response.title);
+                $http({
+                    method: 'GET',
+                    url: '/track/' + response.author.username + '/' + response.title
+                });
+            } else {
+                new Noty({
+                    text: 'ERROR: ' + response.msg,
+                    animation: {
+                        open: 'animated bounceInRight', // Animate.css class names
+                        close: 'animated bounceOutRight' // Animate.css class names
+                    },
+                    type: 'error',
+                    timeout: 3500
+                }).show();
+            }
         };
     });
 });

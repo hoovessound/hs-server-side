@@ -28,18 +28,30 @@ function postComment(text) {
     ajax.onload = function () {
         if (ajax.readyState === 4 && ajax.status === 200) {
             var response = JSON.parse(ajax.response);
-            input.value = null;
-            // Append the cooemt into the top of the comment session
-            var container = document.createElement('div');
-            container.class = 'comment';
-            var link = document.createElement('a');
-            link.href = full_address + '/user/' + response.author.username;
-            link.innerHTML = response.author.fullName;
-            var comment = document.createElement('p');
-            comment.innerHTML = response.commentObject.comment;
-            container.appendChild(link);
-            container.appendChild(comment);
-            comments.insertBefore(container, comments.firstChild);
+            if (!response.error) {
+                input.value = null;
+                // Append the cooemt into the top of the comment session
+                var container = document.createElement('div');
+                container.class = 'comment';
+                var link = document.createElement('a');
+                link.href = full_address + '/user/' + response.author.username;
+                link.innerHTML = response.author.fullName;
+                var comment = document.createElement('p');
+                comment.innerHTML = response.commentObject.comment;
+                container.appendChild(link);
+                container.appendChild(comment);
+                comments.insertBefore(container, comments.firstChild);
+            } else {
+                new Noty({
+                    text: 'ERROR: ' + response.msg,
+                    animation: {
+                        open: 'animated bounceInRight', // Animate.css class names
+                        close: 'animated bounceOutRight' // Animate.css class names
+                    },
+                    type: 'error',
+                    timeout: 3500
+                }).show();
+            }
         }
     };
 }

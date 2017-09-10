@@ -38,7 +38,16 @@ angular.module('uploadTrack', ['ngRoute'])
                 if(uploadAjax.readyState === 4 && uploadAjax.status === 200) {
                     const response = JSON.parse(uploadAjax.response);
                     if(response.error){
-                        errorMessgae.innerHTML = response.msg;
+                        new Noty({
+                            text: `ERROR: ${response.msg}`,
+                            animation: {
+                                open: 'animated bounceInRight', // Animate.css class names
+                                close: 'animated bounceOutRight' // Animate.css class names
+                            },
+                            type: 'error',
+                            timeout: 3500
+                        })
+                        .show();
                     }else{
                         $location.url('/home');
                         $http({

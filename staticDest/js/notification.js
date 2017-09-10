@@ -47,14 +47,26 @@ function removePayload(e) {
     }));
     ajax.onload = function () {
         if (ajax.status === 200 && ajax.readyState === 4) {
-            // Remove the element from eh DOM
-            var remove = function remove(id) {
-                var elem = document.getElementById(id);
-                return elem.parentNode.removeChild(elem);
-            };
-
             var response = JSON.parse(ajax.response);
-            remove(id);
+            if (!response.error) {
+                // Remove the element from eh DOM
+                var remove = function remove(id) {
+                    var elem = document.getElementById(id);
+                    return elem.parentNode.removeChild(elem);
+                };
+
+                remove(id);
+            } else {
+                new Noty({
+                    text: 'ERROR: ' + response.msg,
+                    animation: {
+                        open: 'animated bounceInRight', // Animate.css class names
+                        close: 'animated bounceOutRight' // Animate.css class names
+                    },
+                    type: 'error',
+                    timeout: 3500
+                }).show();
+            }
         }
     };
 }

@@ -52,12 +52,25 @@ function removePayload(e) {
     ajax.onload = function () {
         if(ajax.status === 200 && ajax.readyState === 4){
             var response = JSON.parse(ajax.response);
-            // Remove the element from eh DOM
-            function remove(id) {
-                var elem = document.getElementById(id);
-                return elem.parentNode.removeChild(elem);
+            if(!response.error){
+                // Remove the element from eh DOM
+                function remove(id) {
+                    var elem = document.getElementById(id);
+                    return elem.parentNode.removeChild(elem);
+                }
+                remove(id)
+            }else{
+                new Noty({
+                    text: `ERROR: ${response.msg}`,
+                    animation: {
+                        open: 'animated bounceInRight', // Animate.css class names
+                        close: 'animated bounceOutRight' // Animate.css class names
+                    },
+                    type: 'error',
+                    timeout: 3500
+                })
+                .show();
             }
-            remove(id)
         }
     }
 }

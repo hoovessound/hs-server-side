@@ -24,7 +24,16 @@ iconInput.addEventListener('change', e => {
                 iconInput.value = null;
                 navImg.src = response.icon;
             }else{
-                document.querySelector('.error').innerHTML = response.msg;
+                new Noty({
+                    text: `ERROR: ${response.msg}`,
+                    animation: {
+                        open: 'animated bounceInRight', // Animate.css class names
+                        close: 'animated bounceOutRight' // Animate.css class names
+                    },
+                    type: 'error',
+                    timeout: 3500
+                })
+                .show();
             }
         }
     }

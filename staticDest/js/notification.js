@@ -8,6 +8,18 @@ io.on('notification:new', function (payload) {
         setTimeout(function () {
             document.querySelector('.notificationButton').classList.remove('raining');
         }, 2500);
+        console.log(payload.push);
+        if (payload.push) {
+            new Noty({
+                text: payload.body,
+                animation: {
+                    open: 'animated bounceInRight', // Animate.css class names
+                    close: 'animated bounceOutRight' // Animate.css class names
+                },
+                type: 'info',
+                timeout: 3500
+            }).show();
+        }
     } else {
         // Inside the notification page
         var payloadHTML = '<div id="' + payload.id + '" class="payload">\n{icon}\n{title}\n{body}\n<div class="removeMessage material-icons" payloadId="' + payload.id + '" onclick="removePayload(event);">delete</div>\n</div>';

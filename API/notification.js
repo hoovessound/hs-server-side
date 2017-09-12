@@ -65,6 +65,8 @@ router.post('/', (req, res) => {
 
                 user.notification.push(payload);
 
+                console.log(payload)
+
                 // Save the message to the DB
 
                 return Users.update({
@@ -72,7 +74,13 @@ router.post('/', (req, res) => {
                 }, user)
                 .then(() => {
                     // Send the payload via the socket
+                    if(typeof req.body.push === 'undefined'){
+                        payload.push = true;
+                    }else{
+                        payload.push = req.body.push;
+                    }
                     res.io.emit('notification:new', payload);
+                    delete payload.push;
                     res.json(payload);
                 })
             });

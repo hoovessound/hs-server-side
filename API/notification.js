@@ -118,15 +118,18 @@ router.post('/remove', (req, res) => {
             return false;
         }else{
             // Find that notification id
-            let findOne = false;
-            user.notification.map(object => {
-                if(object.id=== notificationId){
-                    findOne = true;
+            let findIt = false;
+            let notificationIndex;
+            for(let index = 0;index < user.notification.length; index++){
+                if(notificationId === user.notification[index].id){
+                    findIt = true;
+                    notificationIndex = index;
+                    break;
                 }
-            })
-            if(findOne){
-                user.notification.splice(user.notification.indexOf(notificationId), 1);
-                console.log(user.notification)
+            }
+
+            if(findIt){
+                user.notification.splice(notificationIndex, 1);
                 return Users.update({
                     _id: id,
                 }, user)
@@ -143,6 +146,7 @@ router.post('/remove', (req, res) => {
                 });
                 return false;
             }
+
         }
     })
     .catch((error) => {

@@ -8,8 +8,6 @@ var volumeBar = document.querySelector('#volumeBar');
 var tracksElement = document.querySelector('.tracks');
 var container = document.querySelector('.container');
 var ajax = new XMLHttpRequest();
-var ajaxing = false;
-var initPlay = true;
 
 audio.addEventListener('ended', function (e) {
     // When the audio is ended, try to fetch an other track automatically
@@ -22,6 +20,7 @@ audio.addEventListener('ended', function (e) {
 
 io.on('audio:fromserver:change', function (payload) {
     masterTitle.innerHTML = payload.fullName + ' - ' + payload.title;
+    masterPlayer.classList.add('remotePlay');
     masterTitle.href = $full_address + '/track/' + payload.username + '/' + payload.title;
     audio.src = $full_address + '/api/listen/' + payload.trackID + '?token=' + $token;
     audio.pause();

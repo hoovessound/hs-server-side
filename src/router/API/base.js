@@ -29,6 +29,8 @@ router.use((req, res, next) => {
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const sessionToken = req.headers.sessiontoken;
         const token = req.headers.token;
+        console.log(sessionToken)
+        console.log(req.session.sessionToken)
         if(sessionToken === req.session.sessionToken){
             Users.findOne({
                 token,
@@ -87,12 +89,10 @@ router.use((req, res, next) => {
             return Users.findOne({_id: rightAccess.author.user});
         })
         .then(user => {
-            if(!user === false){
-                req.hsAuth = {
-                    user,
-                }
-                next();
+            req.hsAuth = {
+                user,
             }
+            next();
         })
         .catch(error => {
             console.log(error);

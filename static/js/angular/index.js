@@ -14,3 +14,9 @@ hsAngular.run(function($rootScope) {
         localPlayList.clearTrack();
     });
 });
+
+hsAngular.run(function($rootScope, $templateCache) {
+    $rootScope.$on('$viewContentLoaded', function() {
+        $templateCache.removeAll();
+    });
+});

@@ -4507,6 +4507,10 @@ ws@~2.3.1:
     safe-buffer "~5.0.1"
     ultron "~1.1.0"
 
+x-frame-options@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/x-frame-options/-/x-frame-options-1.0.0.tgz#ff9c1ca944b916a9bc27d6672a8b39b5b08b427f"
+
 x-xss-protection@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/x-xss-protection/-/x-xss-protection-1.0.0.tgz#898afb93869b24661cf9c52f9ee8db8ed0764dd9"

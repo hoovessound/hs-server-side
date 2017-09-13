@@ -20,7 +20,6 @@ audio.addEventListener('ended', e => {
 
 io.on('audio:fromserver:change', function(payload) {
     masterTitle.innerHTML = `${payload.fullName} - ${payload.title}`;
-    masterPlayer.classList.add('remotePlay');
     masterTitle.href = `${$full_address}/track/${payload.username}/${payload.title}`;
     audio.src = `${$full_address}/api/listen/${payload.trackID}?token=${$token}`;
     audio.pause();
@@ -28,7 +27,7 @@ io.on('audio:fromserver:change', function(payload) {
 });
 
 io.on('audio:fromserver:pause', function(payload) {
-    masterPlayer.classList.add('remotePlay');
+    masterPlayer.classList.remove('remotePlay');
     masterPlayPuaseButton.innerHTML = 'play_arrow';
 });
 
@@ -38,7 +37,6 @@ io.on('audio:fromserver:play', function(payload) {
 });
 
 io.on('audio:fromserver:volume', function(payload) {
-    masterPlayer.classList.add('remotePlay');
     audio.volume = payload.volume / 100;
     volumeBar.value = payload.volume;
 });

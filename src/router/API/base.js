@@ -87,10 +87,12 @@ router.use((req, res, next) => {
             return Users.findOne({_id: rightAccess.author.user});
         })
         .then(user => {
-            req.hsAuth = {
-                user,
+            if(!user === false){
+                req.hsAuth = {
+                    user,
+                }
+                next();
             }
-            next();
         })
         .catch(error => {
             console.log(error);

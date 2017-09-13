@@ -20,10 +20,6 @@ faveButton.addEventListener('click', function (e) {
     };
 });
 
-audio.addEventListener('ended', function (e) {
-    masterPlayPuaseButton.innerHTML = 'play_arrow';
-});
-
 shareButton.addEventListener('click', function (e) {
     if (shareURL.classList.contains('hide')) {
         shareURL.classList.remove('hide');

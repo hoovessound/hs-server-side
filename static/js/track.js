@@ -18,10 +18,6 @@ faveButton.addEventListener('click', e => {
     }
 });
 
-audio.addEventListener('ended', e => {
-    masterPlayPuaseButton.innerHTML = 'play_arrow';
-});
-
 shareButton.addEventListener('click', e => {
     if(shareURL.classList.contains('hide')){
         shareURL.classList.remove('hide');

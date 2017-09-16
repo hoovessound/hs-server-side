@@ -8,7 +8,6 @@ io.on('notification:new', function (payload) {
         setTimeout(function () {
             document.querySelector('.notificationButton').classList.remove('raining');
         }, 2500);
-        console.log(payload.push);
         if (payload.push) {
             new Noty({
                 text: payload.body,

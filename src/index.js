@@ -137,11 +137,11 @@ server.listen(port, () => {
     });
 });
 
+// Using GZIP
+app.use(compression();
+
 // Productions only settings
 if (process.env.NODE_ENV === 'production') {
-    // Using GZIP
-    app.use(compression());
-
     app.use((req, res, next) => {
         // HTTP to HTTPS
         if (req.secure) {
@@ -152,6 +152,8 @@ if (process.env.NODE_ENV === 'production') {
     });
 
 } else {
+    // Development only settings
+    
     // using the morgan dev server log
     app.use(morgan('dev'));
 }

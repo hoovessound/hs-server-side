@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Tracks = require('../schema/Tracks');
+const xFrameOptions = require('x-frame-options')
 
 router.get('/:id?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const id = req.params.id;
     Tracks.findById(id).then(track => {
-        res.header('X-FRAME-OPTIONS', 'ALLOW-FROM ' + req.query.domain);
+        router.use(xFrameOptions());
         res.render('widget', {
             track,
             full_address,

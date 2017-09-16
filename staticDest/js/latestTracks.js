@@ -8,8 +8,6 @@ var volumeBar = document.querySelector('#volumeBar');
 var tracksElement = document.querySelector('.tracks');
 var container = document.querySelector('.container');
 var ajax = new XMLHttpRequest();
-var ajaxing = false;
-var initPlay = true;
 
 audio.addEventListener('ended', function (e) {
     // When the audio is ended, try to fetch an other track automatically
@@ -30,7 +28,7 @@ io.on('audio:fromserver:change', function (payload) {
 });
 
 io.on('audio:fromserver:pause', function (payload) {
-    masterPlayer.classList.add('remotePlay');
+    masterPlayer.classList.remove('remotePlay');
     masterPlayPuaseButton.innerHTML = 'play_arrow';
 });
 
@@ -40,7 +38,6 @@ io.on('audio:fromserver:play', function (payload) {
 });
 
 io.on('audio:fromserver:volume', function (payload) {
-    masterPlayer.classList.add('remotePlay');
     audio.volume = payload.volume / 100;
     volumeBar.value = payload.volume;
 });

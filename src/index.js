@@ -138,7 +138,7 @@ server.listen(port, () => {
 });
 
 // Using GZIP
-app.use(compression();
+app.use(compression());
 
 // Productions only settings
 if (process.env.NODE_ENV === 'production') {

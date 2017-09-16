@@ -18,6 +18,10 @@ router.use('/oauth1/token/temporary', require('../../../API/auth/token/tempToken
 
 router.use('/oauth1/token/access', require('../../../API/auth/token/accessToken'));
 
+// Third party oAuth
+// router.use('/oauth1/thirdparty/poniverse', require('../../../API/auth/thirdparty/poniverse'));
+router.use('/oauth1/thirdparty/facebook', require('../../../API/auth/thirdparty/facebook'));
+
 // Basic API auth
 router.use((req, res, next) => {
     const bypass = req.query.bypass;

@@ -20,15 +20,23 @@
 
         <div class="icon"></div>
         <h1>Login</h1>
-        <%if(typeof appName !== 'undefined'){%>
-          <p class="appName">Application: <%=appName%></p>
-        <%}%>
         <form id="loginForm" action="" method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <p><input type="email" class="username" value="" name="email" placeholder="Email Address"></p>
             <p><input type="password" class="password" value="" name="password" placeholder="Password"></p>
             <button type="submit" class="btn waves-effect waves-default" id="loginButton">Login</button>
         </form>
+
+        <a class="loginProvider poniverse" href="/api/oauth1/thirdparty/poniverse">
+            <span>Poniverse</span>
+            <img src="https://avatars3.githubusercontent.com/u/3528970?v=4&s=400" alt="" class="image">
+        </a>
+
+        <a class="loginProvider facebook" href="/api/oauth1/thirdparty/facebook">
+            <span>Facebook</span>
+            <img src="https://facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-art.png" alt="" class="image">
+        </a>
+
         <a href="/api/auth/register">Register</a><br>
         <a href="/api/auth/changepassword">Forgot Password</a>
 </div>

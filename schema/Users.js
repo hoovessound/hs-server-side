@@ -31,5 +31,15 @@ const usersSchema = new Schema({
             duration: Number,
         }
     },
+    thirdparty: {
+        provider: {
+            type: String,
+            default: 'hoovessound',
+        },
+        token: {
+            type: String,
+            default: null,
+        }
+    }
 });
 module.exports = mongoose.model('Users', usersSchema);

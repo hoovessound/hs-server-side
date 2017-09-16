@@ -15,7 +15,48 @@
         background: #FFF;
         padding: 7em 2em;
     }
+
 }
+
+.loginProvider{
+    display: block;
+    height: 2.5em;
+    margin: 1em;
+    position: relative;
+    cursor: pointer;
+
+    .image{
+        width: 3em;
+        height: 3em;
+        position: absolute;
+        left: 0em;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0em 0.5em;
+        padding: 0.5em;
+    }
+    
+    span{
+        position: absolute;
+        right: 0em;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0em 0.5em;
+        color: #FFF;
+    }
+
+    // login provider's style
+    &.poniverse {
+        background: #5E63B6;
+    }
+
+    &.facebook{
+        background: #6A0572;
+    }
+
+
+}
+//https://avatars3.githubusercontent.com/u/3528970?v=4&s=400
 
 @media (max-width: 415px){
     #loginButton{

@@ -29,7 +29,6 @@ router.get('/', csurf(), (req, res) => {
             })
             .then(app =>{
                 if(app === null) {
-                    mi
                     return false;
                 }
 
@@ -37,7 +36,6 @@ router.get('/', csurf(), (req, res) => {
                     error: null,
                     message: null,
                     csrfToken: req.csrfToken(),
-                    appName: app.name,
                 });
 
             })

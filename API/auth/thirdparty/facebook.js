@@ -8,21 +8,22 @@ const crypto = require('crypto');
 const fbAuthObject = {
     appId: process.env.FB_CLIENT_ID,
     appSecret: process.env.FB_SECRET,
-    callbackURL: 'http://localhost:3000/api/oauth1/thirdparty/facebook/callback',
 };
 
 router.get('/', (req, res) => {
+    const fullUrl = req.protocol + '://' + req.get('host')
     // Get the tmp token
-    const url = `https://www.facebook.com/v2.10/dialog/oauth?client_id=${fbAuthObject.appId}&redirect_uri=${fbAuthObject.callbackURL}&response_type=code`;
+    const url = `https://www.facebook.com/v2.10/dialog/oauth?client_id=${fbAuthObject.appId}&redirect_uri=${fullUrl}/api/oauth1/thirdparty/facebook/callback&response_type=code`;
     res.redirect(url);
 });
 
 router.get('/callback', (req, res) => {
+    const fullUrl = req.protocol + '://' + req.get('host')
     // Get the access token
     const code = req.query.code;
     let accessToken;
     let _profile;
-    const url = `https://graph.facebook.com/v2.10/oauth/access_token?client_id=${fbAuthObject.appId}&client_secret=${fbAuthObject.appSecret}&code=${code}&redirect_uri=${fbAuthObject.callbackURL}`;
+    const url = `https://graph.facebook.com/v2.10/oauth/access_token?client_id=${fbAuthObject.appId}&client_secret=${fbAuthObject.appSecret}&code=${code}&redirect_uri=${fullUrl}/api/oauth1/thirdparty/facebook/callback`;
     rp.get({
         url,
         json: true,

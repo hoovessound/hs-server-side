@@ -13,6 +13,7 @@ router.use(csurf());
 router.get('/', csurf(), (req, res) => {
     // render th login page
     const service = req.query.service;
+    const redirect = req.query.redirect;
     const clientId = req.query.client_id;
     if(service !== 'hs_service_login'){
         if(!clientId){
@@ -23,6 +24,14 @@ router.get('/', csurf(), (req, res) => {
             });
             return false;
         }else{
+
+            if(!redirect){
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Missing the redirect url',
+                    csrfToken: req.csrfToken(),
+                });
+            }
 
             oAuthApps.findOne({
                 clientId,
@@ -69,7 +78,7 @@ router.post('/', csurf(), (req, res) => {
     if(!redirect){
         res.render('auth/login', {
             error: true,
-            message: 'Missing the redirect query',
+            message: 'Missing the redirect url',
             csrfToken: req.csrfToken(),
         });
     }

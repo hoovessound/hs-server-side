@@ -23,10 +23,7 @@ class Me {
                 username: this.req.hsAuth.user.username,
                 fullname: this.req.hsAuth.user.fullname,
                 email: this.req.hsAuth.user.email,
-                thirdparty: {
-                    provider: this.req.hsAuth.user.thirdparty.provider ? this.req.hsAuth.user.thirdparty.provider : 'hoovessound',
-                },
-                lastPlay: this.req.hsAuth.user.lastPlay,
+                icon: this.req.hsAuth.user.icon,
                 roles: this.req.hsAuth.user.roles,
                 fave: this.req.hsAuth.user.fave,
                 banner: this.req.hsAuth.user.banner,

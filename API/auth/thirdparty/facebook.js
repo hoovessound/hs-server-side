@@ -52,6 +52,7 @@ router.get('/callback', (req, res) => {
             const token = randomBytes.toString('hex');
             return new Users({
                 fullName: _profile.name,
+                username: _profile.name.replace(/ |-/igm, '_'),
                 token,
                 email: _profile.email,
                 thirdparty: {

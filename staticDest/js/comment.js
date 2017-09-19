@@ -17,12 +17,11 @@ input.addEventListener('keydown', function (e) {
 
 function postComment(text) {
     var ajax = new XMLHttpRequest();
-    ajax.open('POST', '/api/comment/add?bypass=true');
+    ajax.open('POST', '/api/track/comment/' + trackid + '?bypass=true');
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.setRequestHeader('token', token);
     ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send(JSON.stringify({
-        trackid: trackid,
         comment: text
     }));
     ajax.onload = function () {

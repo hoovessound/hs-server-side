@@ -29,6 +29,11 @@ router.get('/', csurf(), (req, res) => {
             })
             .then(app =>{
                 if(app === null) {
+                    res.render('auth/login', {
+                        error: null,
+                        message: 'Bad client ID',
+                        csrfToken: req.csrfToken(),
+                    });
                     return false;
                 }
 

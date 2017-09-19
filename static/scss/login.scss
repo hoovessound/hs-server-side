@@ -14,6 +14,21 @@
         transform: translate(-50%, -50%);
         background: #FFF;
         padding: 7em 2em;
+
+        .error{
+            background: #F03861;
+            padding: 0em 0em 0.3em 00em;
+            .title{
+                background: #FF5D6E;
+                position: relative;
+                width: 100%;
+                padding: 0.3em;
+            }
+            .msg{
+                margin-left: 0.3em;
+            }
+        }
+
     }
 
 }

@@ -17,7 +17,7 @@ router.get('/', csurf(), (req, res) => {
     if(service !== 'hs_service_login'){
         if(!clientId){
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Please pass in your client ID',
                 csrfToken: req.csrfToken(),
             });
@@ -30,7 +30,7 @@ router.get('/', csurf(), (req, res) => {
             .then(app =>{
                 if(app === null) {
                     res.render('auth/login', {
-                        error: null,
+                        error: true,
                         message: 'Bad client ID',
                         csrfToken: req.csrfToken(),
                     });
@@ -53,6 +53,7 @@ router.get('/', csurf(), (req, res) => {
             error: null,
             message: null,
             csrfToken: req.csrfToken(),
+            oAuth: req.query.client_id ? true : false,
         });
     }
 });
@@ -67,7 +68,7 @@ router.post('/', csurf(), (req, res) => {
 
     if(!redirect){
         res.render('auth/login', {
-            error: null,
+            error: true,
             message: 'Missing the redirect query',
             csrfToken: req.csrfToken(),
         });
@@ -86,7 +87,7 @@ router.post('/', csurf(), (req, res) => {
     if(service !== 'hs_service_login'){
         if(!clientId){
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Please pass in your client ID',
                 csrfToken: req.csrfToken(),
             });
@@ -124,7 +125,7 @@ router.post('/', csurf(), (req, res) => {
         if(service !== 'hs_service_login') {
             if (dbApp === null) {
                 res.render('auth/login', {
-                    error: null,
+                    error: true,
                     message: 'Bad client ID',
                     csrfToken: req.csrfToken(),
                 });
@@ -139,8 +140,9 @@ router.post('/', csurf(), (req, res) => {
             if(user === null){
                 let msg = 'Incorrect email or password';
                 res.render('auth/login', {
-                    error: true,
-                    message: msg,
+                    error: null,
+                    message: null,
+                    pwdError: msg,
                     csrfToken: req.csrfToken(),
                     appName: app.name,
                 });
@@ -194,7 +196,7 @@ router.post('/permission', csurf(), (req, res) => {
 
     if(!uid){
         res.render('auth/login', {
-            error: null,
+            error: true,
             message: 'Missing UID',
             csrfToken: req.csrfToken(),
         });
@@ -212,7 +214,7 @@ router.post('/permission', csurf(), (req, res) => {
     .then(app => {
         if(app === null) {
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Bad client ID',
                 csrfToken: req.csrfToken(),
             });
@@ -250,7 +252,7 @@ router.post('/permission', csurf(), (req, res) => {
     .catch(error => {
         if(error.message.includes('Cast to ObjectId failed for value')){
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Bad UID',
                 csrfToken: req.csrfToken(),
             });

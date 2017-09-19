@@ -8,6 +8,8 @@ router.use(cors());
 
 router.use('/listen', require('../../../API/listen'));
 
+router.use('/widget', require('../../../API/widget'));
+
 router.use('/auth/register', require('../../../API/auth/register'));
 
 router.use('/auth/login', require('../../../API/auth/login'));
@@ -118,8 +120,6 @@ router.use('/track', require('../../../API/track'));
 router.use('/search', require('../../../API/search'));
 
 router.use('/settings', require('../../../API/settings'));
-
-router.use('/widget', require('../../../API/widget'));
 
 router.use('/notification', require('./../../../API/notification'));
 

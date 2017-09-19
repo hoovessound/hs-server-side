@@ -4,36 +4,8 @@ const Users = require('../schema/Users');
 const randomstring = require('randomstring');
 
 router.get('/', (req, res) => {
-    const id = req.query.userid;
-    Users.findOne({
-        _id: id,
-    })
-    .then(user => {
-        if (user === null) {
-            res.json({
-                error: true,
-                msg: 'can\'t not find your user ID',
-                code: 'unexpected_result',
-            });
-            return false;
-        }else{
-            // Find all the user's notification
-            res.json({
-                notifications: user.notification.reverse(),
-            });
-        }
-    })
-    .catch(error => {
-        if(error.message.includes('Cast to ObjectId failed for value')){
-            res.json({
-                error: true,
-                msg: 'Can\'t not that user id',
-                code: 'unexpected_result',
-            });
-            return false;
-        }else{
-            console.log(error);
-        }
+    res.json({
+        notifications: req.hsAuth.user.notification.reverse(),
     });
 });
 
@@ -64,8 +36,6 @@ router.post('/', (req, res) => {
                 // Updating the user's notification stack locally
 
                 user.notification.push(payload);
-
-                console.log(payload)
 
                 // Save the message to the DB
 

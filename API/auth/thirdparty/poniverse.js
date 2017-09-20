@@ -11,19 +11,19 @@ const pvAuthObject = {
 };
 
 router.get('/', (req, res) => {
-    const fullUrl = req.protocol + '://' + req.get('host')
+    const fullUrl = req.protocol + '://' + req.get('host');
     // Get the tmp token
     const url = `https://poniverse.net/oauth/authorize?response_type=code&client_id=${pvAuthObject.appId}&redirect_uri=${fullUrl}/api/oauth1/thirdparty/poniverse/callback`;
     res.redirect(url);
 });
 
 router.get('/callback', (req, res) => {
-    const fullUrl = req.protocol + '://' + req.get('host')
+    const fullUrl = req.protocol + '://' + req.get('host');
     // Get the access token
     const code = req.query.code;
     let accessToken;
     let _profile;
-    const url = `https://graph.facebook.com/v2.10/oauth/access_token?client_id=${fbAuthObject.appId}&client_secret=${fbAuthObject.appSecret}&code=${code}&redirect_uri=${fullUrl}/api/oauth1/thirdparty/facebook/callback`;
+    const url = `https://poniverse.net/oauth/access_token?grant_type=authorization_code&code=${code}&redirect_uri=${fullUrl}/api/oauth1/thirdparty/poniverse/callback&client_id=${pvAuthObject.appId}&client_secret=${pvAuthObject.appSecret}`;
     rp.get({
         url,
         json: true,
@@ -31,7 +31,7 @@ router.get('/callback', (req, res) => {
     .then(response => {
         accessToken = response.access_token;
         // Find that user's email address
-        const profileUrl = `https://graph.facebook.com/v2.10/me?fields=id,name,email&access_token=${accessToken}`;
+        const profileUrl = `https://api.poniverse.net/v1/users/me?access_token=${accessToken}`;
         return rp.get({
             url: profileUrl,
             json: true
@@ -51,11 +51,12 @@ router.get('/callback', (req, res) => {
             const randomBytes = crypto.randomBytes(50);
             const token = randomBytes.toString('hex');
             return new Users({
-                fullName: _profile.name,
+                fullName: _profile.display_name,
+                username: _profile.username,
                 token,
                 email: _profile.email,
                 thirdparty: {
-                    provider: 'facebook',
+                    provider: 'poniverse',
                     token: accessToken,
                 }
             })
@@ -73,9 +74,9 @@ router.get('/callback', (req, res) => {
 
             // Bind the data to the old account
 
-            if(user.thirdparty.provider !== 'facebook') {
+            if(user.thirdparty.provider !== 'poniverse') {
                 user.thirdparty = {
-                    provider: 'facebook',
+                    provider: 'poniverse',
                     token: accessToken,
                 }
             }

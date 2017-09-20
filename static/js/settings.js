@@ -15,6 +15,7 @@ iconInput.addEventListener('change', e => {
     form.append('image', file);
     ajax.open('POST', '/api/settings/profilepicture/upload?bypass=true');
     ajax.setRequestHeader('token', token);
+    console.log(sessionToken)
     ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send(form);
     ajax.onload = function(){
@@ -54,6 +55,7 @@ function updateFullName(e) {
     e.preventDefault();
     ajax.open('POST', '/api/settings?bypass=true');
     ajax.setRequestHeader('token', token);
+    ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.send(JSON.stringify({
         settings: {
@@ -61,5 +63,4 @@ function updateFullName(e) {
         }
     }));
     fullname.blur();
-    navUsername.innerHTML = fullname.value;
 }

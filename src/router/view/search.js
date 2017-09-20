@@ -72,8 +72,6 @@ router.get('/:query?', (req, res) => {
                         full_address,
                         token,
                     });
-                    console.log(response[0]);
-                    console.log(response[1])
                 })
 
             }

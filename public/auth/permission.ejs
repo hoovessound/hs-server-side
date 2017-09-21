@@ -5,6 +5,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="stylesheet" href="/static/css/permission.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -20,8 +21,12 @@
             <%=message%>
         </div>
 
-        <div class="icon"></div>
-        <h1>Permission</h1>
+        
+        <div id="userInfo">
+            <p>You are login as <%=user.fullName%></p>
+            <img src="<%=user.icon%>" alt="User's profile picture" id="userIcon"/>
+        </div>
+
         <form id="loginForm" action="/api/oauth1/token/temporary/permission?<%-rawQuery%>" method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <input type="hidden" name="uid" value="<%=uid%>">

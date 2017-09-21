@@ -15,29 +15,39 @@ router.get('/', csurf(), (req, res) => {
     const service = req.query.service;
     const redirect = req.query.redirect;
     const clientId = req.query.client_id;
-    if(service !== 'hs_service_login'){
-        if(!clientId){
-            res.render('auth/login', {
-                error: true,
-                message: 'Please pass in your client ID',
-                csrfToken: req.csrfToken(),
-            });
-            return false;
-        }else{
+    const oAuthToken = req.cookies['oauth-token'];
 
-            if(!redirect){
-                res.render('auth/login', {
-                    error: true,
-                    message: 'Missing the redirect url',
-                    csrfToken: req.csrfToken(),
-                });
-            }
+    Users.findOne({
+        token: oAuthToken,
+    })
+    .then(user => {
+        if(user){
+            // Have OAuth tokekn
 
-            oAuthApps.findOne({
+            // Logined user
+
+            // Fastforward to permission page
+
+            
+
+            // Check client ID
+            return oAuthApps.findOne({
                 clientId,
             })
-            .then(app =>{
-                if(app === null) {
+            .then(app => {
+                if(app){
+                    const rawQuery = require('url').parse(req.url).query;
+                    res.render('auth/permission', {
+                        appName: app.name,
+                        csrfToken: req.csrfToken(),
+                        error: null,
+                        message: null,
+                        rawQuery,
+                        uid: user._id,
+                        user,
+                    });
+                }else{
+                    // Fase clientID
                     res.render('auth/login', {
                         error: true,
                         message: 'Bad client ID',
@@ -45,26 +55,67 @@ router.get('/', csurf(), (req, res) => {
                     });
                     return false;
                 }
+            })
 
+        }else{
+
+            // Didn't have oAuth token
+
+            if(service !== 'hs_service_login'){
+                if(!clientId){
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Please pass in your client ID',
+                        csrfToken: req.csrfToken(),
+                    });
+                    return false;
+                }else{
+        
+                    if(!redirect){
+                        res.render('auth/login', {
+                            error: true,
+                            message: 'Missing the redirect url',
+                            csrfToken: req.csrfToken(),
+                        });
+                    }
+        
+                    oAuthApps.findOne({
+                        clientId,
+                    })
+                    .then(app =>{
+                        if(app === null) {
+                            res.render('auth/login', {
+                                error: true,
+                                message: 'Bad client ID',
+                                csrfToken: req.csrfToken(),
+                            });
+                            return false;
+                        }
+        
+                        res.render('auth/login', {
+                            error: null,
+                            message: null,
+                            csrfToken: req.csrfToken(),
+                        });
+        
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+                }
+            }else{
                 res.render('auth/login', {
                     error: null,
                     message: null,
                     csrfToken: req.csrfToken(),
+                    oAuth: req.query.client_id ? true : false,
                 });
-
-            })
-            .catch(error => {
-                console.log(error);
-            });
+            }
         }
-    }else{
-        res.render('auth/login', {
-            error: null,
-            message: null,
-            csrfToken: req.csrfToken(),
-            oAuth: req.query.client_id ? true : false,
-        });
-    }
+    })
+    .catch(error => {
+        console.log(error);
+    })
 });
 
 router.post('/', csurf(), (req, res) => {
@@ -153,7 +204,6 @@ router.post('/', csurf(), (req, res) => {
                     message: null,
                     pwdError: msg,
                     csrfToken: req.csrfToken(),
-                    appName: app.name,
                 });
                 return false;
             }else{
@@ -162,11 +212,12 @@ router.post('/', csurf(), (req, res) => {
                     if(same){
                         const rawQuery = require('url').parse(req.url).query;
 
+                        res.cookie('oauth-token', user.token, {
+                            maxAge: 365 * 24 * 60 * 60,
+                            httpOnly: true,
+                        });
+
                         if(service === 'hs_service_login'){
-                            res.cookie('oauth-token', user.token, {
-                                maxAge: 365 * 24 * 60 * 60,
-                                httpOnly: true,
-                            });
                             res.redirect(redirect);
                         }else{
                             res.render('auth/permission', {
@@ -176,6 +227,7 @@ router.post('/', csurf(), (req, res) => {
                                 message: null,
                                 rawQuery,
                                 uid: user._id,
+                                user,
                             });
                         }
                     }else{
@@ -185,7 +237,6 @@ router.post('/', csurf(), (req, res) => {
                             error: true,
                             message: msg,
                             csrfToken: req.csrfToken(),
-                            appName: app.name,
                         });
                     }
                 });

@@ -72,9 +72,10 @@ router.post('/', (req, res) => {
 
         // Give this application an access token
 
-        // If the user did have an access toke before
+        // If the user did have an access toke before and have the same scope permission
         AccessTokes.findOne({
             'author.user': rightAccess.author.user,
+            permission: rightAccess.permission,
         })
         .then(oldAccessToken => {
             if(!oldAccessToken){

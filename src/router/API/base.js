@@ -80,10 +80,12 @@ router.use((req, res, next) => {
     }else{
         // Normal API calls
         const accessToken = req.headers.access_token;
+        let _rightAccess;
         AccessTokes.findOne({
             token: accessToken,
         })
         .then(rightAccess => {
+            _rightAccess = rightAccess;
             if(rightAccess === null){
                 res.json({
                     error: true,
@@ -97,6 +99,7 @@ router.use((req, res, next) => {
         .then(user => {
             req.hsAuth = {
                 user,
+                app: _rightAccess,
             }
             next();
         })

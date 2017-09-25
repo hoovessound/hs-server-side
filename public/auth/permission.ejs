@@ -31,11 +31,18 @@
             <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <input type="hidden" name="uid" value="<%=uid%>">
             <%if(typeof appName !== 'undefined'){%>
-            <h2>Will you allow <%=appName%> to have access to the following service in your HoovesSound account?</h2>
-            <ul>
-                <li>Seeing your basic information, like email address</li>
-                <li>Uploading track under your name</li>
-                <li>Posting comment under your name</li>
+            <h2><span class="appName"><%=appName%></span> wants the following permission</h2>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    Seeing your basic information, like email address and display name
+                </li>
+                <%if(scope.length >= 1){%>
+                <%scope.forEach(object => {%>
+                <li class="list-group-item">
+                    <%=object.description%>
+                </li>
+                <%})%>
+                <%}%>
             </ul>
             <%}%>
             <button class="btn btn-success" type="submit" name="allow" value="allow">Allow</button>

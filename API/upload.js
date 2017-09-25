@@ -21,6 +21,17 @@ const https = require('https');
 const escape = require('escape-html');
 
 router.post('/', (req, res) => {
+
+    // Check permission
+
+    if(!req.hsAuth.app.permission.includes('upload_track')){
+        res.json({
+            error: 'Bad permission scoping',
+            code: 'service_lock_down',
+        });
+        return false;
+    }
+
     const full_address = req.protocol + "://" + req.headers.host;
 
     const form = formidable.IncomingForm({

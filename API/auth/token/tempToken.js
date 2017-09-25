@@ -10,6 +10,39 @@ const moment = require('moment');
 
 router.use(csurf());
 
+// Parse the scope query string
+router.use((req, res, next) => {
+    const scope = req.query.scope;
+    let scopeInAction = [];
+
+    if(scope){
+        const scopesArray = scope.split(',');
+        const scopes = {
+            'post_comment': 'Post comments under your name',
+            'fave_track': 'Favourite or Un-favourite tracks',
+            'upload_track': 'Upload tracks under your name',
+        }
+
+        for(let key in scopes) {
+            const description = scopes[key];
+            scopesArray.forEach(id => {
+                if(id === key){
+                    scopeInAction.push({
+                        name: key,
+                        description,
+                    });
+                }
+            })
+        }
+
+        req.scopeInAction = {
+            parse: scopeInAction,
+            raw: scopesArray,
+        }
+    }
+    next();
+});
+
 router.get('/', csurf(), (req, res) => {
     // render th login page
     const service = req.query.service;
@@ -45,6 +78,7 @@ router.get('/', csurf(), (req, res) => {
                         rawQuery,
                         uid: user._id,
                         user,
+                        scope: req.scopeInAction.parse,
                     });
                 }else{
                     // Fase clientID
@@ -228,6 +262,7 @@ router.post('/', csurf(), (req, res) => {
                                 rawQuery,
                                 uid: user._id,
                                 user,
+                                scope: req.scopeInAction.parse,
                             });
                         }
                     }else{
@@ -250,7 +285,6 @@ router.post('/', csurf(), (req, res) => {
 
 router.post('/permission', csurf(), (req, res) => {
     const clientId = req.query.client_id;
-    let app;
     const redirect = req.query.redirect;
     const uid = req.body.uid;
 
@@ -299,6 +333,7 @@ router.post('/permission', csurf(), (req, res) => {
                     app: app._id,
                     user: uid,
                 },
+                permission: req.scopeInAction.raw,
             })
             .save()
             .then(() => {

@@ -8,7 +8,7 @@ const AccessTokesSchema = new Schema({
     },
     author: {
         app: Schema.Types.ObjectId,
-        user: Schema.Types.ObjectId
+        user: Schema.Types.ObjectId,
     },
     permission: Array,
 });

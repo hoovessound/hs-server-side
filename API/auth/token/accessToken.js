@@ -10,7 +10,6 @@ router.post('/', (req, res) => {
     const clientId = req.body.client_id;
     const clientSecret = req.body.client_secret;
     const token = req.body.token;
-
     if(!clientId){
         res.json({
             error: 'Missing the client ID',
@@ -89,7 +88,7 @@ router.post('/', (req, res) => {
                     // Just use the old one
                     res.json({
                         access_token: oldAccessToken.token,
-                        expire: oldEndTime,
+                        expire: oldEndTime
                     })
         
                     return TempTokes.remove({
@@ -126,6 +125,7 @@ router.post('/', (req, res) => {
                     app: rightAccess.author.app,
                     user: rightAccess.author.user,
                 },
+                permission: rightAccess.permission,
             })
             .save()
             .then(() => {

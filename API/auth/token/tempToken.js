@@ -39,6 +39,11 @@ router.use((req, res, next) => {
             parse: scopeInAction,
             raw: scopesArray,
         }
+    }else{
+        req.scopeInAction = {
+            parse: [],
+            raw: 'basic_user_info'
+        }
     }
     next();
 });

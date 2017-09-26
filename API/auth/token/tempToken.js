@@ -63,8 +63,9 @@ router.use((req, res, next) => {
                 let find = false;
                 app.callbackUrl.forEach(allowUrl => {
                     const redirectHostName = url.parse(redirect).host;
-                    if(redirectHostName === allowUrl){
+                    if(redirectHostName === allowUrl || allowUrl === '*'){
                         find = true;
+                        return true;
                     }
                 });
 

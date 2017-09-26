@@ -88,11 +88,6 @@ router.post('/', csurf(), (req, res) => {
                                 return false;
                             }
 
-                            if(callbackUrl.split('\n').length >= 0){
-                                res.redirect('/me/apps?error=You have to pass in at less one white list domain');
-                                return false;
-                            }
-
                             // Success
 
                             callbackUrl = callbackUrl.split('\n');

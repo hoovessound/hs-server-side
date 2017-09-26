@@ -10,46 +10,180 @@ const moment = require('moment');
 
 router.use(csurf());
 
-router.get('/', csurf(), (req, res) => {
-    // render th login page
-    const service = req.query.service;
-    const clientId = req.query.client_id;
-    if(service !== 'hs_service_login'){
-        if(!clientId){
-            res.render('auth/login', {
-                error: null,
-                message: 'Please pass in your client ID',
-                csrfToken: req.csrfToken(),
-            });
-            return false;
-        }else{
+// Parse the scope query string
+router.use((req, res, next) => {
+    const scope = req.query.scope;
+    let scopeInAction = [];
 
-            oAuthApps.findOne({
-                clientId,
+    if(scope){
+        const scopesArray = scope.split(',');
+        const scopes = {
+            'post_comment': 'Post comments under your name',
+            'fave_track': 'Favourite or Un-favourite tracks',
+            'upload_track': 'Upload tracks under your name',
+        }
+
+        for(let key in scopes) {
+            const description = scopes[key];
+            scopesArray.forEach(id => {
+                if(id === key){
+                    scopeInAction.push({
+                        name: key,
+                        description,
+                    });
+                }
             })
-            .then(app =>{
-                if(app === null) {
+        }
+
+        req.scopeInAction = {
+            parse: scopeInAction,
+            raw: scopesArray,
+        }
+    }else{
+        req.scopeInAction = {
+            parse: [],
+            raw: 'basic_user_info'
+        }
+    }
+    next();
+});
+
+router.use((req, res, next) => {
+    // Check if the redirect url is match the DB one
+    const service = req.query.service;
+    const redirect = req.query.redirect;
+    const clientId = req.query.client_id;
+    if(!service) {
+        return oAuthApps.findOne({
+            clientId,
+        })
+        .then(app => {
+            if(app) {
+                const url = require('url');
+                let find = false;
+                app.callbackUrl.forEach(allowUrl => {
+                    const redirectHostName = url.parse(redirect).host;
+                    if(redirectHostName === allowUrl || allowUrl === '*'){
+                        find = true;
+                        return true;
+                    }
+                });
+
+                if(find) {
+                    req.hsAuth ={
+                        app,
+                    }
+                    next();
+                }else{
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Your redirect url is not white listed yet',
+                        csrfToken: req.csrfToken(),
+                    });
                     return false;
                 }
 
+            }else{
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Bad client ID',
+                    csrfToken: req.csrfToken(),
+                });
+                return false;
+            }
+        })
+    }
+})
+
+router.get('/', csurf(), (req, res) => {
+    // render th login page
+    const service = req.query.service;
+    const redirect = req.query.redirect;
+    const clientId = req.query.client_id;
+    const oAuthToken = req.cookies['oauth-token'];
+
+    Users.findOne({
+        token: oAuthToken,
+    })
+    .then(user => {
+        if(user){
+            // Have OAuth tokekn
+
+            // Logined user
+
+            // Fastforward to permission page
+
+            const rawQuery = require('url').parse(req.url).query;
+            res.render('auth/permission', {
+                appName: req.hsAuth.app.name,
+                csrfToken: req.csrfToken(),
+                error: null,
+                message: null,
+                rawQuery,
+                uid: user._id,
+                user,
+                scope: req.scopeInAction.parse,
+            });
+
+        }else{
+
+            // Didn't have oAuth token
+
+            if(service !== 'hs_service_login'){
+                if(!clientId){
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Please pass in your client ID',
+                        csrfToken: req.csrfToken(),
+                    });
+                    return false;
+                }else{
+        
+                    if(!redirect){
+                        res.render('auth/login', {
+                            error: true,
+                            message: 'Missing the redirect url',
+                            csrfToken: req.csrfToken(),
+                        });
+                    }
+        
+                    oAuthApps.findOne({
+                        clientId,
+                    })
+                    .then(app =>{
+                        if(app === null) {
+                            res.render('auth/login', {
+                                error: true,
+                                message: 'Bad client ID',
+                                csrfToken: req.csrfToken(),
+                            });
+                            return false;
+                        }
+        
+                        res.render('auth/login', {
+                            error: null,
+                            message: null,
+                            csrfToken: req.csrfToken(),
+                        });
+        
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+                }
+            }else{
                 res.render('auth/login', {
                     error: null,
                     message: null,
                     csrfToken: req.csrfToken(),
+                    oAuth: req.query.client_id ? true : false,
                 });
-
-            })
-            .catch(error => {
-                console.log(error);
-            });
+            }
         }
-    }else{
-        res.render('auth/login', {
-            error: null,
-            message: null,
-            csrfToken: req.csrfToken(),
-        });
-    }
+    })
+    .catch(error => {
+        console.log(error);
+    })
 });
 
 router.post('/', csurf(), (req, res) => {
@@ -62,8 +196,8 @@ router.post('/', csurf(), (req, res) => {
 
     if(!redirect){
         res.render('auth/login', {
-            error: null,
-            message: 'Missing the redirect query',
+            error: true,
+            message: 'Missing the redirect url',
             csrfToken: req.csrfToken(),
         });
     }
@@ -81,7 +215,7 @@ router.post('/', csurf(), (req, res) => {
     if(service !== 'hs_service_login'){
         if(!clientId){
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Please pass in your client ID',
                 csrfToken: req.csrfToken(),
             });
@@ -119,7 +253,7 @@ router.post('/', csurf(), (req, res) => {
         if(service !== 'hs_service_login') {
             if (dbApp === null) {
                 res.render('auth/login', {
-                    error: null,
+                    error: true,
                     message: 'Bad client ID',
                     csrfToken: req.csrfToken(),
                 });
@@ -134,10 +268,10 @@ router.post('/', csurf(), (req, res) => {
             if(user === null){
                 let msg = 'Incorrect email or password';
                 res.render('auth/login', {
-                    error: true,
-                    message: msg,
+                    error: null,
+                    message: null,
+                    pwdError: msg,
                     csrfToken: req.csrfToken(),
-                    appName: app.name,
                 });
                 return false;
             }else{
@@ -146,11 +280,12 @@ router.post('/', csurf(), (req, res) => {
                     if(same){
                         const rawQuery = require('url').parse(req.url).query;
 
+                        res.cookie('oauth-token', user.token, {
+                            maxAge: 365 * 24 * 60 * 60,
+                            httpOnly: true,
+                        });
+
                         if(service === 'hs_service_login'){
-                            res.cookie('oauth-token', user.token, {
-                                maxAge: 365 * 24 * 60 * 60,
-                                httpOnly: true,
-                            });
                             res.redirect(redirect);
                         }else{
                             res.render('auth/permission', {
@@ -160,6 +295,8 @@ router.post('/', csurf(), (req, res) => {
                                 message: null,
                                 rawQuery,
                                 uid: user._id,
+                                user,
+                                scope: req.scopeInAction.parse,
                             });
                         }
                     }else{
@@ -169,7 +306,6 @@ router.post('/', csurf(), (req, res) => {
                             error: true,
                             message: msg,
                             csrfToken: req.csrfToken(),
-                            appName: app.name,
                         });
                     }
                 });
@@ -183,13 +319,12 @@ router.post('/', csurf(), (req, res) => {
 
 router.post('/permission', csurf(), (req, res) => {
     const clientId = req.query.client_id;
-    let app;
     const redirect = req.query.redirect;
     const uid = req.body.uid;
 
     if(!uid){
         res.render('auth/login', {
-            error: null,
+            error: true,
             message: 'Missing UID',
             csrfToken: req.csrfToken(),
         });
@@ -207,7 +342,7 @@ router.post('/permission', csurf(), (req, res) => {
     .then(app => {
         if(app === null) {
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Bad client ID',
                 csrfToken: req.csrfToken(),
             });
@@ -232,6 +367,7 @@ router.post('/permission', csurf(), (req, res) => {
                     app: app._id,
                     user: uid,
                 },
+                permission: req.scopeInAction.raw,
             })
             .save()
             .then(() => {
@@ -245,7 +381,7 @@ router.post('/permission', csurf(), (req, res) => {
     .catch(error => {
         if(error.message.includes('Cast to ObjectId failed for value')){
             res.render('auth/login', {
-                error: null,
+                error: true,
                 message: 'Bad UID',
                 csrfToken: req.csrfToken(),
             });

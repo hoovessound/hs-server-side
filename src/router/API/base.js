@@ -8,6 +8,8 @@ router.use(cors());
 
 router.use('/listen', require('../../../API/listen'));
 
+router.use('/widget', require('../../../API/widget'));
+
 router.use('/auth/register', require('../../../API/auth/register'));
 
 router.use('/auth/login', require('../../../API/auth/login'));
@@ -19,7 +21,7 @@ router.use('/oauth1/token/temporary', require('../../../API/auth/token/tempToken
 router.use('/oauth1/token/access', require('../../../API/auth/token/accessToken'));
 
 // Third party oAuth
-// router.use('/oauth1/thirdparty/poniverse', require('../../../API/auth/thirdparty/poniverse'));
+router.use('/oauth1/thirdparty/poniverse', require('../../../API/auth/thirdparty/poniverse'));
 router.use('/oauth1/thirdparty/facebook', require('../../../API/auth/thirdparty/facebook'));
 
 // Basic API auth
@@ -78,10 +80,12 @@ router.use((req, res, next) => {
     }else{
         // Normal API calls
         const accessToken = req.headers.access_token;
+        let _rightAccess;
         AccessTokes.findOne({
             token: accessToken,
         })
         .then(rightAccess => {
+            _rightAccess = rightAccess;
             if(rightAccess === null){
                 res.json({
                     error: true,
@@ -95,6 +99,7 @@ router.use((req, res, next) => {
         .then(user => {
             req.hsAuth = {
                 user,
+                app: _rightAccess,
             }
             next();
         })
@@ -119,10 +124,13 @@ router.use('/search', require('../../../API/search'));
 
 router.use('/settings', require('../../../API/settings'));
 
-router.use('/comment', require('../../../API/comment'));
-
-router.use('/widget', require('../../../API/widget'));
-
 router.use('/notification', require('./../../../API/notification'));
+
+router.all('*', (req, res) => {
+    res.json({
+        error: 'API endpoint not found',
+        docs_url: 'https://hoovessound.ml/developer/docs',
+    });
+});
 
 module.exports = router;

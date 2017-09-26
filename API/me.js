@@ -3,65 +3,41 @@ const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
 
-async function authUser(res, id) {
-    const user = await Users.findOne({_id: id});
-    return new Promise((ref, rej) => {
-        if(user === null){
-            const object = {
-                error: true,
-                msg: 'can\'t not find your user ID',
-                code: 'bad_authentication',
-            };
-            res.json(object);
-            rej(object);
-        }else{
-            ref(user);
-        }
-    });
-}
-
 class Me {
-    constructor(res, token, req){
+    constructor(req, res){
         this.res = res;
-        this.id = req.query.userid;
         this.req = req;
     }
 
     async findThisUserTracks(){
-        try{
-            const user = await authUser(this.res, this.id);
-            if(user){
-                // Find the user's tracks
-                const offset = parseInt(this.req.query.offset) || 0;
-                const tracks = await Tracks.find({
-                    'author.username': user.username,
-                }, {
-                    file: 0,
-                }).limit(10).skip(offset).sort({uploadDate: -1});
-                this.res.json(tracks);
-            }
-        }
-        catch(error){
-            if(!error.code && !error.msg){
-                if(error.message.includes('Cast to ObjectId failed for value')){
-                    this.res.json({
-                        error: true,
-                        msg: 'Can\'t not that user id',
-                        code: 'unexpected_result',
-                    });
-                    return false;
-                }else{
-                    console.log(error);
-                }
-            }
-        }
+        // Find the user's tracks
+        const offset = parseInt(this.req.query.offset) || 0;
+        const tracks = await Tracks.find({
+            'author.username': this.req.hsAuth.user.username,
+        }, {
+            file: 0,
+        }).limit(10).skip(offset).sort({uploadDate: -1});
+        this.res.json({
+            user: {
+                id: this.req.hsAuth._id,
+                username: this.req.hsAuth.user.username,
+                fullname: this.req.hsAuth.user.fullname,
+                email: this.req.hsAuth.user.email,
+                icon: this.req.hsAuth.user.icon,
+                roles: this.req.hsAuth.user.roles,
+                fave: this.req.hsAuth.user.fave,
+                banner: this.req.hsAuth.user.banner,
+                icon: this.req.hsAuth.user.icon,
+            },
+            tracks,
+        });
     }
 
 }
 
 router.get('/', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
-    const me = new Me(res, token, req);
+    const me = new Me(req, res);
     me.findThisUserTracks();
 });
 

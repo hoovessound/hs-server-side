@@ -21,6 +21,17 @@ const https = require('https');
 const escape = require('escape-html');
 
 router.post('/', (req, res) => {
+
+    // Check permission
+
+    if(!req.hsAuth.app.permission.includes('upload_track')){
+        res.json({
+            error: 'Bad permission scoping',
+            code: 'service_lock_down',
+        });
+        return false;
+    }
+
     const full_address = req.protocol + "://" + req.headers.host;
 
     const form = formidable.IncomingForm({
@@ -29,18 +40,9 @@ router.post('/', (req, res) => {
     form.encoding = 'utf-8';
 
     form.parse(req, (error, fields, files) => {
-        const userid = fields.userid;
-        if(!userid){
-            res.json({
-                error: true,
-                msg: 'Missing the userid',
-                code: 'missing_require_fields',
-            });
-            return false;
-        }
 
         Users.findOne({
-            _id: userid,
+            _id: req.hsAuth.user._id,
         })
         .then(user => {
             if(user === null){

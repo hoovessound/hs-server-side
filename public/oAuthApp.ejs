@@ -27,9 +27,11 @@
     <form class="newApp" method="post" action="/render/oauth-app">
         <h3>Create a new app</h3>
         <input type="hidden" name="_csrf" value="<%-csrfToken%>">
-        <p>Name (*): <input type="text" name="name"></p>
-        <p>Description: <textarea name="description"></textarea></p>
-        <p>Callback URL (*): <input type="url" name="callbackurl"></p>
+        <p>Name (*): <input type="text" name="name" placeholder="My app"></p>
+        <p>Description: <textarea name="description" placeholder="Simple demo app"></textarea></p>
+        <p>White List Domain(s) (*):</p>
+        <p>One per line</p>
+        <textarea type="url" name="callbackurl" placeholder="localhost:3000 or *"></textarea>
         <div class="g-recaptcha" data-sitekey="6LcfXy4UAAAAAKmVgFA2Ol0OR9x_jKXRA1NI46-C"></div>
         <button type="submit" class="btn btn-success">Submit</button>
     </form>

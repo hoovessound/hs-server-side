@@ -8,6 +8,7 @@ const rp = require('request-promise');
 const mg = require('nodemailer-mailgun-transport');
 const authFile = require('../../../src/index');
 const nodemailer = require('nodemailer');
+const moment = require('moment');
 
 router.use(csurf());
 
@@ -76,22 +77,24 @@ router.post('/', csurf(), (req, res) => {
                         }else{
                             const name = req.body.name;
                             const description = req.body.description;
-                            const callbackUrl = req.body.callbackurl;
+                            let callbackUrl = req.body.callbackurl;
                             if(!name){
                                 res.redirect('/me/apps?error=Please enter the app name');
                                 return false;
                             }
 
                             if(!callbackUrl){
-                                res.redirect('/me/apps?error=Please enter the callback URL');
+                                res.redirect('/me/apps?error=Please enter the white domain');
                                 return false;
                             }
 
                             // Success
 
+                            callbackUrl = callbackUrl.split('\n');
+
                             return new oAuthApps({
                                 author: user._id,
-                                createDate: new Date(),
+                                createDate: moment()._d,
                                 name,
                                 clientId: crypto.randomBytes(50).toString('hex'),
                                 clientSecret: crypto.randomBytes(70).toString('hex'),

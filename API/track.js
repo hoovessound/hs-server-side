@@ -16,35 +16,7 @@ const fsp = require('fs-promise');
 const easyimage = require('easyimage');
 const request = require('request');
 const escape = require('escape-html');
-
-async function authUser(req, res, authArgument) {
-    let queryObject = {};
-    const bypass = req.query.bypass;
-    if(bypass){
-        queryObject = {
-            token: authArgument,
-        }
-    }else{
-        queryObject = {
-            _id: authArgument,
-        }
-    }
-    const user = await Users.findOne(queryObject);
-
-    return new Promise((ref, rej) => {
-        if(user === null){
-            const object = {
-                error: true,
-                msg: 'can\'t not find your user ID',
-                code: 'unexpected_result',
-            };
-            res.json(object);
-            rej(object);
-        }else{
-            ref(user);
-        }
-    });
-}
+const moment = require('moment');
 
 class FindTrack {
 
@@ -65,8 +37,7 @@ class FindTrack {
         catch(error){
             if(error.message.includes('Cast to ObjectId failed for value')){
                 this.res.json({
-                    error: true,
-                    msg: 'Can\'t not that track id',
+                    error: 'Can\'t not that track id',
                     code: 'unexpected_result',
                 });
                 return false;
@@ -79,14 +50,24 @@ class FindTrack {
     async faveOrUnfave(id){
 
         try{
+
+            // Check permission
+            const user = this.req.hsAuth.user;
+            if(!this.req.hsAuth.app.permission.includes('post_comment')){
+                this.res.json({
+                    error: 'Bad permission scoping',
+                    code: 'service_lock_down',
+                });
+                return false;
+            }
+
             const authArgument = this.req.body.userid || this.req.headers.token;
             const bypass = this.req.query.bypass;
 
             if(!bypass){
                 if(!id){
                     this.res.json({
-                        error: true,
-                        msg: 'Missing the user id',
+                        error: 'Missing the user id',
                         code: 'missing_require_fields',
                     });
                     return false;
@@ -94,60 +75,55 @@ class FindTrack {
             }
 
             let findFave = false;
-            const user = await authUser(this.req, this.res, authArgument, this.req);
             const full_address = this.req.protocol + "://" + this.req.headers.host;
-            if(user){
-                const track = await Tracks.findOne({_id: this.req.params.id});
+            const track = await Tracks.findOne({_id: this.req.params.id});
 
-                if (track === null) {
+            if (track === null) {
+                this.res.json({
+                    error: 'Can not found your track',
+                    code: 'missing_result_object',
+                })
+                return false;
+            }else{
+                // If the user already fave the track, just remove it, if not add one
+                user.fave.forEach(id => {
+                    if (id == track._id.toString()) {
+                        findFave = true;
+                    }
+                });
+                if (findFave) {
+                    // Remove it
+                    user.fave.splice(user.fave.indexOf(track._id.toString()), 1);
+                    status = 'removed';
+                } else {
+                    user.fave.push(track._id);
+                    status = 'added';
+                }
+
+                const updateFaveStatus = await Users.update({
+                    _id: user._id,
+                }, user)
+                if(updateFaveStatus){
                     this.res.json({
-                        error: true,
-                        msg: 'Can not found your track',
-                        code: 'missing_result_object',
-                    })
-                    return false;
-                }else{
-                    // If the user already fave the track, just remove it, if not add one
-                    user.fave.forEach(id => {
-                        if (id == track._id.toString()) {
-                            findFave = true;
+                        faves: user.fave,
+                        status,
+                    });
+
+                    request({
+                        url: `${full_address}/api/notification`,
+                        headers: {
+                            token: this.token,
+                        },
+                        method: 'post',
+                        json: true,
+                        body: {
+                            to: user._id,
+                            title: 'Someone Has Liked Your Track',
+                            body: `${user.username} Has Favorited Your Track`,
+                            link: `${full_address}/track/${user.username}/${track.title}`,
+                            icon: track.coverImage,
                         }
                     });
-                    if (findFave) {
-                        // Remove it
-                        user.fave.splice(user.fave.indexOf(track._id.toString()), 1);
-                        status = 'removed';
-                    } else {
-                        user.fave.push(track._id);
-                        status = 'added';
-                    }
-
-                    const updateFaveStatus = await Users.update({
-                        _id: user._id,
-                    }, user)
-                    if(updateFaveStatus){
-                        this.res.json({
-                            faves: user.fave,
-                            status,
-                        });
-
-                        request({
-                            url: `${full_address}/api/notification`,
-                            headers: {
-                                token: this.token,
-                            },
-                            method: 'post',
-                            json: true,
-                            body: {
-                                to: user._id,
-                                title: 'Someone Has Liked Your Track',
-                                body: `${user.username} Has Favorited Your Track`,
-                                link: `${full_address}/track/${user.username}/${track.title}`,
-                                icon: track.coverImage,
-                            }
-                        });
-                    }
-
                 }
 
             }
@@ -155,8 +131,7 @@ class FindTrack {
         catch(error){
             if(error.message.includes('Cast to ObjectId failed for value')){
                 this.res.json({
-                    error: true,
-                    msg: 'Can\'t not that user id',
+                    error: 'Can\'t not that user id',
                     code: 'unexpected_result',
                 });
                 return false;
@@ -166,44 +141,72 @@ class FindTrack {
         }
     }
 
-    async isFave(trackId, userId){
+    async getComment(trackId){
         try{
-            const user = await authUser(this.req, this.res, userId);
-            let findFave = false;
-            if(user){
-                const track = await Tracks.findOne({
-                    _id: trackId,
-                });
-
-                if (track === null) {
-                    this.res.json({
-                        error: true,
-                        msg: 'Can not found your track',
-                        code: 'missing_result_object',
-                    })
-                    return false;
-                }
-                // If the user already fave the track, just remove it, if not add one
-                user.fave.forEach(faveStackID => {
-                    if (faveStackID.toString() == trackId) {
-                        findFave = true;
-                    }
-                });
-
-                if (findFave) {
-                    this.res.json({
-                        fave: true,
-                    })
-                }else{
-                    this.res.json({
-                        fave: false,
-                    })
-                }
-
-            }
+            const track = await Tracks.findOne({
+                _id: trackId,
+            })
+            this.res.json(track.comments);
         }
         catch(error){
-            console.log(error);
+            if(error.message.includes('Cast to ObjectId failed for value')){
+                this.res.json({
+                    error: 'Can\'t not that track id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else{
+                console.log(error)
+            }
+        }
+    }
+
+    async addComment(trackId){
+
+        // Check permission
+
+        if(!this.req.hsAuth.app.permission.includes('post_comment')){
+            this.res.json({
+                error: 'Bad permission scoping',
+                code: 'service_lock_down',
+            });
+            return false;
+        }
+
+        try{
+            const track = await Tracks.findOne({
+                _id: trackId,
+            })
+            const comment = escape(this.req.body.comment);
+
+            const commentObject = {
+                author: this.req.hsAuth.user._id,
+                postDate: moment()._d,
+                comment: comment,
+            };
+            track.comments.push(commentObject);
+            await Tracks.update({
+                _id: trackId,
+            }, track);
+
+            this.res.json({
+                commentObject,
+                author: {
+                    username: this.req.hsAuth.user.username,
+                    fullName: this.req.hsAuth.user.fullName,
+                },
+            });
+        }
+        catch(error){
+            if(error.message.includes('Cast to ObjectId failed for value')){
+                this.res.json({
+                    error: 'Can\'t not that track id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }else{
+                console.log(error)
+            }
         }
     }
 }
@@ -222,7 +225,7 @@ router.get('/:id', (req, res) => {
     findTrack.findById(ID);
 });
 
-router.post('/fave/id?', (req, res) => {
+router.post('/fave/:id?', (req, res) => {
     const id = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (typeof id === 'undefined') {
@@ -234,30 +237,6 @@ router.post('/fave/id?', (req, res) => {
         return false;
     }
     findTrack.faveOrUnfave(id);
-});
-
-router.get('/fave/isfave/:trackid?/:userid?', (req, res) => {
-    const trackid = req.params.trackid;
-    const userid = req.params.userid;
-    const findTrack = new FindTrack(res, req);
-    if (!trackid) {
-        res.json({
-            error: true,
-            msg: 'Missing the trackid field',
-            code: 'missing_require_fields',
-        });
-        return false;
-    }
-
-    if (!userid) {
-        res.json({
-            error: true,
-            msg: 'Missing the userid field',
-            code: 'missing_require_fields',
-        });
-        return false;
-    }
-    findTrack.isFave(trackid, userid);
 });
 
 router.post('/edit/:id?', (req, res) => {
@@ -444,6 +423,42 @@ router.post('/edit/:id?', (req, res) => {
 
         }
     });
+});
+
+router.get('/comment/:id?', (req, res) => {
+    const trackid = req.params.id;
+    const findTrack = new FindTrack(res, req);
+    if (!trackid) {
+        res.json({
+            error: true,
+            msg: 'Missing the trackid field',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+    findTrack.getComment(trackid);
+});
+
+router.post('/comment/:id?', (req, res) => {
+    const trackid = req.params.id;
+    const findTrack = new FindTrack(res, req);
+    if (!trackid) {
+        res.json({
+            error: 'Missing the trackid field',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+
+    if(!req.body.comment) {
+        res.json({
+            error: 'Missing the comment field',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+
+    findTrack.addComment(trackid);
 });
 
 module.exports = router;

@@ -10,5 +10,6 @@ const TempTokesSchema = new Schema({
         app: Schema.Types.ObjectId,
         user: Schema.Types.ObjectId
     },
+    permission: Array,
 });
 module.exports = mongoose.model('temptoke', TempTokesSchema);

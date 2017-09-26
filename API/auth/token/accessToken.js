@@ -10,27 +10,23 @@ router.post('/', (req, res) => {
     const clientId = req.body.client_id;
     const clientSecret = req.body.client_secret;
     const token = req.body.token;
-
     if(!clientId){
         res.json({
-            error: true,
-            msg: 'Missing the client ID',
+            error: 'Missing the client ID',
             code: 'missing_require_fields',
         });
         return false;
     }
     if(!clientSecret){
         res.json({
-            error: true,
-            msg: 'Missing the client secret',
+            error: 'Missing the client secret',
             code: 'missing_require_fields',
         });
         return false;
     }
     if(!token){
         res.json({
-            error: true,
-            msg: 'Missing the token',
+            error: 'Missing the token',
             code: 'missing_require_fields',
         });
         return false;
@@ -43,8 +39,7 @@ router.post('/', (req, res) => {
     .then(app => {
         if(app === null){
             res.json({
-                error: true,
-                msg: 'Bad client ID or secret',
+                error: 'Bad client ID or secret',
                 code: 'bad_authentication',
             });
             return false;
@@ -54,19 +49,19 @@ router.post('/', (req, res) => {
         })
     })
     .then(rightAccess => {
-        if(rightAccess === null){
+        if(!rightAccess){
             res.json({
-                error: true,
-                msg: 'Can\'t not that temporary token',
+                error: 'Can\'t not that temporary token',
                 code: 'unexpected_result',
             });
             return false;
         }
 
-        if(moment(rightAccess.timestamp.end).isBefore(moment()._d)){
+        const expired = moment(rightAccess.timestamp.end).isBefore(moment()._d)
+
+        if(expired){
             res.json({
-                error: true,
-                msg: 'Your temporary token has expired',
+                error: 'Your temporary token has expired',
                 code: 'service_lock_down',
             });
             return TempTokes.remove({
@@ -74,35 +69,79 @@ router.post('/', (req, res) => {
             })
         }
 
+
         // Give this application an access token
-        const accessToken = crypto.randomBytes(255).toString('hex');
 
-        // Save the new access token and remove the temporary token
-        const currentTime = moment()._d;
-        const endTime = moment(currentTime).add(1, 'minutes');
-        return new AccessTokes({
-            token: accessToken,
-            timestamp: {
-                start: currentTime,
-                end: endTime,
-            },
-            author: {
-                app: rightAccess.author.app,
-                user: rightAccess.author.user,
-            },
+        // If the user did have an access toke before and have the same scope permission
+        AccessTokes.findOne({
+            'author.user': rightAccess.author.user,
+            permission: rightAccess.permission,
         })
-        .save()
-        .then(() => {
+        .then(oldAccessToken => {
+            if(!oldAccessToken){
+                // Didn't have any OAuth app before
+                createTokenAndResposne();
+            }else{
+                const oldEndTime = oldAccessToken.timestamp.end;
+                const oldexpired = moment(oldEndTime).isBefore(moment()._d);
+                // And that access toek didn't expired yet
+                if(!oldexpired){
+                    // Just use the old one
+                    res.json({
+                        access_token: oldAccessToken.token,
+                        expire: oldEndTime
+                    })
+        
+                    return TempTokes.remove({
+                        token,
+                    })
+                }else{
+                    // It expired lolz
+                    
+                    // Remove that old and make a new one
 
-            res.json({
-                access_token: accessToken,
-                expire: endTime,
-            })
-
-            return TempTokes.remove({
-                token,
-            })
+                    AccessTokes.remove({
+                        _id: oldAccessToken._id,
+                    })
+                    .then(() => {
+                        createTokenAndResposne();
+                    })
+                }
+            }
         })
+
+
+        function createTokenAndResposne(){
+            const accessToken = crypto.randomBytes(255).toString('hex');
+            // Save the new access token and remove the temporary token
+            const currentTime = moment()._d;
+            const endTime = moment(currentTime).add(1, 'years');
+            return new AccessTokes({
+                token: accessToken,
+                timestamp: {
+                    start: currentTime,
+                    end: endTime,
+                },
+                author: {
+                    app: rightAccess.author.app,
+                    user: rightAccess.author.user,
+                },
+                permission: rightAccess.permission,
+            })
+            .save()
+            .then(() => {
+    
+                res.json({
+                    access_token: accessToken,
+                    expire: endTime,
+                })
+    
+                return TempTokes.remove({
+                    token,
+                })
+            })
+        }
+
     })
     .catch(error => {
         console.log(error);

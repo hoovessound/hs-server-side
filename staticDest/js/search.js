@@ -10,10 +10,6 @@ angular.module('hsSearch', ['ngRoute']).controller('search', function ($scope, $
         var query = formInput.value.trim();
         if (query.length > 0) {
             $location.url('/search/' + query);
-            $http({
-                method: 'GET',
-                url: 'api/search/' + query
-            });
         }
     });
 });

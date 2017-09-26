@@ -10,6 +10,6 @@ const oAuthAppsSchema = new Schema({
         type: String,
         default: null,
     },
-    callbackUrl: String,
+    callbackUrl: Array,
 });
 module.exports = mongoose.model('oAuthApps', oAuthAppsSchema);

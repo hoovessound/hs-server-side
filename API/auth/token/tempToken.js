@@ -48,6 +48,52 @@ router.use((req, res, next) => {
     next();
 });
 
+router.use((req, res, next) => {
+    // Check if the redirect url is match the DB one
+    const service = req.query.service;
+    const redirect = req.query.redirect;
+    const clientId = req.query.client_id;
+    if(!service) {
+        return oAuthApps.findOne({
+            clientId,
+        })
+        .then(app => {
+            if(app) {
+                const url = require('url');
+                let find = false;
+                app.callbackUrl.forEach(allowUrl => {
+                    const redirectHostName = url.parse(redirect).host;
+                    if(redirectHostName === allowUrl){
+                        find = true;
+                    }
+                });
+
+                if(find) {
+                    req.hsAuth ={
+                        app,
+                    }
+                    next();
+                }else{
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Your redirect url is not white listed yet',
+                        csrfToken: req.csrfToken(),
+                    });
+                    return false;
+                }
+
+            }else{
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Bad client ID',
+                    csrfToken: req.csrfToken(),
+                });
+                return false;
+            }
+        })
+    }
+})
+
 router.get('/', csurf(), (req, res) => {
     // render th login page
     const service = req.query.service;
@@ -66,35 +112,17 @@ router.get('/', csurf(), (req, res) => {
 
             // Fastforward to permission page
 
-            
-
-            // Check client ID
-            return oAuthApps.findOne({
-                clientId,
-            })
-            .then(app => {
-                if(app){
-                    const rawQuery = require('url').parse(req.url).query;
-                    res.render('auth/permission', {
-                        appName: app.name,
-                        csrfToken: req.csrfToken(),
-                        error: null,
-                        message: null,
-                        rawQuery,
-                        uid: user._id,
-                        user,
-                        scope: req.scopeInAction.parse,
-                    });
-                }else{
-                    // Fase clientID
-                    res.render('auth/login', {
-                        error: true,
-                        message: 'Bad client ID',
-                        csrfToken: req.csrfToken(),
-                    });
-                    return false;
-                }
-            })
+            const rawQuery = require('url').parse(req.url).query;
+            res.render('auth/permission', {
+                appName: req.hsAuth.app.name,
+                csrfToken: req.csrfToken(),
+                error: null,
+                message: null,
+                rawQuery,
+                uid: user._id,
+                user,
+                scope: req.scopeInAction.parse,
+            });
 
         }else{
 

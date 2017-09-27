@@ -32,6 +32,16 @@ class FindTrack {
             }, {
                 file: 0,
             })
+            if(track.private){
+                // Check permission
+                if(!this.req.hsAuth.app.permission.includes('private_track')){
+                    this.res.json({
+                        error: 'Bad permission scoping',
+                        code: 'service_lock_down',
+                    });
+                    return false;
+                }
+            }
             this.res.json(track);
         }
         catch(error){
@@ -63,16 +73,6 @@ class FindTrack {
 
             const authArgument = this.req.body.userid || this.req.headers.token;
             const bypass = this.req.query.bypass;
-
-            if(!bypass){
-                if(!id){
-                    this.res.json({
-                        error: 'Missing the user id',
-                        code: 'missing_require_fields',
-                    });
-                    return false;
-                }
-            }
 
             let findFave = false;
             const full_address = this.req.protocol + "://" + this.req.headers.host;
@@ -240,6 +240,16 @@ router.post('/fave/:id?', (req, res) => {
 });
 
 router.post('/edit/:id?', (req, res) => {
+
+    // Check permission
+    if(!req.hsAuth.app.permission.includes('private_track')){
+        res.json({
+            error: 'Bad permission scoping',
+            code: 'service_lock_down',
+        });
+        return false;
+    }
+
     const id = req.params.id;
     if (!id) {
         res.json({
@@ -263,19 +273,8 @@ router.post('/edit/:id?', (req, res) => {
                 fields.userid = req.hsAuth.user._id;
             }
 
-            const userId = fields.userid;
-
-            if (!userId) {
-                res.json({
-                    error: true,
-                    msg: 'Missing the userid field',
-                    code: 'missing_require_fields',
-                });
-                return false;
-            }
-
             Users.findOne({
-                _id: userId,
+                _id: req.hsAuth.user._id,
             }).then(user => {
                 if (user === null) {
                     res.json({

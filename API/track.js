@@ -32,16 +32,20 @@ class FindTrack {
             }, {
                 file: 0,
             })
-            if(track.private){
-                // Check permission
-                if(!this.req.hsAuth.app.permission.includes('private_track')){
-                    this.res.json({
-                        error: 'Bad permission scoping',
-                        code: 'service_lock_down',
-                    });
-                    return false;
+
+            if(!this.req.query.bypass){
+                if(track.private){
+                    // Check permission
+                    if(!this.req.hsAuth.app.permission.includes('private_track')){
+                        this.res.json({
+                            error: 'Bad permission scoping',
+                            code: 'service_lock_down',
+                        });
+                        return false;
+                    }
                 }
             }
+
             this.res.json(track);
         }
         catch(error){
@@ -63,12 +67,15 @@ class FindTrack {
 
             // Check permission
             const user = this.req.hsAuth.user;
-            if(!this.req.hsAuth.app.permission.includes('post_comment')){
-                this.res.json({
-                    error: 'Bad permission scoping',
-                    code: 'service_lock_down',
-                });
-                return false;
+
+            if(!this.req.query.bypass){
+                if(!this.req.hsAuth.app.permission.includes('post_comment')){
+                    this.res.json({
+                        error: 'Bad permission scoping',
+                        code: 'service_lock_down',
+                    });
+                    return false;
+                }
             }
 
             const authArgument = this.req.body.userid || this.req.headers.token;
@@ -165,12 +172,14 @@ class FindTrack {
 
         // Check permission
 
-        if(!this.req.hsAuth.app.permission.includes('post_comment')){
-            this.res.json({
-                error: 'Bad permission scoping',
-                code: 'service_lock_down',
-            });
-            return false;
+        if(!this.req.query.bypass){
+            if(!this.req.hsAuth.app.permission.includes('post_comment')){
+                this.res.json({
+                    error: 'Bad permission scoping',
+                    code: 'service_lock_down',
+                });
+                return false;
+            }
         }
 
         try{
@@ -240,16 +249,6 @@ router.post('/fave/:id?', (req, res) => {
 });
 
 router.post('/edit/:id?', (req, res) => {
-
-    // Check permission
-    if(!req.hsAuth.app.permission.includes('private_track')){
-        res.json({
-            error: 'Bad permission scoping',
-            code: 'service_lock_down',
-        });
-        return false;
-    }
-
     const id = req.params.id;
     if (!id) {
         res.json({
@@ -273,152 +272,151 @@ router.post('/edit/:id?', (req, res) => {
                 fields.userid = req.hsAuth.user._id;
             }
 
-            Users.findOne({
-                _id: req.hsAuth.user._id,
-            }).then(user => {
-                if (user === null) {
+            const user = req.hsAuth.user;
+
+            // Check if the track exist
+            return Tracks.findById(id, {
+                file: 0,
+            }).then(track => {
+                if(track.author.username !== user.username){
                     res.json({
                         error: true,
-                        msg: 'Can not find your user id',
-                        code: 'unexpected_result',
+                        msg: 'You are unauthorized to perform this action',
+                        code: 'unauthorized_action',
                     });
                     return false;
                 }else{
-                    // Check if the track exist
-                    return Tracks.findById(id, {
-                        file: 0,
-                    }).then(track => {
-                        if(track.author.username !== user.username){
+
+                    if(!req.query.bypass){
+                        if(track.private){
+                            // Check permission
+                            if(!req.hsAuth.app.permission.includes('private_track')){
+                                res.json({
+                                    error: 'Bad permission scoping',
+                                    code: 'service_lock_down',
+                                });
+                                return false;
+                            }
+                        }else{
+                            if(!req.hsAuth.app.permission.includes('edit_track')){
+                                res.json({
+                                    error: 'Bad permission scoping',
+                                    code: 'service_lock_down',
+                                });
+                                return false;
+                            }
+                        }
+                    }
+
+                    if(fields.private === 'true'){
+                        track.private = true;
+                    }else{
+                        track.private = false;
+                    }
+
+                    // Check if the user submit an cover image
+                    if(files.image){
+                        if(files.image.size > 0){
+                            if(!files.image.type.includes('image')){
+                                res.json({
+                                    error: true,
+                                    msg: 'File is not an image type',
+                                    code: 'not_valid_file_type',
+                                });
+                                return false;
+                            }else{
+                                const ext = path.extname(files.image.name);
+                                const newID = sha256(randomstring.generate(10));
+                                let fileID = newID + ext;
+                                const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
+                                const gcsCoverImage = gcs.bucket('hs-cover-image');
+                                fsp.rename(files.image.path, coverImagePath).then(() => {
+                                    // Resize the image first
+                                    return easyimage.resize({
+                                        src: coverImagePath,
+                                        dst: coverImagePath,
+                                        width: 500,
+                                        height: 500,
+                                        ignoreAspectRatio: true,
+                                    }).then(processedImage => {
+                                        return gcsCoverImage.upload(coverImagePath).then(file => {
+                                            file = file[0];
+                                            return file.makePublic()
+                                            .then(url => {
+                                                coverImage = url[0];
+                                                fsp.unlinkSync(coverImagePath);
+                                                track.coverImage = `https://storage.googleapis.com/hs-cover-image/${fileID}`;
+                                                updateTitle();
+                                            })
+                                        })
+                                    });
+                                }).catch(error => {
+                                    console.log(error);
+                                });
+                            }
+                        }else{
+                            updateTitle();
+                        }
+                    }else{
+                        updateTitle();
+                    }
+
+                    function updateTitle() {
+
+                        function writeDB() {
+                            return Tracks.update({
+                                _id: track._id
+                            }, track).then(() => {
+                                // Finish
+                                res.json({
+                                    track,
+                                });
+                            });
+                        }
+
+                        if(track.private){
+                            track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
+                            writeDB();
+                            return false;
+                        }
+
+                        if(fields.description){
+                            track.description = escape(fields.description);
+                        }
+
+                        if(fields.title){
+                            // Check if the new title match the old title
+                            if(fields.title !== track.title){
+                                // Is not the same
+                                return Tracks.findOne({
+                                    title: escape(fields.title),
+                                }).then(authTrack => {
+                                    if(authTrack !== null){
+                                        track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
+                                    }else{
+                                        track.title = escape(fields.title);
+                                    }
+                                    writeDB();
+                                });
+                            }else{
+                                // Same title
+                                writeDB();
+                                return false;
+                            }
+                        }
+                        if(!fields.title && !fields.image && !fields.description){
                             res.json({
                                 error: true,
-                                msg: 'You are unauthorized to perform this action',
-                                code: 'unauthorized_action',
+                                msg: 'You have to pass in one or more argument',
+                                code: 'missing_require_fields',
                             });
                             return false;
                         }else{
-
-                            if(fields.private === 'true'){
-                                track.private = true;
-                            }else{
-                                track.private = false;
-                            }
-
-                            // Check if the user submit an cover image
-                            if(files.image){
-                                if(files.image.size > 0){
-                                    if(!files.image.type.includes('image')){
-                                        res.json({
-                                            error: true,
-                                            msg: 'File is not an image type',
-                                            code: 'not_valid_file_type',
-                                        });
-                                        return false;
-                                    }else{
-                                        const ext = path.extname(files.image.name);
-                                        const newID = sha256(randomstring.generate(10));
-                                        let fileID = newID + ext;
-                                        const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
-                                        const gcsCoverImage = gcs.bucket('hs-cover-image');
-                                        fsp.rename(files.image.path, coverImagePath).then(() => {
-                                            // Resize the image first
-                                            return easyimage.resize({
-                                                src: coverImagePath,
-                                                dst: coverImagePath,
-                                                width: 500,
-                                                height: 500,
-                                                ignoreAspectRatio: true,
-                                            }).then(processedImage => {
-                                                return gcsCoverImage.upload(coverImagePath).then(file => {
-                                                    file = file[0];
-                                                    return file.makePublic()
-                                                    .then(url => {
-                                                        coverImage = url[0];
-                                                        fsp.unlinkSync(coverImagePath);
-                                                        track.coverImage = `https://storage.googleapis.com/hs-cover-image/${fileID}`;
-                                                        updateTitle();
-                                                    })
-                                                })
-                                            });
-                                        }).catch(error => {
-                                            console.log(error);
-                                        });
-                                    }
-                                }else{
-                                    updateTitle();
-                                }
-                            }else{
-                                updateTitle();
-                            }
-
-                            function updateTitle() {
-
-                                function writeDB() {
-                                    return Tracks.update({
-                                        _id: track._id
-                                    }, track).then(() => {
-                                        // Finish
-                                        res.json({
-                                            track,
-                                        });
-                                    });
-                                }
-
-                                if(track.private){
-                                    track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
-                                    writeDB();
-                                    return false;
-                                }
-
-                                if(fields.description){
-                                    track.description = escape(fields.description);
-                                }
-
-                                if(fields.title){
-                                    // Check if the new title match the old title
-                                    if(fields.title !== track.title){
-                                        // Is not the same
-                                        return Tracks.findOne({
-                                            title: escape(fields.title),
-                                        }).then(authTrack => {
-                                            if(authTrack !== null){
-                                                track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
-                                            }else{
-                                                track.title = escape(fields.title);
-                                            }
-                                            writeDB();
-                                        });
-                                    }else{
-                                        // Same title
-                                        writeDB();
-                                        return false;
-                                    }
-                                }
-                                if(!fields.title && !fields.image && !fields.description){
-                                    res.json({
-                                        error: true,
-                                        msg: 'You have to pass in one or more argument',
-                                        code: 'missing_require_fields',
-                                    });
-                                    return false;
-                                }else{
-                                    writeDB();
-                                }
-                            }
+                            writeDB();
                         }
-                    })
+                    }
                 }
-            }).catch(error => {
-                if(error.message.includes('Cast to ObjectId failed for value')){
-                    res.json({
-                        error: true,
-                        msg: 'Can\'t not found your user id',
-                        code: 'unexpected_result',
-                    });
-                    return false;
-                }else{
-                    console.log(error)
-                }
-            });
+            })
 
         }
     });

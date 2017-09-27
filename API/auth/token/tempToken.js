@@ -21,6 +21,8 @@ router.use((req, res, next) => {
             'post_comment': 'Post comments under your name',
             'fave_track': 'Favourite or Un-favourite tracks',
             'upload_track': 'Upload tracks under your name',
+            'private_track': 'Be able to view and edit your own private track',
+            'edit_track': 'Be able to edit your own track information',
         }
 
         for(let key in scopes) {

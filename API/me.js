@@ -10,13 +10,6 @@ class Me {
     }
 
     async findThisUserTracks(){
-        // Find the user's tracks
-        const offset = parseInt(this.req.query.offset) || 0;
-        const tracks = await Tracks.find({
-            'author.username': this.req.hsAuth.user.username,
-        }, {
-            file: 0,
-        }).limit(10).skip(offset).sort({uploadDate: -1});
         this.res.json({
             user: {
                 id: this.req.hsAuth._id,
@@ -28,8 +21,8 @@ class Me {
                 fave: this.req.hsAuth.user.fave,
                 banner: this.req.hsAuth.user.banner,
                 icon: this.req.hsAuth.user.icon,
-            },
-            tracks,
+                tracks: this.req.hsAuth.user.tracks,
+            }
         });
     }
 

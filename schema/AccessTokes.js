@@ -11,5 +11,15 @@ const AccessTokesSchema = new Schema({
         user: Schema.Types.ObjectId,
     },
     permission: Array,
+    rateLimit: {
+        official: {
+            type: Boolean,
+            default: false
+        },
+        used: {
+            type: Number,
+            default: 0,
+        },
+    }
 });
 module.exports = mongoose.model('accesstoke', AccessTokesSchema);

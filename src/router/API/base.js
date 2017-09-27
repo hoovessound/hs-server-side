@@ -97,18 +97,58 @@ router.use((req, res, next) => {
             return Users.findOne({_id: rightAccess.author.user});
         })
         .then(user => {
-            req.hsAuth = {
-                user,
-                app: _rightAccess,
+            // Rate limit control
+            const used = _rightAccess.rateLimit.used;
+            const official = _rightAccess.rateLimit.official;
+            const requestAllowed = 500;
+
+            if(used >= requestAllowed){
+                res.status(429);
+                res.json({
+                    error: `429 rate limit: Please wait 15 minutes for an other ${requestAllowed} requests`,
+                    code: 'services_lock_down'
+                });
+
+                // Wait 15 minutes, and clear the rate limit
+                setTimeout(() => {
+                    _rightAccess.rateLimit.used = 0;
+                    return AccessTokes.update({
+                        _id: _rightAccess._id
+                    }, _rightAccess)
+                    .then(() => {
+                        // clear
+                    })
+                }, 300000);
+
+                return false;
+            }else{
+
+                if(!official){
+                    _rightAccess.rateLimit.used++;
+                    return AccessTokes.update({
+                        _id: _rightAccess._id
+                    }, _rightAccess)
+                    .then(() => {
+                        req.hsAuth = {
+                            user,
+                            app: _rightAccess,
+                        }
+                        next();
+                    })
+                }else{
+                    req.hsAuth = {
+                        user,
+                        app: _rightAccess,
+                    }
+                    next();
+                }
             }
-            next();
         })
         .catch(error => {
             console.log(error);
         })
     }
 });
-
 
 router.use('/tracks', require('../../../API/home'));
 

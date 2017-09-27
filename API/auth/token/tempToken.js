@@ -58,6 +58,7 @@ router.use((req, res, next) => {
             clientId,
         })
         .then(app => {
+            console.log(app)
             if(app) {
                 const url = require('url');
                 let find = false;
@@ -92,6 +93,8 @@ router.use((req, res, next) => {
                 return false;
             }
         })
+    }else{
+        next();
     }
 })
 

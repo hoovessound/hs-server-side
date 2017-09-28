@@ -24,10 +24,13 @@ router.get('/', (req, res) => {
                     ]
                 }, {
                     file: 0,
+                    _id: 0,
+                    __v: 0,
+                    comments: 0,
+                    fave: 0,
                 }).limit(10).skip(offset).sort({uploadDate: -1});
 
                 const total = await Tracks.count({});
-
                 res.json({
                     tracks,
                     total,

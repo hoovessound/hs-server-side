@@ -95,7 +95,7 @@ router.get('/:username?/:title?', (req, res) => {
                 }
 
                 function renderPage() {
-                    if(user.fave.indexOf(track._id) >= 0){
+                    if(user.fave.includes(track.id)){
                         res.render('track', {
                             loginUser: user,
                             track,
@@ -127,7 +127,7 @@ router.get('/:username?/:title?', (req, res) => {
 router.get('/:username?/:title?/edit', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
-        res.redirect('/api/auth/login?redirect=' + fullurl(req));
+        res.end('Access denied');
     }else{
         const username = req.params.username;
         const title = req.params.title;
@@ -137,7 +137,7 @@ router.get('/:username?/:title?/edit', (req, res) => {
             token,
         }).then(user => {
             if(user === null){
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }
 
             if(req.params.username !== user.username){
@@ -185,7 +185,7 @@ router.post('/:username?/:title?/edit', (req, res) => {
             token,
         }).then(user => {
             if(user === null){
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
+                res.end('Access denied');
             }
 
             if(req.params.username !== user.username){

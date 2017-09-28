@@ -7,8 +7,6 @@ const sha256 = require('sha256');
 const path = require('path');
 const Tracks = require('../schema/Tracks');
 const fs = require('fs');
-const request = require('request');
-const fullurl = require('fullurl');
 const fsp = require('fs-promise');
 const rp = require('request-promise');
 const gcs = require('@google-cloud/storage')({
@@ -17,7 +15,7 @@ const gcs = require('@google-cloud/storage')({
 });
 const easyimage = require('easyimage');
 const filezizgag = require('../src/index').filezizgag;
-const https = require('https');
+const genId = require('../src/helper/genId');
 const escape = require('escape-html');
 
 router.post('/', (req, res) => {
@@ -105,6 +103,7 @@ router.post('/', (req, res) => {
                         }
                         const uploadDate = new Date();
                         return new Tracks({
+                            id: genId(),
                             title,
                             file: {
                                 location: path.join(`${__dirname}/../tracks/${newAudioId}`),
@@ -128,7 +127,7 @@ router.post('/', (req, res) => {
                             }, user)
                             .then(() => {
                                 res.json({
-                                    _id: track._id,
+                                    id: track.id,
                                     title,
                                     uploadDate,
                                     description,
@@ -264,7 +263,7 @@ router.post('/', (req, res) => {
                                                 fs.unlinkSync(path.join(`${__dirname}/../tracks/${newAudioId}${ext}`));
                                                 // Send a notification to the user
                                                 return rp({
-                                                    url: `${full_address}/api/notification`,
+                                                    url: `${full_address}/api/notification?bypass=true`,
                                                     headers: {
                                                         token,
                                                     },

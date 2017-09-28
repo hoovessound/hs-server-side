@@ -26,7 +26,7 @@ router.get('/:id?', (req, res) => {
         async findTrack(){
             try{
 
-                const track = await Tracks.findOne({_id: id});
+                const track = await Tracks.findOne({id});
                 // Check if the file is extened or not
                 if(track.file.extend){
                     const myUrl = new URL(track.file.location);

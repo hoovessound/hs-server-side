@@ -3,6 +3,7 @@ const router = new express.Router;
 const rp = require('request-promise');
 const Users = require('../../../schema/Users');
 const crypto = require('crypto');
+const genId = require('../../../src/helper/genId');
 
 
 const pvAuthObject = {
@@ -51,6 +52,7 @@ router.get('/callback', (req, res) => {
             const randomBytes = crypto.randomBytes(50);
             const token = randomBytes.toString('hex');
             return new Users({
+                id: genId(40),
                 fullName: _profile.display_name,
                 username: _profile.username,
                 token,

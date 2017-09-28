@@ -28,7 +28,7 @@ class FindTrack {
     async findById(id){
         try{
             const track = await Tracks.findOne({
-                _id: id,
+                id,
             }, {
                 file: 0,
             })
@@ -46,18 +46,18 @@ class FindTrack {
                 }
             }
 
-            this.res.json(track);
-        }
-        catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
+            if(!track){
                 this.res.json({
                     error: 'Can\'t not that track id',
                     code: 'unexpected_result',
                 });
                 return false;
-            }else{
-                console.log(error)
             }
+
+            this.res.json(track);
+        }
+        catch(error){
+            console.log(error)
         }
     }
 
@@ -81,9 +81,8 @@ class FindTrack {
             const authArgument = this.req.body.userid || this.req.headers.token;
             const bypass = this.req.query.bypass;
 
-            let findFave = false;
             const full_address = this.req.protocol + "://" + this.req.headers.host;
-            const track = await Tracks.findOne({_id: this.req.params.id});
+            const track = await Tracks.findOne({id: this.req.params.id});
 
             if (track === null) {
                 this.res.json({
@@ -93,17 +92,13 @@ class FindTrack {
                 return false;
             }else{
                 // If the user already fave the track, just remove it, if not add one
-                user.fave.forEach(id => {
-                    if (id == track._id.toString()) {
-                        findFave = true;
-                    }
-                });
-                if (findFave) {
+
+                if(user.fave.includes(id)){
                     // Remove it
-                    user.fave.splice(user.fave.indexOf(track._id.toString()), 1);
+                    user.fave.splice(user.fave.indexOf(track.id.toString()), 1);
                     status = 'removed';
-                } else {
-                    user.fave.push(track._id);
+                }else{
+                    user.fave.push(track.id);
                     status = 'added';
                 }
 
@@ -124,7 +119,7 @@ class FindTrack {
                         method: 'post',
                         json: true,
                         body: {
-                            to: user._id,
+                            to: user.id,
                             title: 'Someone Has Liked Your Track',
                             body: `${user.username} Has Favorited Your Track`,
                             link: `${full_address}/track/${user.username}/${track.title}`,
@@ -136,35 +131,28 @@ class FindTrack {
             }
         }
         catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
-                this.res.json({
-                    error: 'Can\'t not that user id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }else{
-                console.log(error)
-            }
+            console.log(error)
         }
     }
 
     async getComment(trackId){
         try{
             const track = await Tracks.findOne({
-                _id: trackId,
+                id: trackId,
             })
-            this.res.json(track.comments);
-        }
-        catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
+
+            if(!track){
                 this.res.json({
                     error: 'Can\'t not that track id',
                     code: 'unexpected_result',
                 });
                 return false;
-            }else{
-                console.log(error)
             }
+
+            this.res.json(track.comments);
+        }
+        catch(error){
+            console.log(error)
         }
     }
 
@@ -184,12 +172,21 @@ class FindTrack {
 
         try{
             const track = await Tracks.findOne({
-                _id: trackId,
+                id: trackId,
             })
+
+            if(!track){
+                this.res.json({
+                    error: 'Can\'t not that track id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }
+
             const comment = escape(this.req.body.comment);
 
             const commentObject = {
-                author: this.req.hsAuth.user._id,
+                author: this.req.hsAuth.user.id,
                 postDate: moment()._d,
                 comment: comment,
             };
@@ -207,17 +204,10 @@ class FindTrack {
             });
         }
         catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
-                this.res.json({
-                    error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }else{
-                console.log(error)
-            }
+            console.log(error);
         }
     }
+
 }
 
 router.get('/:id', (req, res) => {

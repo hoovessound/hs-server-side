@@ -72,7 +72,7 @@ router.get('/fave', (req, res) => {
                     let tracks = [];
                     user.fave.forEach(id => {
                         return Tracks.findOne({
-                            _id: id,
+                            id: id,
                         }).then(track => {
                             tracks.push(track);
                             if(tracks.length === user.fave.length){

@@ -98,9 +98,19 @@ router.use((req, res, next) => {
         })
         .then(user => {
             // Rate limit control
-            const used = _rightAccess.rateLimit.used;
+            const used = _rightAccess.rateLimit.used ? _rightAccess.rateLimit.used : 0;
             const official = _rightAccess.rateLimit.official;
-            const requestAllowed = 500;
+            const requestAllowed = process.env.RATELIMIT || 500;
+
+            setTimeout(() => {
+                _rightAccess.rateLimit.used = 0;
+                return AccessTokes.update({
+                    _id: _rightAccess._id
+                }, _rightAccess)
+                .then(() => {
+                    // clear
+                })
+            }, 300000);
 
             if(used >= requestAllowed){
                 res.status(429);
@@ -108,18 +118,6 @@ router.use((req, res, next) => {
                     error: `429 rate limit: Please wait 15 minutes for an other ${requestAllowed} requests`,
                     code: 'services_lock_down'
                 });
-
-                // Wait 15 minutes, and clear the rate limit
-                setTimeout(() => {
-                    _rightAccess.rateLimit.used = 0;
-                    return AccessTokes.update({
-                        _id: _rightAccess._id
-                    }, _rightAccess)
-                    .then(() => {
-                        // clear
-                    })
-                }, 300000);
-
                 return false;
             }else{
 
@@ -155,8 +153,6 @@ router.use('/tracks', require('../../../API/home'));
 router.use('/me', require('../../../API/me'));
 
 router.use('/upload', require('../../../API/upload'));
-
-router.use('/user', require('../../../API/user'));
 
 router.use('/track', require('../../../API/track'));
 

@@ -12,7 +12,7 @@ class Me {
     async findThisUserTracks(){
         this.res.json({
             user: {
-                id: this.req.hsAuth._id,
+                id: this.req.hsAuth.id,
                 username: this.req.hsAuth.user.username,
                 fullname: this.req.hsAuth.user.fullname,
                 email: this.req.hsAuth.user.email,

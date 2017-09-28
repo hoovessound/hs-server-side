@@ -40,7 +40,7 @@
     <%if(track !== null){%>
     <script>
         var audio = new Audio();
-        audio.src = "<%=full_address%>/api/listen/<%=track._id%>";
+        audio.src = "<%=full_address%>/api/listen/<%=track.id%>";
         var isPlaying = false;
         audio.addEventListener('ended', function(e){
             isPlaying = false;

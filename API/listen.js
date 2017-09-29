@@ -32,7 +32,6 @@ router.get('/:id?', (req, res) => {
                     const myUrl = new URL(track.file.location);
                     const baseName = path.basename(myUrl.pathname)
                     const extName = path.extname(baseName);
-                    console.log(baseName)
                     if(extName.endsWith('.ogg') || extName.endsWith('mp3')){
                         // Go stream the audio to the user
 

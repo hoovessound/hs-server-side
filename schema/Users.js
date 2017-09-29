@@ -21,7 +21,7 @@ const usersSchema = new Schema({
     notification: Array,
     lastPlay: {
         date: Schema.Types.Date,
-        trackID: Schema.Types.ObjectId,
+        trackID: String,
         volume: Number,
         isPlaying: {
             type: Boolean,

@@ -28,7 +28,6 @@
         <button type="submit" class="btn waves-effect waves-default" id="loginButton">Login</button>
     </form>
 
-    <%if(typeof oAuth !== 'undefined'){%>
     <a class="loginProvider poniverse" href="/api/oauth1/thirdparty/poniverse">
         <span>Poniverse</span>
         <img src="https://avatars3.githubusercontent.com/u/3528970?v=4&s=400" alt="" class="image">
@@ -38,7 +37,6 @@
         <span>Facebook</span>
         <img src="https://facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-art.png" alt="" class="image">
     </a>
-    <%}%>
 
     <a href="/api/auth/register">Register</a><br>
     <a href="/api/auth/changepassword">Forgot Password</a>

@@ -68,7 +68,12 @@ router.get('/callback', (req, res) => {
                     maxAge: 365 * 24 * 60 * 60,
                     httpOnly: true,
                 });
-                res.redirect('/home');
+
+                if(req.query.service) {
+                    res.redirect('/home');
+                }else{
+                    res.redirect(`/api/oauth1/token/temporary?${req.session.rawQuery}`);
+                }
             })
 
         }else{
@@ -88,7 +93,11 @@ router.get('/callback', (req, res) => {
                 httpOnly: true,
             });
 
-            res.redirect('/home');
+            if(req.query.service) {
+                res.redirect('/home');
+            }else{
+                res.redirect(`/api/oauth1/token/temporary?${req.session.rawQuery}`);
+            }
 
             return Users.update({
                 _id: user._id

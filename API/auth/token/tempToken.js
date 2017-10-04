@@ -60,7 +60,6 @@ router.use((req, res, next) => {
             clientId,
         })
         .then(app => {
-            console.log(app)
             if(app) {
                 const url = require('url');
                 let find = false;
@@ -106,6 +105,8 @@ router.get('/', csurf(), (req, res) => {
     const redirect = req.query.redirect;
     const clientId = req.query.client_id;
     const oAuthToken = req.cookies['oauth-token'];
+    const rawQuery = require('url').parse(req.url).query;
+    req.session.rawQuery = rawQuery;
 
     Users.findOne({
         token: oAuthToken,

@@ -4,6 +4,8 @@ const rp = require('request-promise');
 const Users = require('../../../schema/Users');
 const crypto = require('crypto');
 const genId = require('../../../src/helper/genId');
+const oAuthApps = require('../../../schema/oAuthApps');
+const TempTokes = require('../../../schema/TempTokes');
 
 
 const pvAuthObject = {
@@ -68,7 +70,12 @@ router.get('/callback', (req, res) => {
                     maxAge: 365 * 24 * 60 * 60,
                     httpOnly: true,
                 });
-                res.redirect('/home');
+
+                if(req.query.service) {
+                    res.redirect('/home');
+                }else{
+                    res.redirect(`/api/oauth1/token/temporary?${req.session.rawQuery}`);
+                }
             })
 
         }else{
@@ -88,7 +95,11 @@ router.get('/callback', (req, res) => {
                 httpOnly: true,
             });
 
-            res.redirect('/home');
+            if(req.query.service) {
+                res.redirect('/home');
+            }else{
+                res.redirect(`/api/oauth1/token/temporary?${req.session.rawQuery}`);
+            }
 
             return Users.update({
                 _id: user._id

@@ -30,7 +30,7 @@ router.use((req, res, next) => {
     const service = req.query.service;
     // In site use case
 
-    if(bypass === 'true' || service === 'hs_service_login'){
+    if(bypass === 'true' || service){
         // Check for the host name
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const sessionToken = req.headers.sessiontoken;

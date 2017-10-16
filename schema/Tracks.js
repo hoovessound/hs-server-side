@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const tracksSchema = new Schema({
+    id: String,
     title: String,
     file: {
         location: String,

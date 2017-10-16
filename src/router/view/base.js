@@ -71,7 +71,7 @@ router.get('*', (req, res) => {
                     if(typeof user.lastPlay.trackID !== 'undefined'){
                         // Fetch the last track object
                         return Tracks.findOne({
-                            _id: user.lastPlay.trackID,
+                            id: user.lastPlay.trackID,
                         })
                         .then(track => {
                             if(track === null){
@@ -83,7 +83,7 @@ router.get('*', (req, res) => {
                                     totalPage: 0,
                                     offset: 10,
                                     year: new Date().getFullYear(),
-                                    initAudioSource: `${full_address}/api/listen/${lastTrack._id}`,
+                                    initAudioSource: `${full_address}/api/listen/${lastTrack.id}`,
                                     volume: 100,
                                     sessionToken,
                                 });
@@ -96,7 +96,7 @@ router.get('*', (req, res) => {
                                     totalPage: 0,
                                     offset: 10,
                                     year: new Date().getFullYear(),
-                                    initAudioSource: `${full_address}/api/listen/${track._id}`,
+                                    initAudioSource: `${full_address}/api/listen/${track.id}`,
                                     volume: user.lastPlay.volume,
                                     playTimeValue: true,
                                     sessionToken,
@@ -104,6 +104,7 @@ router.get('*', (req, res) => {
                             }
                         })
                     }else{
+                        console.log('No last play')
                         res.render('index', {
                             loginUser: user,
                             track,
@@ -112,7 +113,7 @@ router.get('*', (req, res) => {
                             totalPage: 0,
                             offset: 10,
                             year: new Date().getFullYear(),
-                            initAudioSource: `${full_address}/api/listen/${track._id}`,
+                            initAudioSource: `${full_address}/api/listen/${track.id}`,
                             volume: 100,
                             sessionToken,
                         });

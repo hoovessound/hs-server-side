@@ -26,13 +26,12 @@ router.get('/:id?', (req, res) => {
         async findTrack(){
             try{
 
-                const track = await Tracks.findOne({_id: id});
+                const track = await Tracks.findOne({id});
                 // Check if the file is extened or not
                 if(track.file.extend){
                     const myUrl = new URL(track.file.location);
                     const baseName = path.basename(myUrl.pathname)
                     const extName = path.extname(baseName);
-                    console.log(baseName)
                     if(extName.endsWith('.ogg') || extName.endsWith('mp3')){
                         // Go stream the audio to the user
 

@@ -21,6 +21,8 @@ router.use((req, res, next) => {
             'post_comment': 'Post comments under your name',
             'fave_track': 'Favourite or Un-favourite tracks',
             'upload_track': 'Upload tracks under your name',
+            'private_track': 'Be able to view and edit your own private track',
+            'edit_track': 'Be able to edit your own track information',
         }
 
         for(let key in scopes) {
@@ -92,6 +94,8 @@ router.use((req, res, next) => {
                 return false;
             }
         })
+    }else{
+        next();
     }
 })
 
@@ -101,6 +105,8 @@ router.get('/', csurf(), (req, res) => {
     const redirect = req.query.redirect;
     const clientId = req.query.client_id;
     const oAuthToken = req.cookies['oauth-token'];
+    const rawQuery = require('url').parse(req.url).query;
+    req.session.rawQuery = rawQuery;
 
     Users.findOne({
         token: oAuthToken,

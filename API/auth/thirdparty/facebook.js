@@ -3,6 +3,7 @@ const router = new express.Router;
 const rp = require('request-promise');
 const Users = require('../../../schema/Users');
 const crypto = require('crypto');
+const genId = require('../../../src/helper/genId');
 
 
 const fbAuthObject = {
@@ -51,6 +52,7 @@ router.get('/callback', (req, res) => {
             const randomBytes = crypto.randomBytes(50);
             const token = randomBytes.toString('hex');
             return new Users({
+                id: genId(40),
                 fullName: _profile.name,
                 username: _profile.name.replace(/ |-/igm, '_'),
                 token,
@@ -66,7 +68,12 @@ router.get('/callback', (req, res) => {
                     maxAge: 365 * 24 * 60 * 60,
                     httpOnly: true,
                 });
-                res.redirect('/home');
+
+                if(req.query.service) {
+                    res.redirect('/home');
+                }else{
+                    res.redirect(`/api/oauth1/token/temporary?${req.session.rawQuery}`);
+                }
             })
 
         }else{
@@ -86,7 +93,11 @@ router.get('/callback', (req, res) => {
                 httpOnly: true,
             });
 
-            res.redirect('/home');
+            if(req.query.service) {
+                res.redirect('/home');
+            }else{
+                res.redirect(`/api/oauth1/token/temporary?${req.session.rawQuery}`);
+            }
 
             return Users.update({
                 _id: user._id

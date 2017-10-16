@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const usersSchema = new Schema({
+    id: String,
     username: String,
     password: String,
     email: String,
@@ -20,7 +21,7 @@ const usersSchema = new Schema({
     notification: Array,
     lastPlay: {
         date: Schema.Types.Date,
-        trackID: Schema.Types.ObjectId,
+        trackID: String,
         volume: Number,
         isPlaying: {
             type: Boolean,

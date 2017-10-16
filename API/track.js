@@ -28,22 +28,36 @@ class FindTrack {
     async findById(id){
         try{
             const track = await Tracks.findOne({
-                _id: id,
+                id,
             }, {
                 file: 0,
             })
-            this.res.json(track);
-        }
-        catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
+
+            if(!this.req.query.bypass){
+                if(track.private){
+                    // Check permission
+                    if(!this.req.hsAuth.app.permission.includes('private_track')){
+                        this.res.json({
+                            error: 'Bad permission scoping',
+                            code: 'service_lock_down',
+                        });
+                        return false;
+                    }
+                }
+            }
+
+            if(!track){
                 this.res.json({
                     error: 'Can\'t not that track id',
                     code: 'unexpected_result',
                 });
                 return false;
-            }else{
-                console.log(error)
             }
+
+            this.res.json(track);
+        }
+        catch(error){
+            console.log(error)
         }
     }
 
@@ -53,30 +67,22 @@ class FindTrack {
 
             // Check permission
             const user = this.req.hsAuth.user;
-            if(!this.req.hsAuth.app.permission.includes('post_comment')){
-                this.res.json({
-                    error: 'Bad permission scoping',
-                    code: 'service_lock_down',
-                });
-                return false;
-            }
 
-            const authArgument = this.req.body.userid || this.req.headers.token;
-            const bypass = this.req.query.bypass;
-
-            if(!bypass){
-                if(!id){
+            if(!this.req.query.bypass){
+                if(!this.req.hsAuth.app.permission.includes('post_comment')){
                     this.res.json({
-                        error: 'Missing the user id',
-                        code: 'missing_require_fields',
+                        error: 'Bad permission scoping',
+                        code: 'service_lock_down',
                     });
                     return false;
                 }
             }
 
-            let findFave = false;
+            const authArgument = this.req.body.userid || this.req.headers.token;
+            const bypass = this.req.query.bypass;
+
             const full_address = this.req.protocol + "://" + this.req.headers.host;
-            const track = await Tracks.findOne({_id: this.req.params.id});
+            const track = await Tracks.findOne({id: this.req.params.id});
 
             if (track === null) {
                 this.res.json({
@@ -86,17 +92,13 @@ class FindTrack {
                 return false;
             }else{
                 // If the user already fave the track, just remove it, if not add one
-                user.fave.forEach(id => {
-                    if (id == track._id.toString()) {
-                        findFave = true;
-                    }
-                });
-                if (findFave) {
+
+                if(user.fave.includes(id)){
                     // Remove it
-                    user.fave.splice(user.fave.indexOf(track._id.toString()), 1);
+                    user.fave.splice(user.fave.indexOf(track.id.toString()), 1);
                     status = 'removed';
-                } else {
-                    user.fave.push(track._id);
+                }else{
+                    user.fave.push(track.id);
                     status = 'added';
                 }
 
@@ -117,7 +119,7 @@ class FindTrack {
                         method: 'post',
                         json: true,
                         body: {
-                            to: user._id,
+                            to: user.id,
                             title: 'Someone Has Liked Your Track',
                             body: `${user.username} Has Favorited Your Track`,
                             link: `${full_address}/track/${user.username}/${track.title}`,
@@ -129,35 +131,28 @@ class FindTrack {
             }
         }
         catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
-                this.res.json({
-                    error: 'Can\'t not that user id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }else{
-                console.log(error)
-            }
+            console.log(error)
         }
     }
 
     async getComment(trackId){
         try{
             const track = await Tracks.findOne({
-                _id: trackId,
+                id: trackId,
             })
-            this.res.json(track.comments);
-        }
-        catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
+
+            if(!track){
                 this.res.json({
                     error: 'Can\'t not that track id',
                     code: 'unexpected_result',
                 });
                 return false;
-            }else{
-                console.log(error)
             }
+
+            this.res.json(track.comments);
+        }
+        catch(error){
+            console.log(error)
         }
     }
 
@@ -165,22 +160,33 @@ class FindTrack {
 
         // Check permission
 
-        if(!this.req.hsAuth.app.permission.includes('post_comment')){
-            this.res.json({
-                error: 'Bad permission scoping',
-                code: 'service_lock_down',
-            });
-            return false;
+        if(!this.req.query.bypass){
+            if(!this.req.hsAuth.app.permission.includes('post_comment')){
+                this.res.json({
+                    error: 'Bad permission scoping',
+                    code: 'service_lock_down',
+                });
+                return false;
+            }
         }
 
         try{
             const track = await Tracks.findOne({
-                _id: trackId,
+                id: trackId,
             })
+
+            if(!track){
+                this.res.json({
+                    error: 'Can\'t not that track id',
+                    code: 'unexpected_result',
+                });
+                return false;
+            }
+
             const comment = escape(this.req.body.comment);
 
             const commentObject = {
-                author: this.req.hsAuth.user._id,
+                author: this.req.hsAuth.user.id,
                 postDate: moment()._d,
                 comment: comment,
             };
@@ -198,17 +204,10 @@ class FindTrack {
             });
         }
         catch(error){
-            if(error.message.includes('Cast to ObjectId failed for value')){
-                this.res.json({
-                    error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }else{
-                console.log(error)
-            }
+            console.log(error);
         }
     }
+
 }
 
 router.get('/:id', (req, res) => {
@@ -263,163 +262,151 @@ router.post('/edit/:id?', (req, res) => {
                 fields.userid = req.hsAuth.user._id;
             }
 
-            const userId = fields.userid;
+            const user = req.hsAuth.user;
 
-            if (!userId) {
-                res.json({
-                    error: true,
-                    msg: 'Missing the userid field',
-                    code: 'missing_require_fields',
-                });
-                return false;
-            }
-
-            Users.findOne({
-                _id: userId,
-            }).then(user => {
-                if (user === null) {
+            // Check if the track exist
+            return Tracks.findById(id, {
+                file: 0,
+            }).then(track => {
+                if(track.author.username !== user.username){
                     res.json({
                         error: true,
-                        msg: 'Can not find your user id',
-                        code: 'unexpected_result',
+                        msg: 'You are unauthorized to perform this action',
+                        code: 'unauthorized_action',
                     });
                     return false;
                 }else{
-                    // Check if the track exist
-                    return Tracks.findById(id, {
-                        file: 0,
-                    }).then(track => {
-                        if(track.author.username !== user.username){
+
+                    if(!req.query.bypass){
+                        if(track.private){
+                            // Check permission
+                            if(!req.hsAuth.app.permission.includes('private_track')){
+                                res.json({
+                                    error: 'Bad permission scoping',
+                                    code: 'service_lock_down',
+                                });
+                                return false;
+                            }
+                        }else{
+                            if(!req.hsAuth.app.permission.includes('edit_track')){
+                                res.json({
+                                    error: 'Bad permission scoping',
+                                    code: 'service_lock_down',
+                                });
+                                return false;
+                            }
+                        }
+                    }
+
+                    if(fields.private === 'true'){
+                        track.private = true;
+                    }else{
+                        track.private = false;
+                    }
+
+                    // Check if the user submit an cover image
+                    if(files.image){
+                        if(files.image.size > 0){
+                            if(!files.image.type.includes('image')){
+                                res.json({
+                                    error: true,
+                                    msg: 'File is not an image type',
+                                    code: 'not_valid_file_type',
+                                });
+                                return false;
+                            }else{
+                                const ext = path.extname(files.image.name);
+                                const newID = sha256(randomstring.generate(10));
+                                let fileID = newID + ext;
+                                const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
+                                const gcsCoverImage = gcs.bucket('hs-cover-image');
+                                fsp.rename(files.image.path, coverImagePath).then(() => {
+                                    // Resize the image first
+                                    return easyimage.resize({
+                                        src: coverImagePath,
+                                        dst: coverImagePath,
+                                        width: 500,
+                                        height: 500,
+                                        ignoreAspectRatio: true,
+                                    }).then(processedImage => {
+                                        return gcsCoverImage.upload(coverImagePath).then(file => {
+                                            file = file[0];
+                                            return file.makePublic()
+                                            .then(url => {
+                                                coverImage = url[0];
+                                                fsp.unlinkSync(coverImagePath);
+                                                track.coverImage = `https://storage.googleapis.com/hs-cover-image/${fileID}`;
+                                                updateTitle();
+                                            })
+                                        })
+                                    });
+                                }).catch(error => {
+                                    console.log(error);
+                                });
+                            }
+                        }else{
+                            updateTitle();
+                        }
+                    }else{
+                        updateTitle();
+                    }
+
+                    function updateTitle() {
+
+                        function writeDB() {
+                            return Tracks.update({
+                                _id: track._id
+                            }, track).then(() => {
+                                // Finish
+                                res.json({
+                                    track,
+                                });
+                            });
+                        }
+
+                        if(track.private){
+                            track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
+                            writeDB();
+                            return false;
+                        }
+
+                        if(fields.description){
+                            track.description = escape(fields.description);
+                        }
+
+                        if(fields.title){
+                            // Check if the new title match the old title
+                            if(fields.title !== track.title){
+                                // Is not the same
+                                return Tracks.findOne({
+                                    title: escape(fields.title),
+                                }).then(authTrack => {
+                                    if(authTrack !== null){
+                                        track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
+                                    }else{
+                                        track.title = escape(fields.title);
+                                    }
+                                    writeDB();
+                                });
+                            }else{
+                                // Same title
+                                writeDB();
+                                return false;
+                            }
+                        }
+                        if(!fields.title && !fields.image && !fields.description){
                             res.json({
                                 error: true,
-                                msg: 'You are unauthorized to perform this action',
-                                code: 'unauthorized_action',
+                                msg: 'You have to pass in one or more argument',
+                                code: 'missing_require_fields',
                             });
                             return false;
                         }else{
-
-                            if(fields.private === 'true'){
-                                track.private = true;
-                            }else{
-                                track.private = false;
-                            }
-
-                            // Check if the user submit an cover image
-                            if(files.image){
-                                if(files.image.size > 0){
-                                    if(!files.image.type.includes('image')){
-                                        res.json({
-                                            error: true,
-                                            msg: 'File is not an image type',
-                                            code: 'not_valid_file_type',
-                                        });
-                                        return false;
-                                    }else{
-                                        const ext = path.extname(files.image.name);
-                                        const newID = sha256(randomstring.generate(10));
-                                        let fileID = newID + ext;
-                                        const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
-                                        const gcsCoverImage = gcs.bucket('hs-cover-image');
-                                        fsp.rename(files.image.path, coverImagePath).then(() => {
-                                            // Resize the image first
-                                            return easyimage.resize({
-                                                src: coverImagePath,
-                                                dst: coverImagePath,
-                                                width: 500,
-                                                height: 500,
-                                                ignoreAspectRatio: true,
-                                            }).then(processedImage => {
-                                                return gcsCoverImage.upload(coverImagePath).then(file => {
-                                                    file = file[0];
-                                                    return file.makePublic()
-                                                    .then(url => {
-                                                        coverImage = url[0];
-                                                        fsp.unlinkSync(coverImagePath);
-                                                        track.coverImage = `https://storage.googleapis.com/hs-cover-image/${fileID}`;
-                                                        updateTitle();
-                                                    })
-                                                })
-                                            });
-                                        }).catch(error => {
-                                            console.log(error);
-                                        });
-                                    }
-                                }else{
-                                    updateTitle();
-                                }
-                            }else{
-                                updateTitle();
-                            }
-
-                            function updateTitle() {
-
-                                function writeDB() {
-                                    return Tracks.update({
-                                        _id: track._id
-                                    }, track).then(() => {
-                                        // Finish
-                                        res.json({
-                                            track,
-                                        });
-                                    });
-                                }
-
-                                if(track.private){
-                                    track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
-                                    writeDB();
-                                    return false;
-                                }
-
-                                if(fields.description){
-                                    track.description = escape(fields.description);
-                                }
-
-                                if(fields.title){
-                                    // Check if the new title match the old title
-                                    if(fields.title !== track.title){
-                                        // Is not the same
-                                        return Tracks.findOne({
-                                            title: escape(fields.title),
-                                        }).then(authTrack => {
-                                            if(authTrack !== null){
-                                                track.title = `${escape(fields.title)}(${randomstring.generate(10)})`;
-                                            }else{
-                                                track.title = escape(fields.title);
-                                            }
-                                            writeDB();
-                                        });
-                                    }else{
-                                        // Same title
-                                        writeDB();
-                                        return false;
-                                    }
-                                }
-                                if(!fields.title && !fields.image && !fields.description){
-                                    res.json({
-                                        error: true,
-                                        msg: 'You have to pass in one or more argument',
-                                        code: 'missing_require_fields',
-                                    });
-                                    return false;
-                                }else{
-                                    writeDB();
-                                }
-                            }
+                            writeDB();
                         }
-                    })
+                    }
                 }
-            }).catch(error => {
-                if(error.message.includes('Cast to ObjectId failed for value')){
-                    res.json({
-                        error: true,
-                        msg: 'Can\'t not found your user id',
-                        code: 'unexpected_result',
-                    });
-                    return false;
-                }else{
-                    console.log(error)
-                }
-            });
+            })
 
         }
     });

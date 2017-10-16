@@ -5,6 +5,7 @@ const Users = require('../../schema/Users');
 const randomstring = require('randomstring');
 const crypto = require('crypto');
 const csurf = require('csurf');
+const genId = require('../../src/helper/genId');
 
 router.use(csurf());
 
@@ -136,6 +137,7 @@ router.post('/', csurf(), (req, res) => {
                         token = randomBytes.toString('hex');
                         // Save the hashed password into the db     
                         const newUser = new Users({
+                            id: genId(40),
                             username: req.body.username,
                             password: hashedPassword,
                             fullName: req.body.fullname,

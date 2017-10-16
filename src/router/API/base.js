@@ -30,13 +30,11 @@ router.use((req, res, next) => {
     const service = req.query.service;
     // In site use case
 
-    if(bypass === 'true' || service === 'hs_service_login'){
+    if(bypass === 'true' || service){
         // Check for the host name
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const sessionToken = req.headers.sessiontoken;
         const token = req.headers.token;
-        console.log(sessionToken)
-        console.log(req.session.sessionToken)
         if(sessionToken === req.session.sessionToken){
             Users.findOne({
                 token,
@@ -97,11 +95,50 @@ router.use((req, res, next) => {
             return Users.findOne({_id: rightAccess.author.user});
         })
         .then(user => {
-            req.hsAuth = {
-                user,
-                app: _rightAccess,
+            // Rate limit control
+            const used = _rightAccess.rateLimit.used ? _rightAccess.rateLimit.used : 0;
+            const official = _rightAccess.rateLimit.official;
+            const requestAllowed = process.env.RATELIMIT || 500;
+
+            setTimeout(() => {
+                _rightAccess.rateLimit.used = 0;
+                return AccessTokes.update({
+                    _id: _rightAccess._id
+                }, _rightAccess)
+                .then(() => {
+                    // clear
+                })
+            }, 300000);
+
+            if(used >= requestAllowed){
+                res.status(429);
+                res.json({
+                    error: `429 rate limit: Please wait 15 minutes for an other ${requestAllowed} requests`,
+                    code: 'services_lock_down'
+                });
+                return false;
+            }else{
+
+                if(!official){
+                    _rightAccess.rateLimit.used++;
+                    return AccessTokes.update({
+                        _id: _rightAccess._id
+                    }, _rightAccess)
+                    .then(() => {
+                        req.hsAuth = {
+                            user,
+                            app: _rightAccess,
+                        }
+                        next();
+                    })
+                }else{
+                    req.hsAuth = {
+                        user,
+                        app: _rightAccess,
+                    }
+                    next();
+                }
             }
-            next();
         })
         .catch(error => {
             console.log(error);
@@ -109,14 +146,11 @@ router.use((req, res, next) => {
     }
 });
 
-
 router.use('/tracks', require('../../../API/home'));
 
 router.use('/me', require('../../../API/me'));
 
 router.use('/upload', require('../../../API/upload'));
-
-router.use('/user', require('../../../API/user'));
 
 router.use('/track', require('../../../API/track'));
 

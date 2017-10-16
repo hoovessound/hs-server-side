@@ -2,6 +2,7 @@
   "dependencies": {
     "@google-cloud/storage": "^1.2.0",
     "backblaze-b2": "^1.0.2",
+    "base64-url": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
     "child-process-promise": "^2.2.1",

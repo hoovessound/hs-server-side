@@ -142,14 +142,14 @@ app.use(compression());
 
 // Productions only settings
 if (process.env.NODE_ENV === 'production') {
-    app.use((req, res, next) => {
-        // HTTP to HTTPS
-        if (req.secure) {
-            return next();
-        } else {
-            res.redirect(301, 'https://' + req.hostname + req.url);
-        }
-    });
+    // app.use((req, res, next) => {
+    //     // HTTP to HTTPS
+    //     if (req.secure) {
+    //         return next();
+    //     } else {
+    //         res.redirect(301, 'https://' + req.hostname + req.url);
+    //     }
+    // });
 
 } else {
     // Development only settings

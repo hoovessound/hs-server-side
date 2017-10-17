@@ -44,7 +44,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "gulp javascript && gulp scss && node src/index.js",
+    "start": "node src/index.js",
     "build": "gulp default",
     "snyk-protect": "snyk protect",
     "prepublish": "npm run snyk-protect"

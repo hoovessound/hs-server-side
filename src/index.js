@@ -90,10 +90,18 @@ if(process.env.FILEZIGZAG_TOKEN){
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;
+const sslPath = function (fileName) {
+    const sp = path.join(`/etc/letsencrypt/live/hoovessound.ml/${fileName}`);
+    if(fs.existsSync(sp)){
+        return sp;
+    }else{
+        return null;
+    }
+};
 
 const options = {
-    cert: process.env.HS_SSL_CERT,
-    key: process.env.HS_SSL_KEY,
+    cert: sslPath('fullchain.pem'),
+    key: sslPath('privkey.pem'),
 };
 
 // Check of require directory
@@ -147,10 +155,6 @@ server.listen(port, () => {
     });
 });
 
-https.createServer(options, app).listen(8443, () => {
-    console.log(`SSL is listening on port ${color.blue(8443)}`);
-});
-
 // Using GZIP
 app.use(compression());
 
@@ -164,6 +168,12 @@ if (process.env.NODE_ENV === 'production') {
     //         res.redirect(301, 'https://' + req.hostname + req.url);
     //     }
     // });
+
+    // Create an HTTPS version of HS
+
+    https.createServer(options, app).listen(8443, () => {
+        console.log(`SSL is listening on port ${color.blue(8443)}`);
+    });
 
 } else {
     // Development only settings

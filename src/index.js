@@ -4,15 +4,8 @@ const https = require('https');
 const tls = require('tls');
 const sslPath = '/etc/letsencrypt/live/hoovessound.ml/';
 const fs = require('fs');
-let options = null;
-if(fs.existsSync(sslPath)){
-    options = {
-        key: fs.readFileSync(sslPath + 'privkey.pem'),
-        cert: fs.readFileSync(sslPath + 'fullchain.pem')
-    };
-}
 const app = express();
-const server = options ? http.createServer(options, app) : http.createServer(app);
+const server = http.createServer(app);
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -96,7 +89,12 @@ if(process.env.FILEZIGZAG_TOKEN){
 }
 
 // Setting up the app port
-const port = options ? 433 : 3000;
+const port = process.env.PORT || cli.port || 3000;
+
+const options = {
+    cert: process.env.HS_SSL_CERT,
+    key: process.env.HS_SSL_KEY,
+};
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
@@ -147,6 +145,10 @@ server.listen(port, () => {
     mongoose.connect(process.env.DB, {
         useMongoClient: true,
     });
+});
+
+https.createServer(options, app).listen(8443, () => {
+    console.log(`SSL is listening on port ${color.blue(8443)}`);
 });
 
 // Using GZIP

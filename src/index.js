@@ -2,16 +2,17 @@ const express = require('express');
 const http = require('http');
 const https = require('https');
 const tls = require('tls');
-const sslOptions = {
-    key: process.env.HS_SSL_KEY,
-    cert: process.env.HS_SSL_CERT,
-    ca: process.env.HS_SSL_CA,
-};
+const sslPath = '/etc/letsencrypt/live/hoovessound.ml/';
+const fs = require('fs');
+let options = null;
+if(fs.existsSync(sslPath)){
+    options = {
+        key: fs.readFileSync(sslPath + 'privkey.pem'),
+        cert: fs.readFileSync(sslPath + 'fullchain.pem')
+    };
+}
 const app = express();
-const server = http.createServer(app);
-https.createServer(sslOptions, app).listen(443);
-const io = require('socket.io').listen(server);
-module.exports.io = io;
+const server = options ? http.createServer(options, app) : http.createServer(app);
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -95,7 +96,7 @@ if(process.env.FILEZIGZAG_TOKEN){
 }
 
 // Setting up the app port
-const port = process.env.PORT || cli.port || 3000;
+const port = options ? 433 : 3000;
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
@@ -136,6 +137,9 @@ app.use(cookieSession({
     keys: [randomstring.generate(30)],
     maxAge: 365 * 24 * 60 * 60,
 }));
+
+const io = require('socket.io').listen(server);
+module.exports.io = io;
 
 server.listen(port, () => {
     console.log(`HoovesSound are running on port ${color.green(port)}`);

@@ -1,7 +1,15 @@
 const express = require('express');
 const http = require('http');
+const https = require('https');
+const tls = require('tls');
+const sslOptions = {
+    key: process.env.HS_SSL_KEY,
+    cert: process.env.HS_SSL_CERT,
+    ca: process.env.HS_SSL_CA,
+};
 const app = express();
 const server = http.createServer(app);
+https.createServer(sslOptions, app).listen(443);
 const io = require('socket.io').listen(server);
 module.exports.io = io;
 const path = require('path');

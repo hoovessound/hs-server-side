@@ -2,7 +2,6 @@ const express = require('express');
 const http = require('http');
 const https = require('https');
 const tls = require('tls');
-const sslPath = '/etc/letsencrypt/live/hoovessound.ml/';
 const fs = require('fs');
 const app = express();
 const server = http.createServer(app);

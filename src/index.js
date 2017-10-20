@@ -89,18 +89,10 @@ if(process.env.FILEZIGZAG_TOKEN){
 
 // Setting up the app port
 const port = process.env.PORT || cli.port || 3000;
-const sslPath = function (fileName) {
-    const sp = path.join(`/etc/letsencrypt/live/hoovessound.ml/${fileName}`);
-    if(fs.existsSync(sp)){
-        return sp;
-    }else{
-        return null;
-    }
-};
 
 const options = {
-    cert: sslPath('fullchain.pem'),
-    key: sslPath('privkey.pem'),
+    cert: process.env.HSSSL_CERT,
+    key: process.env.HSSSL_KEY,
 };
 
 // Check of require directory

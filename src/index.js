@@ -98,8 +98,8 @@ const sslPath = function (fileName) {
     }
 }
 const options = {
-    cert: sslPath('fullchain.pem'),
-    key: sslPath('privkey.pem'),
+    cert: process.env.HSSSL_FULLCHAIN,
+    key: process.env.HSSSL_PRIVKEY,
 };
 
 // Check of require directory

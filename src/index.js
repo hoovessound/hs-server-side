@@ -102,6 +102,11 @@ const options = {
     key: process.env.HSSSL_PRIVKEY,
 };
 
+fs.writeFileSync(path.join(`${__dirname}/fullchan.pem`), process.env.HSSSL_FULLCHAIN);
+fs.writeFileSync(path.join(`${__dirname}/privkey.pem`), process.env.HSSSL_PRIVKEY);
+
+return false;
+
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
     if (!exists) {

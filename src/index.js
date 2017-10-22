@@ -98,11 +98,6 @@ const sslPath = function (fileName) {
     }
 };
 
-fs.writeFileSync(path.join(`${__dirname}/fullchan.pem`), process.env.HSSSL_FULLCHAIN);
-fs.writeFileSync(path.join(`${__dirname}/privkey.pem`), process.env.HSSSL_PRIVKEY);
-
-console.log(process.env.HSSSL_FULLCHAIN)
-
 const options = {
     cert: fs.readFileSync(path.join(`${__dirname}/fullchan.pem`)),
     key: fs.readFileSync(path.join(`${__dirname}/privkey.pem`)),
@@ -175,9 +170,9 @@ if (process.env.NODE_ENV === 'production') {
 
     // Create an HTTPS version of HS
 
-    https.createServer(options, app).listen(8443, () => {
-        console.log(`SSL is listening on port ${color.blue(8443)}`);
-    });
+    // https.createServer(options, app).listen(8443, () => {
+    //     console.log(`SSL is listening on port ${color.blue(8443)}`);
+    // });
 
 } else {
     // Development only settings

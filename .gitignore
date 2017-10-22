@@ -2,11 +2,8 @@ node_modules
 tracks
 usersContent
 .idea
-src/db.js
 .DS_Store
-gcsAuth/gcsAuthToken.json
 encrypt_pack.tar
-.well-known
 gcsAuth
 .gulp-scss-cache
 .sass-cache

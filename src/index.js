@@ -96,16 +96,17 @@ const sslPath = function (fileName) {
     }else{
         return null
     }
-}
-const options = {
-    cert: process.env.HSSSL_FULLCHAIN,
-    key: process.env.HSSSL_PRIVKEY,
 };
 
 fs.writeFileSync(path.join(`${__dirname}/fullchan.pem`), process.env.HSSSL_FULLCHAIN);
 fs.writeFileSync(path.join(`${__dirname}/privkey.pem`), process.env.HSSSL_PRIVKEY);
 
-return false;
+console.log(process.env.HSSSL_FULLCHAIN)
+
+const options = {
+    cert: fs.readFileSync(path.join(`${__dirname}/fullchan.pem`)),
+    key: fs.readFileSync(path.join(`${__dirname}/privkey.pem`)),
+};
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {

@@ -11,6 +11,6 @@ RUN apt-get clean
 
 COPY . .
 
-EXPOSE 8080 8443
+EXPOSE 3000 8443
 
 CMD [ "npm", "start" ]

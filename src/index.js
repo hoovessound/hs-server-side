@@ -98,10 +98,10 @@ const sslPath = function (fileName) {
     }
 };
 
-const options = {
-    cert: fs.readFileSync(path.join(`${__dirname}/fullchan.pem`)),
-    key: fs.readFileSync(path.join(`${__dirname}/privkey.pem`)),
-};
+// const options = {
+//     cert: fs.readFileSync(path.join(`${__dirname}/fullchan.pem`)),
+//     key: fs.readFileSync(path.join(`${__dirname}/privkey.pem`)),
+// };
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {

@@ -13,4 +13,6 @@ COPY . .
 
 EXPOSE 3000 8443
 
+ENTRYPOINT "caddy" && /bin/bash
+
 CMD [ "npm", "start" ]

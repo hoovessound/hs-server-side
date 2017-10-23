@@ -1,7 +1,0 @@
-hoovessound.ml
-gzip
-
-proxy / localhost:3000 {
-  transparent
-  websocket
-}

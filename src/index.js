@@ -98,10 +98,10 @@ const sslPath = function (fileName) {
     }
 };
 
-// const options = {
-//     cert: fs.readFileSync(path.join(`${__dirname}/fullchan.pem`)),
-//     key: fs.readFileSync(path.join(`${__dirname}/privkey.pem`)),
-// };
+const options = {
+    cert: process.env.HSSSL_FULLCHAIN,
+    key: process.env.HSSSL_PRIVKEY,
+};
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
@@ -170,9 +170,9 @@ if (process.env.NODE_ENV === 'production') {
 
     // Create an HTTPS version of HS
 
-    // https.createServer(options, app).listen(8443, () => {
-    //     console.log(`SSL is listening on port ${color.blue(8443)}`);
-    // });
+    https.createServer(options, app).listen(8443, () => {
+        console.log(`SSL is listening on port ${color.blue(8443)}`);
+    });
 
 } else {
     // Development only settings

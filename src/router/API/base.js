@@ -4,6 +4,14 @@ const cors = require('cors');
 const oAuthApps = require('../../../schema/oAuthApps');
 const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
+const RateLimit = require('express-rate-limit');
+
+const limiter = new RateLimit({
+    windowMs: 1*60*1000,
+    max: 200,
+    delayMs: 0,
+    message: '429 rate limit: Please wait 1 minutes for an other 200 requests'
+});
 router.use(cors());
 
 router.use('/listen', require('../../../API/listen'));
@@ -96,49 +104,12 @@ router.use((req, res, next) => {
         })
         .then(user => {
             // Rate limit control
-            const used = _rightAccess.rateLimit.used ? _rightAccess.rateLimit.used : 0;
-            const official = _rightAccess.rateLimit.official;
-            const requestAllowed = process.env.RATELIMIT || 500;
-
-            setTimeout(() => {
-                _rightAccess.rateLimit.used = 0;
-                return AccessTokes.update({
-                    _id: _rightAccess._id
-                }, _rightAccess)
-                .then(() => {
-                    // clear
-                })
-            }, 300000);
-
-            if(used >= requestAllowed){
-                res.status(429);
-                res.json({
-                    error: `429 rate limit: Please wait 15 minutes for an other ${requestAllowed} requests`,
-                    code: 'services_lock_down'
-                });
-                return false;
-            }else{
-
-                if(!official){
-                    _rightAccess.rateLimit.used++;
-                    return AccessTokes.update({
-                        _id: _rightAccess._id
-                    }, _rightAccess)
-                    .then(() => {
-                        req.hsAuth = {
-                            user,
-                            app: _rightAccess,
-                        }
-                        next();
-                    })
-                }else{
-                    req.hsAuth = {
-                        user,
-                        app: _rightAccess,
-                    }
-                    next();
-                }
-            }
+            app.use(limiter);
+            req.hsAuth = {
+                user,
+                app: _rightAccess,
+            };
+            next();
         })
         .catch(error => {
             console.log(error);

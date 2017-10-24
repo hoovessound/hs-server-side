@@ -19,6 +19,7 @@
     "ejs": "^2.5.6",
     "escape-html": "^1.0.3",
     "express": "^4.15.3",
+    "express-rate-limit": "^2.9.0",
     "fast-crc32c": "^1.0.4",
     "fb": "^2.0.0",
     "formidable": "^1.1.1",
@@ -37,10 +38,10 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "sha256": "^0.2.0",
+    "snyk": "^1.41.1",
     "socket.io": "^2.0.3",
     "underscore": "^1.8.3",
-    "x-frame-options": "^1.0.0",
-    "snyk": "^1.41.1"
+    "x-frame-options": "^1.0.0"
   },
   "private": true,
   "scripts": {

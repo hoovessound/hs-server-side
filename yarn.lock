@@ -1504,7 +1504,7 @@ deepcopy@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/deepcopy/-/deepcopy-0.5.0.tgz#d2ca34335c2d31f54c1b4f13745e001977d491a2"
 
-defaults@^1.0.0, defaults@^1.0.3:
+defaults@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/defaults/-/defaults-1.0.3.tgz#c656051e9817d9ff08ed881477f3fe4019f3ef7d"
   dependencies:
@@ -1830,11 +1830,11 @@ expect-ct@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.0.tgz#52735678de18530890d8d7b95f0ac63640958094"
 
-express-rate-limit@^2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-2.9.0.tgz#62c29fc939d72f0a03a87428c647fc4ee0d15978"
+express-better-ratelimit@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/express-better-ratelimit/-/express-better-ratelimit-1.1.2.tgz#aae8933b8361caf3f263670c1aecf97896f2e9dc"
   dependencies:
-    defaults "^1.0.3"
+    ipchecker "*"
 
 express@^4.15.3:
   version "4.15.3"
@@ -2777,6 +2777,10 @@ ip@^1.1.4:
 ipaddr.js@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.3.0.tgz#1e03a52fdad83a8bbb2b25cbf4998b4cffcd3dec"
+
+ipchecker@*:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/ipchecker/-/ipchecker-0.0.2.tgz#9606ebf7bb3cd23419b149a704e17c1532f0b679"
 
 is-absolute@^0.2.3:
   version "0.2.6"

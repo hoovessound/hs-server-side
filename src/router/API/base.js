@@ -4,14 +4,8 @@ const cors = require('cors');
 const oAuthApps = require('../../../schema/oAuthApps');
 const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
-const RateLimit = require('express-rate-limit');
+const limit = require('express-better-ratelimit');
 
-const limiter = new RateLimit({
-    windowMs: 1*60*1000,
-    max: 200,
-    delayMs: 0,
-    message: '429 rate limit: Please wait 1 minutes for an other 200 requests'
-});
 router.use(cors());
 
 router.use('/listen', require('../../../API/listen'));
@@ -85,6 +79,16 @@ router.use((req, res, next) => {
         }
     }else{
         // Normal API calls
+
+        app.use(limit({
+            duration: 900000, // 15 min
+            max: 500,
+            accessLimited: {
+                error: 'Too many request for this IP address, please read the API rate limit docs',
+                code: 'service_lock_down',
+            }
+        }));
+
         const accessToken = req.headers.access_token;
         let _rightAccess;
         AccessTokes.findOne({

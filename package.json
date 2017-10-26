@@ -19,7 +19,7 @@
     "ejs": "^2.5.6",
     "escape-html": "^1.0.3",
     "express": "^4.15.3",
-    "express-rate-limit": "^2.9.0",
+    "express-better-ratelimit": "^1.1.2",
     "fast-crc32c": "^1.0.4",
     "fb": "^2.0.0",
     "formidable": "^1.1.1",

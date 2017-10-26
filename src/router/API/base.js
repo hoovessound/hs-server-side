@@ -4,7 +4,7 @@ const cors = require('cors');
 const oAuthApps = require('../../../schema/oAuthApps');
 const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
-const limit = require('express-better-ratelimit');
+const limiter = require('express-better-ratelimit');
 
 router.use(cors());
 
@@ -25,6 +25,15 @@ router.use('/oauth1/token/access', require('../../../API/auth/token/accessToken'
 // Third party oAuth
 router.use('/oauth1/thirdparty/poniverse', require('../../../API/auth/thirdparty/poniverse'));
 router.use('/oauth1/thirdparty/facebook', require('../../../API/auth/thirdparty/facebook'));
+
+router.use(limiter({
+    duration: 900000, // 15 min
+    max: 200,
+    accessLimited: {
+        error: 'Too many request for this IP address, please read the API rate limit docs',
+        code: 'service_lock_down',
+    }
+}));
 
 // Basic API auth
 router.use((req, res, next) => {
@@ -79,16 +88,6 @@ router.use((req, res, next) => {
         }
     }else{
         // Normal API calls
-
-        app.use(limit({
-            duration: 900000, // 15 min
-            max: 500,
-            accessLimited: {
-                error: 'Too many request for this IP address, please read the API rate limit docs',
-                code: 'service_lock_down',
-            }
-        }));
-
         const accessToken = req.headers.access_token;
         let _rightAccess;
         AccessTokes.findOne({
@@ -108,7 +107,7 @@ router.use((req, res, next) => {
         })
         .then(user => {
             // Rate limit control
-            app.use(limiter);
+            router.use(limiter);
             req.hsAuth = {
                 user,
                 app: _rightAccess,

@@ -4,7 +4,7 @@ const cors = require('cors');
 const oAuthApps = require('../../../schema/oAuthApps');
 const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
-const limiter = require('express-better-ratelimit');
+const limiter = require('express-better-ratelimit_hs_specific');
 
 router.use(cors());
 
@@ -28,7 +28,7 @@ router.use('/oauth1/thirdparty/facebook', require('../../../API/auth/thirdparty/
 
 router.use(limiter({
     duration: 900000, // 15 min
-    max: 200,
+    max: 500,
     accessLimited: {
         error: 'Too many request for this IP address, please read the API rate limit docs',
         code: 'service_lock_down',
@@ -107,7 +107,6 @@ router.use((req, res, next) => {
         })
         .then(user => {
             // Rate limit control
-            router.use(limiter);
             req.hsAuth = {
                 user,
                 app: _rightAccess,

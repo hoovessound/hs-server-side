@@ -1830,9 +1830,9 @@ expect-ct@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.0.tgz#52735678de18530890d8d7b95f0ac63640958094"
 
-express-better-ratelimit@^1.1.2:
+"express-better-ratelimit_hs_specific@https://github.com/felixfong227/express-better-ratelimit_hs_specific":
   version "1.1.2"
-  resolved "https://registry.yarnpkg.com/express-better-ratelimit/-/express-better-ratelimit-1.1.2.tgz#aae8933b8361caf3f263670c1aecf97896f2e9dc"
+  resolved "https://github.com/felixfong227/express-better-ratelimit_hs_specific#b25f61ceadf49b375bf25d5bb7c19be66bda53be"
   dependencies:
     ipchecker "*"
 

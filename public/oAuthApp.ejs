@@ -11,11 +11,16 @@
         <h3>My apps</h3>
         <%if(apps.length >= 1){%>
         <%apps.map(app => {%>
-        <div class="app">
-            <p><%=app.name%></p>
+        <form class="app" action="/render/oauth-app/update" method="post">
+            <input name="appName" value="<%=app.name%>">
             <p>Client ID: <input type="text" value="<%=app.clientId%>" onmouseenter="this.select()" onmouseleave="this.blur()" readonly></p>
             <p>Client Secret: <input type="password" value="<%=app.clientSecret%>" onmouseenter="this.select(); this.type = 'text';" onmouseleave="this.blur(); this.type = 'password';" readonly></p>
-        </div>
+            <textarea name="callbackurl" id="callbackurl"><%app.callbackUrl.map(url => {%><%=url%><%})%></textarea>
+            <input type="hidden" name="_clientid" value="<%=app.clientId%>">
+            <input type="hidden" name="_csrf" value="<%-csrfToken%>">
+            <br>
+            <button type="submit" class="btn btn-success">Update</button>
+        </form>
         <%})%>
         <%}else{%>
           <p>Looks like you didn't have an app setup yet, you can do so by registering a new app using the form below</p>
@@ -32,7 +37,7 @@
         <p>White List Domain(s) (*):</p>
         <p>One per line</p>
         <textarea type="url" name="callbackurl" placeholder="localhost:3000 or *"></textarea>
-        <div class="g-recaptcha" data-sitekey="6LcfXy4UAAAAAKmVgFA2Ol0OR9x_jKXRA1NI46-C"></div>
+        <!--<div class="g-recaptcha" data-sitekey="6LcfXy4UAAAAAKmVgFA2Ol0OR9x_jKXRA1NI46-C"></div>-->
         <button type="submit" class="btn btn-success">Submit</button>
     </form>
 

@@ -7,6 +7,7 @@ const oAuthApps = require('../../../schema/oAuthApps');
 const TempTokes = require('../../../schema/TempTokes');
 const crypto = require('crypto');
 const moment = require('moment');
+const url = require('url');
 
 router.use(csurf());
 
@@ -61,16 +62,14 @@ router.use((req, res, next) => {
         })
         .then(app => {
             if(app) {
-                const url = require('url');
+
                 let find = false;
                 app.callbackUrl.forEach(allowUrl => {
-                    const redirectHostName = url.parse(redirect).host;
-                    if(redirectHostName === allowUrl || allowUrl === '*'){
+                    const clientHost = url.parse(redirect).host;
+                    if(clientHost === allowUrl || allowUrl === '*'){
                         find = true;
-                        return true;
                     }
                 });
-
                 if(find) {
                     req.hsAuth ={
                         app,
@@ -105,7 +104,7 @@ router.get('/', csurf(), (req, res) => {
     const redirect = req.query.redirect;
     const clientId = req.query.client_id;
     const oAuthToken = req.cookies['oauth-token'];
-    const rawQuery = require('url').parse(req.url).query;
+    const rawQuery = url.parse(req.url).query;
     req.session.rawQuery = rawQuery;
 
     Users.findOne({
@@ -119,7 +118,7 @@ router.get('/', csurf(), (req, res) => {
 
             // Fastforward to permission page
 
-            const rawQuery = require('url').parse(req.url).query;
+            const rawQuery = url.parse(req.url).query;
             res.render('auth/permission', {
                 appName: req.hsAuth.app.name,
                 csrfToken: req.csrfToken(),
@@ -284,7 +283,7 @@ router.post('/', csurf(), (req, res) => {
                 // Check for the password
                 return bcrypt.compare(req.body.password, user.password).then(same => {
                     if(same){
-                        const rawQuery = require('url').parse(req.url).query;
+                        const rawQuery = url.parse(req.url).query;
 
                         res.cookie('oauth-token', user.token, {
                             maxAge: 365 * 24 * 60 * 60,

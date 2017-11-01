@@ -308,8 +308,9 @@ router.post('/', csurf(), (req, res) => {
                         // Incorrect username or password
                         let msg = 'Incorrect email or password';
                         res.render('auth/login', {
-                            error: true,
-                            message: msg,
+                            error: null,
+                            message: null,
+                            pwdError: msg,
                             csrfToken: req.csrfToken(),
                         });
                     }

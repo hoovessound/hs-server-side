@@ -11,18 +11,16 @@ class Me {
 
     async findThisUserTracks(){
         this.res.json({
-            user: {
-                id: this.req.hsAuth.id,
-                username: this.req.hsAuth.user.username,
-                fullname: this.req.hsAuth.user.fullname,
-                email: this.req.hsAuth.user.email,
-                icon: this.req.hsAuth.user.icon,
-                roles: this.req.hsAuth.user.roles,
-                fave: this.req.hsAuth.user.fave,
-                banner: this.req.hsAuth.user.banner,
-                icon: this.req.hsAuth.user.icon,
-                tracks: this.req.hsAuth.user.tracks,
-            }
+            id: this.req.hsAuth.user.id,
+            username: this.req.hsAuth.user.username,
+            fullname: this.req.hsAuth.user.fullname,
+            email: this.req.hsAuth.user.email,
+            icon: this.req.hsAuth.user.icon,
+            roles: this.req.hsAuth.user.roles,
+            fave: this.req.hsAuth.user.fave,
+            banner: this.req.hsAuth.user.banner,
+            icon: this.req.hsAuth.user.icon,
+            tracks: this.req.hsAuth.user.tracks,
         });
     }
 

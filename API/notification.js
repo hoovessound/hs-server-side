@@ -58,8 +58,8 @@ router.post('/', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
-    const notificationId = req.body.id;
+router.delete('/:notificationId', (req, res) => {
+    const notificationId = req.params.notificationId;
     const user = req.hsAuth.user;
 
     // Find that notification id

@@ -88,7 +88,7 @@ router.use((req, res, next) => {
         }
     }else{
         // Normal API calls
-        const accessToken = req.headers.access_token;
+        const accessToken = req.headers.authorization || req.headers.access_token;
         let _rightAccess;
         AccessTokes.findOne({
             token: accessToken,

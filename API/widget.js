@@ -6,21 +6,21 @@ const xFrameOptions = require('x-frame-options')
 router.get('/:id?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const id = req.params.id;
-    Tracks.findById(id).then(track => {
+    Tracks.findOne(id).then(track => {
         router.use(xFrameOptions());
+        if(!track){
+            res.render('widget', {
+                track: null,
+                full_address,
+            });
+            return false;
+        }
         res.render('widget', {
             track,
             full_address,
         });
     }).catch(error => {
-        if(error.message.includes('Cast to ObjectId failed for value')){
-            res.render('widget', {
-                track: null,
-                full_address,
-            });
-        }else{
-            console.log(error)
-        }
+        console.log(error);
     })
 });
 

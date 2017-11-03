@@ -6,10 +6,6 @@ const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
 const limiter = require('express-better-ratelimit_hs_specific');
 
-router.use(cors());
-
-router.use('/listen', require('../../../API/listen'));
-
 router.use('/widget', require('../../../API/widget'));
 
 router.use('/auth/register', require('../../../API/auth/register'));
@@ -25,6 +21,10 @@ router.use('/oauth1/token/access', require('../../../API/auth/token/accessToken'
 // Third party oAuth
 router.use('/oauth1/thirdparty/poniverse', require('../../../API/auth/thirdparty/poniverse'));
 router.use('/oauth1/thirdparty/facebook', require('../../../API/auth/thirdparty/facebook'));
+
+router.use(cors());
+
+router.use('/listen', require('../../../API/listen'));
 
 router.use(limiter({
     duration: 900000, // 15 min
@@ -53,8 +53,7 @@ router.use((req, res, next) => {
             .then(user => {
                 if(user === null){
                     res.json({
-                        error: true,
-                        msg: 'Can\'t not found your user id',
+                        error: 'Can\'t not found your user id',
                         code: 'bad_authentication',
                     });
                     return false;
@@ -69,8 +68,7 @@ router.use((req, res, next) => {
             .catch(error => {
                 if(error.message.includes('Cast to ObjectId failed for value')){
                     res.json({
-                        error: true,
-                        msg: 'Can\'t not found your user id',
+                        error: 'Can\'t not found your user id',
                         code: 'bad_authentication',
                     });
                     return false;
@@ -80,8 +78,7 @@ router.use((req, res, next) => {
             })
         }else{
             res.json({
-                error: true,
-                msg: `Not authenticated domain`,
+                error: `Not authenticated domain`,
                 code: 'bad_authentication',
             });
             return false;
@@ -97,8 +94,7 @@ router.use((req, res, next) => {
             _rightAccess = rightAccess;
             if(rightAccess === null){
                 res.json({
-                    error: true,
-                    msg: 'Bad access token',
+                    error: 'Bad access token',
                     code: 'bad_authentication',
                 });
                 return false;

@@ -2,16 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Tracks = require('../schema/Tracks');
 const path = require('path');
-const fs = require('fs');
-const https = require('https');
-const request = require('request');
-const { URL } = require('url');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../src/index').gcsPath,
 });
+const request = require('request');
 
 router.get('/:id?', (req, res) => {
+
     const id = req.params.id;
     if(typeof id === 'undefined'){
         res.json({
@@ -28,31 +26,28 @@ router.get('/:id?', (req, res) => {
 
                 const track = await Tracks.findOne({id});
                 // Check if the file is extened or not
+
+                if(!track){
+                    res.json({
+                        error: 'Can\'t find your audio track source',
+                        code: 'unexpected_result',
+                    });
+                }
+
                 if(track.file.extend){
-                    const myUrl = new URL(track.file.location);
-                    const baseName = path.basename(myUrl.pathname)
-                    const extName = path.extname(baseName);
-                    if(extName.endsWith('.ogg') || extName.endsWith('mp3')){
-                        // Go stream the audio to the user
+                    // res.set('Cache-Control', 'public, max-no-cache');
+                    res.set('Cache-Control', 'public, max-31557600');
+                    res.set('Transfer-Encodin', 'chunked');
+                    res.set('Content-Type', 'application/octet-stream');
+                    // Stream the audio from GCS
+                    // const stream = gcs.bucket('hs-track')
+                    // .file(baseName)
+                    // .createReadStream()
+                    // console.log(stream)
+                    // res.pipe(stream);
+                    // https.get(track.file.location).pipe(res);
+                    request.get(track.file.location).pipe(res);
 
-                        switch (extName){
-                            case '.ogg':
-                                res.setHeader('Content-Type', 'audio/ogg');
-                                break;
-                            case '.mp3':
-                                res.setHeader('Content-Type', 'audio/mp3');
-                                break;
-                        }
-                        res.set('Cache-Control', 'public, max-age=31557600');
-                        // Stream the audio from GCS
-                        gcs.bucket('hs-track')
-                        .file(baseName)
-                        .createReadStream()
-                        .pipe(res)
-
-                    }else{
-                        res.end(`${extName} is not an valid audio file type`);
-                    }
                 }else{
                     // Send back the audio file
                     const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);
@@ -60,12 +55,7 @@ router.get('/:id?', (req, res) => {
                 }
             }
             catch(error){
-                if(error.message.includes('Cast to ObjectId failed for value')){
-                    res.setHeader('Content-Type', 'audio/mp3');
-                    res.end(null);
-                }else{
-                    console.log(error);
-                }
+                console.log(error);
             }
         }
     }

@@ -67,7 +67,6 @@ router.delete('/:notificationId', (req, res) => {
     let notificationIndex;
 
     user.notification.forEach(notifyObject => {
-        console.log(notifyObject)
         if(notifyObject.id === notificationId){
             findIt = true;
         }

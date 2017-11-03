@@ -178,7 +178,6 @@ router.post('/', (req, res) => {
                                                 .then(response => {
                                                     const jobId = response.Convertfile.id;
                                                     const waitingStatusCode = setInterval(function() {
-                                                        console.log('fetching status code');
                                                         return rp({
                                                             url: 'http://api.filezigzag.com/fzz.svc/Getfile',
                                                             method: 'POST',

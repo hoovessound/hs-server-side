@@ -166,7 +166,7 @@ class FindTrack {
                     error: 'Bad permission scoping',
                     code: 'service_lock_down',
                 });
-                return false;
+                // return false;
             }
         }
 

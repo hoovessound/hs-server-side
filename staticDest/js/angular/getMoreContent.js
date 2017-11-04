@@ -9,7 +9,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
         }
         $http({
             method: 'GET',
-            url: '/api/tracks?offset=' + offset + '&bypass=true',
+            url: full_address_util.addSubdomain('api', '/tracks?offset=' + offset + '&bypass=true'),
             headers: {
                 token: token,
                 sessionToken: sessionToken
@@ -18,7 +18,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
             if (!data.data.error) {
                 offset += 10;
                 data.data.tracks.forEach(function (track, index) {
-                    var html = '<div id="' + track._id + '" style="background-image: url(' + track.coverImage + ');" class="trackContainer">\n                        <div class="playPuaseButton material-icons" fullname="' + track.author.fullName + '" username="' + track.author.username + '" title="' + track.title + '" trackid="' + track.id + '" onclick="playMusic(this)">play_arrow</div>\n                        <a href="' + full_address + '/track/' + track.author.username + '/' + track.title + '" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="' + track.author.fullName + '" username="' + track.author.username + '" title="' + track.title + '" class="trackName">' + track.author.fullName + ' - ' + track.title + '</a>\n                    </div>';
+                    var html = '<div id="' + track._id + '" style="background-image: url(' + track.coverImage + ');" class="trackContainer">\n                        <div class="playPuaseButton material-icons" fullname="' + track.author.fullName + '" username="' + track.author.username + '" title="' + track.title + '" trackid="' + track.id + '" onclick="playMusic(this)">play_arrow</div>\n                        <a href="/track/' + track.author.username + '/' + track.title + '" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="' + track.author.fullName + '" username="' + track.author.username + '" title="' + track.title + '" class="trackName">' + track.author.fullName + ' - ' + track.title + '</a>\n                    </div>';
                     document.querySelector('.tracks').innerHTML += html;
                     if (history.pushState) {
                         if (index === 9) {

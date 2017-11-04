@@ -4,7 +4,7 @@ var shareButton = document.querySelector('.share');
 
 faveButton.addEventListener('click', e => {
     var el = e.target;
-    ajax.open('POST', `/api/track/fave/${trackid}?bypass=true`);
+    ajax.open('POST', `api.${full_address}/track/fave/${trackid}?bypass=true`);
     ajax.setRequestHeader('token', token);
     ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send();

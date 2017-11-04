@@ -13,7 +13,7 @@ iconInput.addEventListener('change', e => {
     var file = e.target.files[0];
     var form = new FormData();
     form.append('image', file);
-    ajax.open('POST', '/api/settings/profilepicture/upload?bypass=true');
+    ajax.open('POST', `api.${full_address}/settings/profilepicture/upload?bypass=true`);
     ajax.setRequestHeader('token', token);
     console.log(sessionToken)
     ajax.setRequestHeader('sessionToken', sessionToken);
@@ -53,7 +53,7 @@ fullname.addEventListener('focusout', e => {
 
 function updateFullName(e) {
     e.preventDefault();
-    ajax.open('POST', '/api/settings?bypass=true');
+    ajax.open('POST', full_address_util.addSubdomain('api', `/settings?bypass=true`));
     ajax.setRequestHeader('token', token);
     ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.setRequestHeader('Content-Type', 'application/json');

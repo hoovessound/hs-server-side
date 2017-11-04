@@ -6,9 +6,5 @@ angular.module('homeTrackLink', ['ngRoute'])
             var username = target.getAttribute('username');
             var title = target.getAttribute('title');
             $location.url(`/track/${username}/${title}`);
-            $http({
-                method: 'GET',
-                url: `/track/${username}/${title}`
-            })
         }
     })

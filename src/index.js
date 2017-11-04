@@ -1,6 +1,5 @@
 const express = require('express');
 const http = require('http');
-const https = require('https');
 const tls = require('tls');
 const fs = require('fs');
 const app = express();
@@ -12,7 +11,6 @@ const randomstring = require('randomstring');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const fsp = require('fs-promise');
-const cli = require('commander');
 const color = require('cli-color');
 const compression = require('compression');
 const helmet = require('helmet');
@@ -21,14 +19,10 @@ const Users = require('../schema/Users');
 const cookie = require('cookie');
 const request = require('request');
 const csurf = require('csurf');
+const subdomain = require('express-subdomain');
 
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
-
-cli
-.version('1.0.0')
-.option('--port [number]', 'The port that HoovesSound will running on')
-.parse(process.argv);
 
 // Settings up MongoDB
 if (process.env.DB) {
@@ -88,7 +82,7 @@ if(process.env.FILEZIGZAG_TOKEN){
 }
 
 // Setting up the app port
-const port = process.env.PORT || cli.port || 3000;
+const port = 3000;
 const sslPath = function (fileName) {
     const p = path.join(`/etc/letsencrypt/live/hoovessound.ml/${fileName}`);
     if(fs.existsSync(p)){
@@ -97,11 +91,6 @@ const sslPath = function (fileName) {
         return null
     }
 };
-
-// const options = {
-//     cert: process.env.HSSSL_FULLCHAIN,
-//     key: process.env.HSSSL_PRIVKEY,
-// };
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
@@ -159,21 +148,7 @@ app.use(compression());
 
 // Productions only settings
 if (process.env.NODE_ENV === 'production') {
-    // app.use((req, res, next) => {
-    //     // HTTP to HTTPS
-    //     if (req.secure) {
-    //         return next();
-    //     } else {
-    //         res.redirect(301, 'https://' + req.hostname + req.url);
-    //     }
-    // });
-
-    // Create an HTTPS version of HS
-
-//     https.createServer(options, app).listen(8443, () => {
-//         console.log(`SSL is listening on port ${color.blue(8443)}`);
-//     });
-
+    // Production
 } else {
     // Development only settings
     
@@ -194,7 +169,12 @@ app.use((req, res, next) => {
 });
 
 // No CSRF check
-app.use('/api', require('./router/API/base'));
+
+app.use(subdomain('api', require('./router/API/base')));
+
+app.use(subdomain('id', require('./router/ID/id')));
+
+app.use(subdomain('stream', require('../API/listen')));
 
 io.on('connection', (socket) => {
     const clientCookie = cookie.parse(socket.handshake.headers.cookie);
@@ -259,5 +239,4 @@ app.use(function (err, req, res, next) {
     res.redirect(link);
 });
 
-const view = require('./router/view/base');
-app.use('/', view);
+app.use('/', require('./router/view/base'));

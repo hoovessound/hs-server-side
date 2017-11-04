@@ -8,9 +8,5 @@ angular.module('masterPlayerTitle', ['ngRoute']).controller('masterPlayerTitle',
         var title = target.getAttribute('title');
         var url = '/track/' + username + '/' + title;
         $location.url(url);
-        $http({
-            method: 'GET',
-            url: url
-        });
     };
 });

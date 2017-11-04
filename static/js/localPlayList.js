@@ -14,7 +14,7 @@ var localPlayList = {
         }
         localPlayList.currentIndex += 1;
         // Fetch the track info
-        ajax.open('GET', `/api/track/${localPlayList.playList[localPlayList.currentIndex]}?bypass=true`);
+        ajax.open('GET', full_address_util.addSubdomain('api', `/track/${localPlayList.playList[localPlayList.currentIndex]}?bypass=true`));
         ajax.setRequestHeader('token', token);
         ajax.setRequestHeader('sessionToken', sessionToken);
         ajax.send();

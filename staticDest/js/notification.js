@@ -49,7 +49,7 @@ function removePayload(e) {
     e.preventDefault();
     var target = e.target;
     var id = target.getAttribute('payloadId');
-    ajax.open('DELETE', full_address + '/api/notification/' + id + '?bypass=true');
+    ajax.open('DELETE', full_address_util.addSubdomain('api', '/notification/' + id + '?bypass=true'));
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.setRequestHeader('token', token);
     ajax.setRequestHeader('sessionToken', sessionToken);

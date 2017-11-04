@@ -14,9 +14,5 @@ angular.module('toEditLink', ['ngRoute']).controller('toEditLink', function ($sc
             url = '/track/' + username + '/' + title + '/';
         }
         $location.url(url);
-        $http({
-            method: 'GET',
-            url: url
-        });
     };
 });

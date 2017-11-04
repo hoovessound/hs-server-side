@@ -13,9 +13,5 @@ angular.module('toEditLink', ['ngRoute'])
                 url = `/track/${username}/${title}/`
             }
             $location.url(url);
-            $http({
-                method: 'GET',
-                url,
-            })
         }
     })

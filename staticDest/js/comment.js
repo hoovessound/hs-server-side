@@ -17,7 +17,7 @@ input.addEventListener('keydown', function (e) {
 
 function postComment(text) {
     var ajax = new XMLHttpRequest();
-    ajax.open('POST', '/api/track/comment/' + trackid + '?bypass=true');
+    ajax.open('POST', full_address_util.addSubdomain('api', '/track/comment/' + trackid + '?bypass=true'));
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.setRequestHeader('token', token);
     ajax.setRequestHeader('sessionToken', sessionToken);
@@ -33,7 +33,7 @@ function postComment(text) {
                 var container = document.createElement('div');
                 container.class = 'comment';
                 var link = document.createElement('a');
-                link.href = full_address + '/user/' + response.author.username;
+                link.href = '/@' + response.author.username;
                 link.innerHTML = response.author.fullName;
                 var comment = document.createElement('p');
                 comment.innerHTML = response.commentObject.comment;

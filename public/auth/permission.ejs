@@ -27,7 +27,7 @@
             <img src="<%=user.icon%>" alt="User's profile picture" id="userIcon"/>
         </div>
 
-        <form id="loginForm" action="/api/oauth1/token/temporary/permission?<%-rawQuery%>" method="post" enctype="application/x-www-form-urlencoded">
+        <form id="loginForm" action="/permission?<%-rawQuery%>" method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <input type="hidden" name="uid" value="<%=uid%>">
             <%if(typeof appName !== 'undefined'){%>

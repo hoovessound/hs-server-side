@@ -27,7 +27,7 @@ angular.module('uploadTrack', ['ngRoute']).controller('uploadTrack', function ($
         if (fileInput.files[0]) {
             var file = fileInput.files[0];
             var form = new FormData();
-            uploadAjax.open('POST', '/api/upload?bypass=true');
+            uploadAjax.open('POST', full_address_util.addSubdomain('api', '/upload?bypass=true'));
             form.append('audio', file);
             form.append('title', title.value);
             form.append('description', description.value);

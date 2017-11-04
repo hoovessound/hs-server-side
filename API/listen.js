@@ -39,15 +39,7 @@ router.get('/:id?', (req, res) => {
                     res.set('Cache-Control', 'public, max-31557600');
                     res.set('Transfer-Encodin', 'chunked');
                     res.set('Content-Type', 'application/octet-stream');
-                    // Stream the audio from GCS
-                    // const stream = gcs.bucket('hs-track')
-                    // .file(baseName)
-                    // .createReadStream()
-                    // console.log(stream)
-                    // res.pipe(stream);
-                    // https.get(track.file.location).pipe(res);
                     request.get(track.file.location).pipe(res);
-
                 }else{
                     // Send back the audio file
                     const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);

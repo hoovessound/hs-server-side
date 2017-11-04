@@ -8,7 +8,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
         }
         $http({
             method: 'GET',
-            url: `/api/tracks?offset=${offset}&bypass=true`,
+            url: full_address_util.addSubdomain('api', `/tracks?offset=${offset}&bypass=true`),
             headers: {
                 token,
                 sessionToken,
@@ -20,7 +20,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
                 data.data.tracks.forEach((track, index) => {
                     const html = `<div id="${track._id}" style="background-image: url(${track.coverImage});" class="trackContainer">
                         <div class="playPuaseButton material-icons" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" trackid="${track.id}" onclick="playMusic(this)">play_arrow</div>
-                        <a href="${full_address}/track/${track.author.username}/${track.title}" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" class="trackName">${track.author.fullName} - ${track.title}</a>
+                        <a href="/track/${track.author.username}/${track.title}" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="${track.author.fullName}" username="${track.author.username}" title="${track.title}" class="trackName">${track.author.fullName} - ${track.title}</a>
                     </div>`;
                     document.querySelector('.tracks').innerHTML += html;
                     if (history.pushState) {

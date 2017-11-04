@@ -1836,6 +1836,10 @@ expect-ct@0.1.0:
   dependencies:
     ipchecker "*"
 
+express-subdomain@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/express-subdomain/-/express-subdomain-1.0.5.tgz#990ef97940b7f4c2823d9593648b79be858a638b"
+
 express@^4.15.3:
   version "4.15.3"
   resolved "https://registry.yarnpkg.com/express/-/express-4.15.3.tgz#bab65d0f03aa80c358408972fc700f916944b662"
@@ -3912,6 +3916,10 @@ parse-bmfont-xml@^1.1.0:
   dependencies:
     xml-parse-from-string "^1.0.0"
     xml2js "^0.4.5"
+
+parse-domain@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/parse-domain/-/parse-domain-1.1.0.tgz#6cb05bc9002552773bf7cc4c06dbd60dc939a973"
 
 parse-filepath@^1.0.1:
   version "1.0.1"

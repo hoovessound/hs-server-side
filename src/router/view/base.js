@@ -4,6 +4,7 @@ const fullurl = require('fullurl');
 const Users = require('../../../schema/Users');
 const Tracks = require('../../../schema/Tracks');
 const randomstring = require('randomstring');
+const parseDomain = require('parse-domain');
 
 
 let socketConnection = {};
@@ -31,18 +32,28 @@ router.all('/error/404', (req, res) => {
     res.send('<h1>404</h1><br><p>Page not find :/</p>')
 });
 
+const reLogin = function(req, res) {
+    res.redirect(`${req.protocol}://id.${req.get('host')}${req.originalUrl}?redirect=${fullurl(req)}&service=hs_service_login`);
+}
+
 router.get('*', (req, res) => {
-    const full_address = req.protocol + "://" + req.headers.host;
+    const domain = parseDomain(req.hostname);
+    const full_address = {
+        domain: domain.domain,
+        tld: domain.tld,
+        protocol: req.protocol,
+        host: req.get('host'),
+    }
+
     const token = req.cookies['oauth-token'];
     if(!req.cookies['oauth-token']){
-        res.redirect(`/api/auth/login?redirect=${fullurl(req)}&service=hs_service_login`);
+        reLogin(req, res);
     }else{
         Users.findOne({
             token: token,
         }).then(user => {
             if (user === null) {
-                res.redirect('/api/auth/login?redirect=' + fullurl(req));
-                return false;
+                reLogin(req, res);
             } else {
                 let sessionToken = null;
 

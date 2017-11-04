@@ -8,6 +8,7 @@ const TempTokes = require('../../../schema/TempTokes');
 const crypto = require('crypto');
 const moment = require('moment');
 const url = require('url');
+const parseDomain = require('parse-domain');
 
 router.use(csurf());
 
@@ -107,34 +108,41 @@ router.get('/', csurf(), (req, res) => {
     const rawQuery = url.parse(req.url).query;
     req.session.rawQuery = rawQuery;
 
-    Users.findOne({
-        token: oAuthToken,
-    })
-    .then(user => {
-        if(user){
-            // Have OAuth tokekn
+    if(service){
+        res.render('auth/login', {
+            error: null,
+            message: null,
+            csrfToken: req.csrfToken(),
+            oAuth: req.query.client_id ? true : false,
+        });
+    }else{
+        Users.findOne({
+            token: oAuthToken,
+        })
+        .then(user => {
+            if(user){
+                // Have OAuth tokekn
+    
+                // Logined user
+    
+                // Fastforward to permission page
+    
+                const rawQuery = url.parse(req.url).query;
+                res.render('auth/permission', {
+                    appName: req.hsAuth.app.name,
+                    csrfToken: req.csrfToken(),
+                    error: null,
+                    message: null,
+                    rawQuery,
+                    uid: user._id,
+                    user,
+                    scope: req.scopeInAction.parse,
+                });
+    
+            }else{
+    
+                // Didn't have oAuth token
 
-            // Logined user
-
-            // Fastforward to permission page
-
-            const rawQuery = url.parse(req.url).query;
-            res.render('auth/permission', {
-                appName: req.hsAuth.app.name,
-                csrfToken: req.csrfToken(),
-                error: null,
-                message: null,
-                rawQuery,
-                uid: user._id,
-                user,
-                scope: req.scopeInAction.parse,
-            });
-
-        }else{
-
-            // Didn't have oAuth token
-
-            if(service !== 'hs_service_login'){
                 if(!clientId){
                     res.render('auth/login', {
                         error: true,
@@ -176,19 +184,12 @@ router.get('/', csurf(), (req, res) => {
                         console.log(error);
                     });
                 }
-            }else{
-                res.render('auth/login', {
-                    error: null,
-                    message: null,
-                    csrfToken: req.csrfToken(),
-                    oAuth: req.query.client_id ? true : false,
-                });
             }
-        }
-    })
-    .catch(error => {
-        console.log(error);
-    })
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 });
 
 router.post('/', csurf(), (req, res) => {
@@ -284,10 +285,12 @@ router.post('/', csurf(), (req, res) => {
                 return bcrypt.compare(req.body.password, user.password).then(same => {
                     if(same){
                         const rawQuery = url.parse(req.url).query;
-
+                        const domain = parseDomain(req.hostname);
                         res.cookie('oauth-token', user.token, {
-                            maxAge: 365 * 24 * 60 * 60,
-                            httpOnly: true,
+                            maxAge: 3600 * 1000 * 24 * 365 * 10,
+                            httpOnly: false,
+                            // cors all HS subdomains
+                            domain: `.${domain.domain}.${domain.tld}`,
                         });
 
                         if(service === 'hs_service_login'){

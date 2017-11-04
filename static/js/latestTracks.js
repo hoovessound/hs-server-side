@@ -19,8 +19,8 @@ audio.addEventListener('ended', e => {
 io.on('audio:fromserver:change', function(payload) {
     masterTitle.innerHTML = `${payload.fullName} - ${payload.title}`;
     masterPlayer.classList.add('remotePlay');
-    masterTitle.href = `${$full_address}/track/${payload.username}/${payload.title}`;
-    audio.src = `${$full_address}/api/listen/${payload.trackID}?token=${$token}`;
+    masterTitle.href = `/track/${payload.username}/${payload.title}`;
+    audio.src = full_address_util.addSubdomain('stream', `/${payload.trackID}`);
     audio.pause();
     masterPlayPuaseButton.innerHTML = 'pause';
 });
@@ -67,8 +67,8 @@ function playMusic(el){
     var fullName = el.getAttribute('fullname');
     var username = el.getAttribute('username');
     masterTitle.innerHTML = `${fullName} - ${title}`;
-    masterTitle.href = `${$full_address}/track/${username}/${title}`;
-    audio.src = `${$full_address}/api/listen/${trackID}`;
+    masterTitle.href = `track/${username}/${title}`;
+    audio.src = full_address_util.addSubdomain('stream', `/${trackID}`);
     audio.play();
     audio.onloadedmetadata = function () {
         masterPlayerTimeStamp.max = audio.duration;

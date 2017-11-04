@@ -1,18 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
-const oAuthApps = require('../../../schema/oAuthApps');
-const Users = require('../../../schema/Users');
-const AccessTokes = require('../../../schema/AccessTokes');
 const limiter = require('express-better-ratelimit_hs_specific');
 
 router.use('/widget', require('../../../API/widget'));
-
-router.use('/auth/register', require('../../../API/auth/register'));
-
-router.use('/auth/login', require('../../../API/auth/login'));
-
-router.use('/auth/changepassword', require('../../../API/auth/changepassword'));
 
 router.use('/oauth1/token/temporary', require('../../../API/auth/token/tempToken'));
 
@@ -24,8 +15,6 @@ router.use('/oauth1/thirdparty/facebook', require('../../../API/auth/thirdparty/
 
 router.use(cors());
 
-router.use('/listen', require('../../../API/listen'));
-
 router.use(limiter({
     duration: 900000, // 15 min
     max: 500,
@@ -35,85 +24,6 @@ router.use(limiter({
     }
 }));
 
-// Basic API auth
-router.use((req, res, next) => {
-    const bypass = req.query.bypass;
-    const service = req.query.service;
-    // In site use case
-
-    if(bypass === 'true' || service){
-        // Check for the host name
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const sessionToken = req.headers.sessiontoken;
-        const token = req.headers.token;
-        if(sessionToken === req.session.sessionToken){
-            Users.findOne({
-                token,
-            })
-            .then(user => {
-                if(user === null){
-                    res.json({
-                        error: 'Can\'t not found your user id',
-                        code: 'bad_authentication',
-                    });
-                    return false;
-                }else{
-                    req.hsAuth = {
-                        token,
-                        user,
-                    }
-                    next();
-                }
-            })
-            .catch(error => {
-                if(error.message.includes('Cast to ObjectId failed for value')){
-                    res.json({
-                        error: 'Can\'t not found your user id',
-                        code: 'bad_authentication',
-                    });
-                    return false;
-                }else{
-                    console.log(error)
-                }
-            })
-        }else{
-            res.json({
-                error: `Not authenticated domain`,
-                code: 'bad_authentication',
-            });
-            return false;
-        }
-    }else{
-        // Normal API calls
-        const accessToken = req.headers.authorization || req.headers.access_token;
-        let _rightAccess;
-        AccessTokes.findOne({
-            token: accessToken,
-        })
-        .then(rightAccess => {
-            _rightAccess = rightAccess;
-            if(rightAccess === null){
-                res.json({
-                    error: 'Bad access token',
-                    code: 'bad_authentication',
-                });
-                return false;
-            }
-            return Users.findOne({_id: rightAccess.author.user});
-        })
-        .then(user => {
-            // Rate limit control
-            req.hsAuth = {
-                user,
-                app: _rightAccess,
-            };
-            next();
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
-});
 
 router.use('/tracks', require('../../../API/home'));
 

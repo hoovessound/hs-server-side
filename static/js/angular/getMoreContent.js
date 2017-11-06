@@ -8,11 +8,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
         }
         $http({
             method: 'GET',
-            url: full_address_util.addSubdomain('api', `/tracks?offset=${offset}&bypass=true`),
-            headers: {
-                token,
-                sessionToken,
-            }
+            url: full_address_util.addSubdomain('api', `/tracks?offset=${offset}&bypass=true&oauth_token=${token}`),
         })
         .then(data => {
             if (!data.data.error) {

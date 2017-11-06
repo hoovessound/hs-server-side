@@ -4,9 +4,7 @@ var shareButton = document.querySelector('.share');
 
 faveButton.addEventListener('click', e => {
     var el = e.target;
-    ajax.open('POST', `api.${full_address}/track/fave/${trackid}?bypass=true`);
-    ajax.setRequestHeader('token', token);
-    ajax.setRequestHeader('sessionToken', sessionToken);
+    ajax.open('POST', `api.${full_address}/track/fave/${trackid}?bypass=true&oauth_token=${token}`);
     ajax.send();
     if(el.classList.contains('isFave')){
         el.classList.remove('isFave');

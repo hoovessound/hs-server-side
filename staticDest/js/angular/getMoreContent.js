@@ -9,11 +9,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
         }
         $http({
             method: 'GET',
-            url: full_address_util.addSubdomain('api', '/tracks?offset=' + offset + '&bypass=true'),
-            headers: {
-                token: token,
-                sessionToken: sessionToken
-            }
+            url: full_address_util.addSubdomain('api', '/tracks?offset=' + offset + '&bypass=true&oauth_token=' + token)
         }).then(function (data) {
             if (!data.data.error) {
                 offset += 10;

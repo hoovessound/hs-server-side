@@ -35,44 +35,36 @@ router.use((req, res, next) => {
         // Check for the host name
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const sessionToken = req.headers.sessiontoken;
-        const token = req.headers.token;
-        if(sessionToken === req.session.sessionToken){
-            Users.findOne({
-                token,
-            })
-            .then(user => {
-                if(user === null){
-                    res.json({
-                        error: 'Can\'t not found your user id',
-                        code: 'bad_authentication',
-                    });
-                    return false;
-                }else{
-                    req.hsAuth = {
-                        token,
-                        user,
-                    }
-                    next();
+        const token = req.query.oauth_token;
+        Users.findOne({
+            token,
+        })
+        .then(user => {
+            if(user === null){
+                res.json({
+                    error: `Not authenticated domain`,
+                    code: 'bad_authentication',
+                });
+                return false;
+            }else{
+                req.hsAuth = {
+                    token,
+                    user,
                 }
-            })
-            .catch(error => {
-                if(error.message.includes('Cast to ObjectId failed for value')){
-                    res.json({
-                        error: 'Can\'t not found your user id',
-                        code: 'bad_authentication',
-                    });
-                    return false;
-                }else{
-                    console.log(error)
-                }
-            })
-        }else{
-            res.json({
-                error: `Not authenticated domain`,
-                code: 'bad_authentication',
-            });
-            return false;
-        }
+                next();
+            }
+        })
+        .catch(error => {
+            if(error.message.includes('Cast to ObjectId failed for value')){
+                res.json({
+                    error: `Not authenticated domain`,
+                    code: 'bad_authentication',
+                });
+                return false;
+            }else{
+                console.log(error)
+            }
+        })
     }else{
         // Normal API calls
         const accessToken = req.headers.authorization || req.headers.access_token;

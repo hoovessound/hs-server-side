@@ -54,9 +54,7 @@ fullname.addEventListener('focusout', function (e) {
 
 function updateFullName(e) {
     e.preventDefault();
-    ajax.open('POST', full_address_util.addSubdomain('api', '/settings?bypass=true'));
-    ajax.setRequestHeader('token', token);
-    ajax.setRequestHeader('sessionToken', sessionToken);
+    ajax.open('POST', full_address_util.addSubdomain('api', '/settings?bypass=true&oauth_token=' + token));
     ajax.setRequestHeader('Content-Type', 'application/json');
     ajax.send(JSON.stringify({
         settings: {

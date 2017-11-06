@@ -17,10 +17,8 @@ input.addEventListener('keydown', function (e) {
 
 function postComment(text) {
     var ajax = new XMLHttpRequest();
-    ajax.open('POST', full_address_util.addSubdomain('api', '/track/comment/' + trackid + '?bypass=true'));
+    ajax.open('POST', full_address_util.addSubdomain('api', '/track/comment/' + trackid + '?bypass=true&oauth_token=' + token));
     ajax.setRequestHeader('Content-Type', 'application/json');
-    ajax.setRequestHeader('token', token);
-    ajax.setRequestHeader('sessionToken', sessionToken);
     ajax.send(JSON.stringify({
         comment: text
     }));

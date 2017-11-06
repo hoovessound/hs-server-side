@@ -20,6 +20,8 @@ const cookie = require('cookie');
 const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
+const url = require('url');
+const parseDomain = require('parse-domain');
 
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
@@ -126,10 +128,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(`${__dirname}/../public`));
 app.set('trust proxy', 1);
 app.use(cookieParser());
+
 app.use(cookieSession({
     name: `hoovessound`,
     keys: [randomstring.generate(30)],
-    maxAge: 365 * 24 * 60 * 60,
 }));
 
 const io = require('socket.io').listen(server);

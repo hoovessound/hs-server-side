@@ -55,15 +55,7 @@ router.get('*', (req, res) => {
             if (user === null) {
                 reLogin(req, res);
             } else {
-                let sessionToken = null;
-
-                if(!req.session.sessionToken){
-                    sessionToken = randomstring.generate(30);
-                    req.session.sessionToken = sessionToken;
-                }else{
-                    sessionToken = req.session.sessionToken;
-                }
-
+                req.session.sessionToken = randomstring.generate(10);
                 return Tracks.findOne({
                     $or: [
                         {
@@ -96,7 +88,7 @@ router.get('*', (req, res) => {
                                     year: new Date().getFullYear(),
                                     initAudioSource: `${full_address}/api/listen/${lastTrack.id}`,
                                     volume: 100,
-                                    sessionToken,
+                                    sessionToken: req.session.sessionToken,
                                 });
                             }else{
                                 res.render('index', {
@@ -110,12 +102,11 @@ router.get('*', (req, res) => {
                                     initAudioSource: `${full_address}/api/listen/${track.id}`,
                                     volume: user.lastPlay.volume,
                                     playTimeValue: true,
-                                    sessionToken,
+                                    sessionToken: req.session.sessionToken,
                                 });
                             }
                         })
                     }else{
-                        console.log('No last play')
                         res.render('index', {
                             loginUser: user,
                             track,
@@ -126,7 +117,7 @@ router.get('*', (req, res) => {
                             year: new Date().getFullYear(),
                             initAudioSource: `${full_address}/api/listen/${track.id}`,
                             volume: 100,
-                            sessionToken,
+                            sessionToken: req.session.sessionToken,
                         });
                     }
                 })

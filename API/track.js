@@ -31,6 +31,9 @@ class FindTrack {
                 id,
             }, {
                 file: 0,
+                __v: 0,
+                _id: 0,
+                comments: 0,
             })
 
             if(!this.req.query.bypass){
@@ -248,7 +251,7 @@ router.post('/edit/:id?', (req, res) => {
         });
         return false;
     }
-
+    
     const form = formidable.IncomingForm({
         uploadDir: path.join(`${__dirname}/../usersContent`),
     });
@@ -264,8 +267,12 @@ router.post('/edit/:id?', (req, res) => {
 
             const user = req.hsAuth.user;
 
+            console.log(fields)
+
             // Check if the track exist
-            return Tracks.findById(id, {
+            return Tracks.findOne({
+                id,
+            }, {
                 file: 0,
             }).then(track => {
                 if(track.author.username !== user.username){
@@ -359,7 +366,16 @@ router.post('/edit/:id?', (req, res) => {
                             }, track).then(() => {
                                 // Finish
                                 res.json({
-                                    track,
+                                    id: track.id,
+                                    title: track.title,
+                                    uploadDate: track.uploadDate,
+                                    description: track.description,
+                                    private: track.private,
+                                    coverImage: track.coverImage,
+                                    author: {
+                                        username: track.author.username,
+                                        fullName: track.author.fullName,
+                                    }
                                 });
                             });
                         }

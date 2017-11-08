@@ -44,6 +44,11 @@ router.post('/:query?', (req, res) => {
             password: 0,
             tracks: 0,
             token: 0,
+            _id: 0,
+            __v: 0,
+            thirdparty: 0,
+            notification: 0,
+            lastPlay: 0,
         }),
         Tracks.find({
             title: regex,
@@ -59,6 +64,10 @@ router.post('/:query?', (req, res) => {
             ]
         }, {
             file: 0,
+            _id: 0,
+            __v: 0,
+            comments: 0,
+            fave: 0,
         })
     ])
     .then(response => {

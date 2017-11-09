@@ -195,7 +195,7 @@ class FindTrack {
             };
             track.comments.push(commentObject);
             await Tracks.update({
-                _id: trackId,
+                id: trackId,
             }, track);
 
             this.res.json({

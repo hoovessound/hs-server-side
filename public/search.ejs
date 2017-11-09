@@ -4,7 +4,7 @@
     <%if(users){%>
     <%users.forEach(user => {%>
     <div class="user">
-        <a href="<%=full_address%>/user/<%=user.username%>">
+        <a href="/@<%=user.username%>">
             <img src="<%=user.icon%>" alt="" class="icon">
             <%=user.fullName%>
         </a>
@@ -16,8 +16,8 @@
     <%tracks.forEach((track) => {%>
     <div style="background-image: url(<%=track.coverImage%>);" class="trackContainer">
         <script>localPlayList.addTrack('<%-track.id%>')</script>
-        <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track.id%>" onclick="playMusic(this)">play_arrow</div>
-        <a href="/track/<%=track.author.username%>/<%=track.title%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" class="trackName"><%=track.author.fullName%> - <%=track.title%></a>
+        <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackId="<%=track.id%>" onclick="playMusic(this)">play_arrow</div>
+                <a href="/track/<%=track.id%>" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" class="trackName" trackId="<%=track.id%>"><%=track.author.fullName%> - <%=track.title%></a>
     </div>
     <%});%>
     <%}%>

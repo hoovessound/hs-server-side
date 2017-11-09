@@ -31,11 +31,30 @@ router.get('/', (req, res) => {
                 }).limit(10).skip(offset).sort({uploadDate: -1});
 
                 const total = await Tracks.count({});
-                res.json({
-                    tracks,
-                    total,
-                });
-
+                
+                tracks.forEach((track, index) => {
+                    return Users.findOne({
+                        id: track.author,
+                    })
+                    .then(user => {
+                        const username = user.username;
+                        const fullName = user.fullName;
+                        tracks[index].author = {
+                            username,
+                            fullName,
+                        };
+                        if(tracks.length === (index + 1) ){
+                            // Finish
+                            res.json({
+                                tracks,
+                                total,
+                            })
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                })
             }
             catch(error){
                 console.log(error);

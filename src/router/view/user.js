@@ -23,33 +23,50 @@ router.get('/:username?', (req, res) => {
                 return Users.findOne({
                     username,
                 }).then(profile => {
-                    
-                    // Check if the user is the ownUser
-                    const ownUser = profile.username === user.username ? true:false;
-                    let searchQuery;
-                    if(ownUser){
-                        searchQuery = {
-                            'author.username': profile.username,
+                    if(profile){
+                        // Check if the user is the ownUser
+                        const ownUser = profile.username === user.username ? true:false;
+                        let searchQuery;
+                        if(ownUser){
+                            searchQuery = {
+                                author: profile.id,
+                            }
+                        }else{
+                            searchQuery = {
+                                author: profile.id,
+                                $or: [
+                                    {
+                                        private: false,
+                                    },
+                                    {
+                                        private: {
+                                            $exists: false,
+                                        }
+                                    }
+                                ]
+                            }
                         }
+                        
+                        return Tracks.find(searchQuery).sort({
+                            uploadDate: -1
+                        }).then(tracks => {
+                            tracks.forEach((track, index) => {
+                                tracks[index].author = {
+                                    username: profile.username,
+                                    fullName: profile.fullName,
+                                }
+                            });
+                            res.render('profile', {
+                                loginUser: user,
+                                profile,
+                                tracks,
+                                full_address,
+                                token,
+                            });
+                        })
                     }else{
-                        searchQuery = {
-                            'author.username': profile.username,
-                            private: false || null,
-                        }
+                        // lol
                     }
-
-                    return Tracks.find(searchQuery).sort({
-                        uploadDate: -1
-                    }).then(tracks => {
-                        res.render('profile', {
-                            loginUser: user,
-                            profile,
-                            tracks,
-                            full_address,
-                            token,
-                        });
-                    })
-
                 })
             }
         }).catch(error => {

@@ -26,7 +26,7 @@
         <%}%>
         <div class="fa fa-heart fave <%=isFave%>"></div>
         <h1 id="title"><%=track.title%></h1>
-        <a style="display: block;" href="/user/<%=track.author.username%>"><%=track.author.username%></a>
+        <p>By <a href="@<%=track.author.username%>">@<%=track.author.username%></a></p>
         <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track.id%>" onclick="playMusic(this)">play_arrow</div><br>
         <a class="share btn btn-info">Widget</a>
         <input type="text" class="shareURL hide" value='<iframe src="<%=full_address%>/api/widget/<%=track.id%>"></iframe>' readonly>

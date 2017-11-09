@@ -34,13 +34,32 @@ router.get('/', (req, res) => {
                 }).limit(10).skip(parseInt(offset)).sort({
                     uploadDate: -1
                 }).then(tracks => {
-                    res.render('tracks', {
-                        tracks,
-                        full_address,
-                        token,
-                        offset,
-                        track: tracks[0],
-                    });
+                    tracks.forEach((track, index) => {
+                        return Users.findOne({
+                            id: track.author,
+                        })
+                        .then(user => {
+                            const username = user.username;
+                            const fullName = user.fullName;
+                            tracks[index].author = {
+                                username,
+                                fullName,
+                            };
+                            if(tracks.length === (index + 1) ){
+                                // Finish
+                                res.render('tracks', {
+                                    tracks,
+                                    full_address,
+                                    token,
+                                    offset,
+                                    track: tracks[0],
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        })
+                    })   
                 })
             }
         }).catch(error => {

@@ -30,95 +30,132 @@ const TextFormattign = {
     }
 }
 
-router.get('/:username?/:title?', (req, res) => {
+router.get('/:id?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     if(!req.cookies['oauth-token']){
         res.end('Access denied');
     }else{
-        const username = req.params.username;
-        const title = req.params.title;
+        const id = req.params.id;
         const token = req.cookies['oauth-token'];
+        let _user;
         let comments = [];
-
         Users.findOne({
             token,
-        }).then(user => {
+        })
+        .then(user => {
             if(user === null){
                 res.end('Access denied');
+            }else{
+                _user = user;
             }
+
             return Tracks.findOne({
-                'author.username': username,
-                title: title,
-            }).then(track => {
-                if(track === null){
-                    res.render('track', {
-                        loginUser: user,
-                        track: null,
-                        comments: null,
-                        full_address,
-                        token,
-                        isFave: 'notFave',
-                        error: `Can't not find your track :/`
-                    });
-                    return false;
-                }
-                // Find out if the user fave this track or not
+                id,
+            })
+        })
+        .then(track => {
+            this.track = track;
+            if(track === null){
+                res.render('track', {
+                    loginUser: _user,
+                    track: null,
+                    comments: null,
+                    full_address,
+                    token,
+                    isFave: 'notFave',
+                    error: `Can't not find your track :/`
+                });
+                return false;
+            }
+            // Find out if the user fave this track or not
 
+            if(track.description){
                 track.description = TextFormattign.url(track.description);
+            }
 
-                if(track.comments.length >= 1){
-                    track.comments.forEach(comment =>{
+            if(track.comments.length >= 1){
+                track.comments.forEach((comment, index) =>{
 
-                        // text formatting
-                        comment.comment = TextFormattign.url(comment.comment);
-                        // Find the user object
-                        return Users.findOne({
-                            _id: comment.author,
-                        }, {
-                            username: 1,
-                            fullName: 1,
-                        }).then(commentUser => {
-                            comments.push({
-                                author: {
-                                    username: commentUser.username,
-                                    fullName: commentUser.fullName,
-                                },
-                                comment: comment.comment,
-                            });
-                            if(comments.length === track.comments.length){
-                                renderPage();
-                            }
-                        });
-                    });
-                }else{
-                    renderPage();
-                }
+                    // Find the user object
+                    return Users.findOne({
+                        id: comment.author,
+                    })
+                    .then(user => {
+                        if(!user){
+                            // Remove the comment
+                            track.comments[index] = null;
+                        }else{
+                            // text formatting
+                            this.track.comments[index].comment = TextFormattign.url(this.track.comments[index].comment);
+                            this.track.comments[index].author = {
+                                username: user.username,
+                                fullName: user.fullName,
+                            };
+                        }
+                        if(track.comments.length === (index + 1) ){
+                            // Find the track author
+                            renderPage();
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
 
-                function renderPage() {
-                    if(user.fave.includes(track.id)){
+                });
+            }else{
+                renderPage();
+            }
+
+            function renderPage() {
+
+                // Find the track author
+                return Users.findOne({
+                    id: track.author,
+                })
+                .then(trackAuthor => {
+
+                    let isFave = 'isFave'
+                    if(_user.fave.includes(track.id)){
+                        isFave = 'isFave';
+                    }else{
+                        isFave = 'notFave';
+                    }
+
+                    if(trackAuthor){
+                        track.author = {
+                            username: trackAuthor.username,
+                            fullName: trackAuthor.fullName,
+                        };
+
                         res.render('track', {
-                            loginUser: user,
+                            loginUser: _user,
                             track,
-                            comments,
+                            comments: track.comments,
                             full_address,
                             token,
-                            isFave: 'isFave',
+                            isFave,
                         });
+
                     }else{
                         res.render('track', {
-                            loginUser: user,
-                            track,
-                            comments,
+                            loginUser: _user,
+                            track: null,
+                            comments: null,
                             full_address,
                             token,
                             isFave: 'notFave',
+                            error: `Can't not find your track :/`
                         });
+                        return false;
                     }
-                }
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            }
 
-                return false;
-            });
-        }).catch(error => {
+        })
+        .catch(error => {
             console.log(error);
         })
     }

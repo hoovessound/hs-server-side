@@ -32,9 +32,9 @@ angular.module('hsRoutes', ['ngRoute'])
                     return `/render/user/${params.username}`;
                 },
             })
-            .when(`/track/:username/:title`, {
+            .when(`/track/:id`, {
                 templateUrl: function(params){
-                    return `/render/track/${params.username}/${params.title}`;
+                    return `/render/track/${params.id}`;
                 },
             })
             .when(`/track/:username/:title/edit`, {

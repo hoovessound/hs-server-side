@@ -7,10 +7,7 @@ const tracksSchema = new Schema({
         location: String,
         extend: Boolean,
     },
-    author: {
-        username: String,
-        fullName: String,
-    },
+    author: Schema.Types.Mixed,
     uploadDate: Date,
     coverImage: {
         type: String,

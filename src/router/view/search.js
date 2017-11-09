@@ -65,13 +65,43 @@ router.get('/:query?', (req, res) => {
                     })
                 ])
                 .then(response => {
-                    res.render('search', {
-                        loginUser: user,
-                        users: response[0],
-                        tracks: response[1],
-                        full_address,
-                        token,
-                    });
+                    // Fetch the tracks author info
+                    const tracks = response[1];
+                    if(tracks.length >= 1){
+                        tracks.forEach((track, index) => {
+                            return Users.findOne({
+                                id: track.author,
+                            })
+                            .then(trackUser => {
+                                tracks[index].author = {
+                                    username: trackUser.username,
+                                    fullName: trackUser.fullName,
+                                }
+
+                                if(tracks.length === (index + 1)){
+                                    res.render('search', {
+                                        loginUser: user,
+                                        users: response[0],
+                                        tracks,
+                                        full_address,
+                                        token,
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
+                        })
+                    }else{
+                        res.render('search', {
+                            loginUser: user,
+                            users: response[0],
+                            tracks: [],
+                            full_address,
+                            token,
+                        });
+                    }
+                    
                 })
 
             }

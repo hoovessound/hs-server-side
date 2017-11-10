@@ -62,37 +62,15 @@ router.post('/', (req, res) => {
         _id: user._id,
     }, user)
     .then(() => {
-        // Return a new user object
-        return Users.findOne({
-            _id: user._id
-        }, {
-            password: 0,
-            tracks: 0,
-            token: 0,
-        })
-        .then(user => {
-            this.user = user;
-            res.json({
-                fullname: this.user.fullName,
-                username: this.user.username,
-                id: this.user.id,
-            });
-            // Update the tracks DB as well
-            return Tracks.find({
-                'author.username': user.username,
-            })
-            .then(tracks => {
-                tracks.forEach(track => {
-                    track.author.fullName = this.user.fullName;
-                    return Tracks.update({
-                        _id: track._id,
-                    }, track)
-                    .catch(error => {
-                        console.log(error);
-                    });
-                });
-            });
+        res.json({
+            fullname: user.fullName,
+            username: user.username,
+            icon: user.icon,
+            id: user.id,
         });
+    })
+    .catch(error => {
+        console.log(error);
     })
 });
 

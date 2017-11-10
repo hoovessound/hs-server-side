@@ -12,6 +12,22 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
         })
         .then(data => {
             if (!data.data.error) {
+
+                // No more tracks
+                if(data.data.tracks.length <= 0){
+                    new Noty({
+                        text: `No more tracks :P`,
+                        animation: {
+                            open: 'animated bounceInRight', // Animate.css class names
+                            close: 'animated bounceOutRight' // Animate.css class names
+                        },
+                        type: 'success',
+                        timeout: 3500
+                    })
+                    .show();
+                    return false;
+                }
+
                 offset += 10;
                 data.data.tracks.forEach((track, index) => {
                     const html = `<div id="${track._id}" style="background-image: url(${track.coverImage});" class="trackContainer">
@@ -28,7 +44,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate'])
             } else {
                 // Error
                 new Noty({
-                    text: `ERROR: ${data.data.msg}`,
+                    text: `ERROR: ${data.data.error}`,
                     animation: {
                         open: 'animated bounceInRight', // Animate.css class names
                         close: 'animated bounceOutRight' // Animate.css class names

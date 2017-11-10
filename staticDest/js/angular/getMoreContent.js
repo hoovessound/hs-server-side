@@ -12,6 +12,21 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
             url: full_address_util.addSubdomain('api', '/tracks?offset=' + offset + '&bypass=true&oauth_token=' + token)
         }).then(function (data) {
             if (!data.data.error) {
+
+                // No more tracks
+                if (data.data.tracks.length <= 0) {
+                    new Noty({
+                        text: 'No more tracks :P',
+                        animation: {
+                            open: 'animated bounceInRight', // Animate.css class names
+                            close: 'animated bounceOutRight' // Animate.css class names
+                        },
+                        type: 'success',
+                        timeout: 3500
+                    }).show();
+                    return false;
+                }
+
                 offset += 10;
                 data.data.tracks.forEach(function (track, index) {
                     var html = '<div id="' + track._id + '" style="background-image: url(' + track.coverImage + ');" class="trackContainer">\n                        <div class="playPuaseButton material-icons" fullname="' + track.author.fullName + '" username="' + track.author.username + '" title="' + track.title + '" trackid="' + track.id + '" onclick="playMusic(this)">play_arrow</div>\n                        <a href="/track/' + track.author.username + '/' + track.title + '" ng-controller="homeTrackLink" ng-click="homeTrackLink($event); $event.stopPropagation();" fullname="' + track.author.fullName + '" username="' + track.author.username + '" title="' + track.title + '" class="trackName">' + track.author.fullName + ' - ' + track.title + '</a>\n                    </div>';
@@ -25,7 +40,7 @@ angular.module('getMoreContent', ['ngRoute', 'ngLocationUpdate']).controller('ge
             } else {
                 // Error
                 new Noty({
-                    text: 'ERROR: ' + data.data.msg,
+                    text: 'ERROR: ' + data.data.error,
                     animation: {
                         open: 'animated bounceInRight', // Animate.css class names
                         close: 'animated bounceOutRight' // Animate.css class names

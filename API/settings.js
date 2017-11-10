@@ -62,6 +62,7 @@ router.post('/', (req, res) => {
         _id: user._id,
     }, user)
     .then(() => {
+        fp.unlinkSync(filePath);
         res.json({
             fullname: user.fullName,
             username: user.username,

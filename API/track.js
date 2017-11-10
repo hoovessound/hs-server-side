@@ -242,6 +242,7 @@ router.post('/fave/:id?', (req, res) => {
 });
 
 router.post('/edit/:id?', (req, res) => {
+
     const id = req.params.id;
     if (!id) {
         res.json({
@@ -261,29 +262,32 @@ router.post('/edit/:id?', (req, res) => {
             console.log(error);
         } else {
 
-            if(req.query.bypass){
-                fields.userid = req.hsAuth.user._id;
-            }
+            fields.userid = req.hsAuth.user._id;
 
             const user = req.hsAuth.user;
-
-            console.log(fields)
 
             // Check if the track exist
             return Tracks.findOne({
                 id,
-            }, {
-                file: 0,
-            }).then(track => {
-                if(track.author.username !== user.username){
+            })
+            .then(track => {
+
+                if(!track){
                     res.json({
                         error: true,
-                        msg: 'You are unauthorized to perform this action',
+                        msg: 'can\'t not find your track',
+                        code: 'unexpected_result',
+                    });
+                    return false;
+                }
+
+                if(track.author !== user.id){
+                    res.json({
+                        error: 'You are unauthorized to perform this action',
                         code: 'unauthorized_action',
                     });
                     return false;
                 }else{
-
                     if(!req.query.bypass){
                         if(track.private){
                             // Check permission
@@ -368,14 +372,9 @@ router.post('/edit/:id?', (req, res) => {
                                 res.json({
                                     id: track.id,
                                     title: track.title,
-                                    uploadDate: track.uploadDate,
                                     description: track.description,
                                     private: track.private,
                                     coverImage: track.coverImage,
-                                    author: {
-                                        username: track.author.username,
-                                        fullName: track.author.fullName,
-                                    }
                                 });
                             });
                         }

@@ -37,9 +37,9 @@ angular.module('hsRoutes', ['ngRoute'])
                     return `/render/track/${params.id}`;
                 },
             })
-            .when(`/track/:username/:title/edit`, {
+            .when(`/track/:id/edit`, {
                 templateUrl: function(params){
-                    return `/render/track/${params.username}/${params.title}/edit`;
+                    return `/render/track/${params.id}/edit`;
                 },
             })
             .when(`/notification`, {

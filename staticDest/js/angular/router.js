@@ -28,9 +28,9 @@ angular.module('hsRoutes', ['ngRoute']).config(function ($routeProvider, $locati
         templateUrl: function templateUrl(params) {
             return '/render/track/' + params.id;
         }
-    }).when('/track/:username/:title/edit', {
+    }).when('/track/:id/edit', {
         templateUrl: function templateUrl(params) {
-            return '/render/track/' + params.username + '/' + params.title + '/edit';
+            return '/render/track/' + params.id + '/edit';
         }
     }).when('/notification', {
         templateUrl: '/render/notification'

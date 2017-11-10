@@ -13,16 +13,12 @@ angular.module('hsEditTracks', ['ngRoute']).controller('editTrack', function ($s
         ajax.open('POST', full_address_util.addSubdomain('api', '/track/edit/' + trackid + '?bypass=true&oauth_token=' + token));
         ajax.send(formData);
         ajax.onload = function () {
-            var response = JSON.parse(ajax.response).track;
+            var response = JSON.parse(ajax.response);
             if (!response.error) {
-                $location.url('/track/' + response.author.username + '/' + response.title);
-                $http({
-                    method: 'GET',
-                    url: '/track/' + response.author.username + '/' + response.title
-                });
+                $location.url('/track/' + response.id);
             } else {
                 new Noty({
-                    text: 'ERROR: ' + response.msg,
+                    text: 'ERROR: ' + response.error,
                     animation: {
                         open: 'animated bounceInRight', // Animate.css class names
                         close: 'animated bounceOutRight' // Animate.css class names

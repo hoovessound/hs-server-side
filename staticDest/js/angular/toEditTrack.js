@@ -4,14 +4,13 @@ angular.module('toEditLink', ['ngRoute']).controller('toEditLink', function ($sc
     $scope.toEditLink = function ($event, editing) {
         $event.preventDefault();
         var target = $event.currentTarget;
-        var username = target.getAttribute('username');
-        var title = target.getAttribute('title');
+        var trackId = target.getAttribute('trackId');
         var url;
         editing = typeof editing === 'undefined' ? true : false;
         if (editing) {
-            url = '/track/' + username + '/' + title + '/edit';
+            url = '/track/' + trackId + '/edit';
         } else {
-            url = '/track/' + username + '/' + title + '/';
+            url = '/track/' + trackId;
         }
         $location.url(url);
     };

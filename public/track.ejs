@@ -22,7 +22,7 @@
         <%}else{%>
         <%if(track !== null){%>
         <%if(track.author.username === loginUser.username){%>
-        <a href="<%=full_address%>/track/<%=track.author.username%>/<%=track.title%>/edit" class="btn btn-default" ng-controller="toEditLink" ng-click="toEditLink($event); $event.stopPropagation();" username="<%=track.author.username%>" title="<%=track.title%>">Edit</a>
+        <a href="/track/<%=track.id%>/edit" class="btn btn-default" ng-controller="toEditLink" ng-click="toEditLink($event); $event.stopPropagation();" username="<%=track.author.username%>" title="<%=track.title%>" trackId="<%=track.id%>">Edit</a>
         <%}%>
         <div class="fa fa-heart fave <%=isFave%>"></div>
         <h1 id="title"><%=track.title%></h1>

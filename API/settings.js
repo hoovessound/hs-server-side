@@ -72,7 +72,11 @@ router.post('/', (req, res) => {
         })
         .then(user => {
             this.user = user;
-            res.json(user);
+            res.json({
+                fullname: this.user.fullName,
+                username: this.user.username,
+                id: this.user.id,
+            });
             // Update the tracks DB as well
             return Tracks.find({
                 'author.username': user.username,
@@ -90,11 +94,13 @@ router.post('/', (req, res) => {
             });
         });
     })
+});
 
 // Upload the profile picture
-router.post('/profilepicture/upload', (req, res) => {
+router.post('/profilepicture', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const user = req.hsAuth.user;
+    this.user = req.hsAuth.user;
     if(req.query.bypass !== 'true'){
         res.json({
             error: true,
@@ -163,34 +169,44 @@ router.post('/profilepicture/upload', (req, res) => {
                     width: 50,
                     height: 50,
                     ignoreAspectRatio: true,
-                }).then(processedImage => {
-                    return fp.exists(filePath).then(exists => {
-                        if(exists){
-                            // Upload the file to Google Cloud Storage
-                            const gcsProfilePictures = gcs.bucket('hs-profile-picture');
-                            return gcsProfilePictures.upload(filePath).then(file => {
-                                file = file[0];
-                                return file.makePublic()
-                                .then(url => {
-                                    // Update the new image URL to the DB
-                                    this.user.icon = `https://storage.googleapis.com/hs-profile-picture/${fileID}`;
-                                    return Users.update({
-                                        _id: this.user._id,
-                                    }, this.user).then(() => {
-                                        // Remove the icon from local disk
-                                        fp.unlinkSync(filePath);
-                                        res.json(user);
+                })
+                .then(processedImage => {
+                    return fp.exists(filePath)
+                })
+                .then(exists => {
+                    if(exists){
+                        // Upload the file to Google Cloud Storage
+                        const gcsProfilePictures = gcs.bucket('hs-profile-picture');
+                        return gcsProfilePictures.upload(filePath).then(file => {
+                            file = file[0];
+                            return file.makePublic()
+                            .then(url => {
+                                // Update the new image URL to the DB
+                                this.user.icon = `https://storage.googleapis.com/hs-profile-picture/${fileID}`;
+                                return Users.update({
+                                    _id: this.user._id,
+                                }, this.user).then(() => {
+                                    // Remove the icon from local disk
+                                    fp.unlinkSync(filePath);
+                                    res.json({
+                                        icon: this.user.icon,
                                     });
-                                })
-                            });
-                        }
-                    });
+                                });
+                            })
+                        });
+                    }else{
+                        res.json({
+                            error: 'Something when wrong, please try again later',
+                            code: 'system_error',
+                        })
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
                 })
             }
         });
     });
-
-});
 });
 
 

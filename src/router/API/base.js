@@ -113,6 +113,7 @@ router.use('/settings', require('../../../API/settings'));
 router.use('/notification', require('./../../../API/notification'));
 
 router.all('*', (req, res) => {
+    res.status(404);
     res.json({
         error: 'API endpoint not found',
         docs_url: 'https://hoovessound.ml/developer/docs',

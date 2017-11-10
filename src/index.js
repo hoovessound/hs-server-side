@@ -231,14 +231,10 @@ io.on('connection', (socket) => {
 app.use(csurf());
 app.use(function (err, req, res, next) {
     if (err.code !== 'EBADCSRFTOKEN') return next(err)
-    // Someone just try to CSRF attack my app lol
-    const links = [
-        'https://www.youtube.com/watch?v=dv13gl0a-FA', // Deja Vu
-        'https://www.youtube.com/watch?v=XCiDuy4mrWU', // Running in The 90s
-        'https://www.youtube.com/watch?v=atuFSv2bLa8', // Gas Gas Gas
-    ];
-    const link = links[Math.floor(Math.random()*links.length)];
-    res.redirect(link);
+    res.status(401);
+    res.json({
+        error: 'Incorrect CSRF token',
+    })
 });
 
 app.use('/', require('./router/view/base'));

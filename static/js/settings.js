@@ -13,20 +13,17 @@ iconInput.addEventListener('change', e => {
     var file = e.target.files[0];
     var form = new FormData();
     form.append('image', file);
-    ajax.open('POST', `api.${full_address}/settings/profilepicture/upload?bypass=true`);
-    ajax.setRequestHeader('token', token);
-    console.log(sessionToken)
-    ajax.setRequestHeader('sessionToken', sessionToken);
+    ajax.open('POST', full_address_util.addSubdomain('api', `/settings/profilepicture?bypass=true&oauth_token=${token}`));
     ajax.send(form);
     ajax.onload = function(){
         if(ajax.readyState === 4 && ajax.status === 200){
             var response = JSON.parse(ajax.response);
-            if(response.success){
+            if(!response.error){
                 iconInput.value = null;
                 navImg.src = response.icon;
             }else{
                 new Noty({
-                    text: `ERROR: ${response.msg}`,
+                    text: `ERROR: ${response.error}`,
                     animation: {
                         open: 'animated bounceInRight', // Animate.css class names
                         close: 'animated bounceOutRight' // Animate.css class names

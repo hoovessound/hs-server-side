@@ -17,6 +17,7 @@ const easyimage = require('easyimage');
 const filezizgag = require('../src/index').filezizgag;
 const genId = require('../src/helper/genId');
 const escape = require('escape-html');
+const fileType = require('file-type');
 
 router.post('/', (req, res) => {
 
@@ -64,14 +65,34 @@ router.post('/', (req, res) => {
                 const coverImage = files.image;
 
                 if(coverImage){
-                    if(!coverImage.type.includes('image')){
+                    if(!fileType(fs.readFileSync(coverImage.path)).mime.includes('image')){
                         res.json({
-                            error: true,
-                            msg: 'The image fields is not an image file',
+                            error: 'The image fields is not an image file',
                             code: 'not_valid_file_object',
                         });
                         return false;
                     }
+                }
+
+                // Check the audio file type
+                const audioType = fileType(fs.readFileSync(files.audio.path)).mime;
+                let findAudioType = false;
+                const suportTypes = [
+                    'audio/mp3',
+                    'audio/mpeg',
+                    'audio/ogg'
+                ];
+                suportTypes.forEach(type => {
+                    if(type === audioType){
+                        findAudioType = true;
+                    }
+                });
+                if(!findAudioType){
+                    res.json({
+                        error: 'HoovesSound only suport MP3 or OGG audio file',
+                        code: 'not_valid_file_object',
+                    });
+                    return false;
                 }
 
                 const description = fields.description ? escape(fields.description) : null;
@@ -147,138 +168,12 @@ router.post('/', (req, res) => {
                                     // Get the download url
                                     return file.makePublic()
                                     .then(() => {
-                                        if(files.audio.type.includes('ogg')){
-                                            return rp({
-                                                url: `${full_address}/api/notification`,
-                                                headers: {
-                                                    token,
-                                                },
-                                                method: 'post',
-                                                json: true,
-                                                body: {
-                                                    to: user._id,
-                                                    title: 'Processing your track',
-                                                    body: `We are currently converting your track ${title} to MP3 formet`,
-                                                }
-                                            })
-                                            .then(() => {
-                                                return rp({
-                                                    url: 'http://api.filezigzag.com/fzz.svc/convertfile',
-                                                    method: 'POST',
-                                                    json: true,
-                                                    headers: {
-                                                        token: filezizgag.key,
-                                                    },
-                                                    body: {
-                                                        target: 'mp3',
-                                                        category: 'audio',
-                                                        source: `https://storage.googleapis.com/hs-track/${newAudioId}${ext}`,
-                                                    }
-                                                })
-                                                .then(response => {
-                                                    const jobId = response.Convertfile.id;
-                                                    const waitingStatusCode = setInterval(function() {
-                                                        return rp({
-                                                            url: 'http://api.filezigzag.com/fzz.svc/Getfile',
-                                                            method: 'POST',
-                                                            json: true,
-                                                            headers: {
-                                                                token: filezizgag.key,
-                                                            },
-                                                            body: {
-                                                                id: jobId,
-                                                            }
-                                                        })
-                                                        .then(response => {
-                                                            if(response.Getfile.Status == 7){
-                                                                uploadOggFile(response.Getfile.FileURL);
-                                                            }
-                                                        })
-                                                    }, 30000);
-
-                                                    function uploadOggFile(downloadUrl){
-                                                        clearInterval(waitingStatusCode);
-                                                        // Remove the MP3 from GCS
-                                                        removeGcsTrack();
-                                                        const download = require('download-file');
-                                                        download(downloadUrl, {
-                                                            directory: '../tracks',
-                                                            filename: `${newAudioId}-converted.mp3`
-                                                        }, error => {
-                                                            if(error){
-                                                                console.log(error);
-                                                            }else{
-                                                                // Re-upload the OGG to GCS
-
-                                                                gcs.bucket('hs-track')
-                                                                .upload(newPath)
-                                                                .then(file => {
-                                                                    file = file[0];
-                                                                    return file.makePublic()
-                                                                })
-                                                                .then(() => {
-                                                                    track.file.location = `https://storage.googleapis.com/hs-track/${newAudioId}-converted.mp3`;
-                                                                    track.file.extend = true;
-                                                                    track.private = false;
-                                                                    return Tracks.update({
-                                                                        _id: track._id,
-                                                                    }, track)
-                                                                })
-                                                                .then(() => {
-                                                                    fsp.unlinkSync(newPath);
-                                                                    return rp({
-                                                                        url: `${full_address}/api/notification`,
-                                                                        headers: {
-                                                                            token,
-                                                                        },
-                                                                        method: 'post',
-                                                                        json: true,
-                                                                        body: {
-                                                                            to: user._id,
-                                                                            title: 'Track Is Uploaded!',
-                                                                            body: `${title} Is Uploaded`,
-                                                                            link: `${full_address}/track/${user.username}/${title}`,
-                                                                        }
-                                                                    })
-                                                                })
-                                                                .catch(error => {
-                                                                    console.log(error);
-                                                                })
-                                                            }
-                                                        })
-                                                    }
-
-                                                })
-                                            })
-                                        }else{
-                                            track.file.location = `https://storage.googleapis.com/hs-track/${newAudioId}${ext}`;
-                                            track.file.extend = true;
-                                            track.private = false;
-                                            Tracks.update({
-                                                _id: track._id,
-                                            }, track)
-                                            .then(() => {
-                                                // Remove the local track from the disk
-                                                fs.unlinkSync(path.join(`${__dirname}/../tracks/${newAudioId}${ext}`));
-                                                // Send a notification to the user
-                                                return rp({
-                                                    url: `${full_address}/api/notification?bypass=true`,
-                                                    headers: {
-                                                        token,
-                                                    },
-                                                    method: 'post',
-                                                    json: true,
-                                                    body: {
-                                                        to: user._id,
-                                                        title: 'Track Is Uploaded!',
-                                                        body: `${title} Is Uploaded`,
-                                                        link: `${full_address}/track/${user.username}/${title}`,
-                                                    }
-                                                })
-
-                                            })
-
-                                        }
+                                        track.file.location = `https://storage.googleapis.com/hs-track/${newAudioId}${ext}`;
+                                        track.file.extend = true;
+                                        track.private = false;
+                                        return Tracks.update({
+                                            _id: track._id,
+                                        }, track)
                                     })
                                 })
                                 .catch(error => {

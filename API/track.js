@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Tracks = require('../schema/Tracks');
 const Users = require('../schema/Users');
+const Tags = require('../schema/Tags');
 const mongoose = require('mongoose');
 let status;
 const formidable = require('formidable');
@@ -387,6 +388,58 @@ router.post('/edit/:id?', (req, res) => {
 
                         if(fields.description){
                             track.description = escape(fields.description);
+                        }
+
+                        if(fields.tags){
+                            // Check if the tag already exists
+                            const tags = fields.tags.split(',');
+                            tags.forEach(tag => {
+                                Tags.findOne({
+                                    name: tag,
+                                })
+                                .then(tagInfo => {
+                                    if(!tagInfo){
+                                        // Tag does not exists
+
+                                        // Make a new one
+                                        new Tags({
+                                            name: tag,
+                                            tracks:[
+                                                track.id,
+                                            ]
+                                        })
+                                        .save()
+                                        .then(() => {
+                                            // Update the track itself
+                                            track.tags.push(tag);
+                                            return Tracks.update({
+                                                _id: track._id,
+                                            }, track);
+                                        })
+                                        .catch(error => {
+                                            console.log(error);
+                                        })
+                                    }else{
+                                        // The tag already exists
+                                        tagInfo.tracks.push(track.id);
+                                        track.tags.push(tag);
+                                        Tags.update({
+                                            _id: tagInfo._id,
+                                        }, tagInfo)
+                                        .then(() => {
+                                            return Tracks.update({
+                                                _id: track._id,
+                                            }, track);
+                                        })
+                                        .catch(error => {
+                                            console.log(error);
+                                        })
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log(error);
+                                })
+                            })
                         }
 
                         if(fields.title){

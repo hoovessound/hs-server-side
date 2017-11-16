@@ -6,6 +6,7 @@
     <%}else{%>
     <form method="post" enctype="multipart/form-data" id="trackEditForm" trackid="<%=track.id%>">
         <p>Title: <input type="text" name="title" value="<%=track.title%>"></p>
+        <p>Tags: <input type="text" name="tags" value="<%=track.tags%>"></p>
         <p>Description: <textarea name="description" id="description"><%=track.description%></textarea></p>
         <p>Cover Image: <input type="file" name="image"></p>
         <%if(track.private){%>

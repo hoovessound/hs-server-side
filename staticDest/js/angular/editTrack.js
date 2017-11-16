@@ -10,12 +10,13 @@ angular.module('hsEditTracks', ['ngRoute']).controller('editTrack', function ($s
         formData.append('description', document.querySelector('textarea[name=description]').value);
         formData.append('image', document.querySelector('input[name=image]').files[0]);
         formData.append('private', document.querySelector('input[name=private]').checked);
+        formData.append('tags', document.querySelector('input[name=tags]').value);
         ajax.open('POST', full_address_util.addSubdomain('api', '/track/edit/' + trackid + '?bypass=true&oauth_token=' + token));
         ajax.send(formData);
         ajax.onload = function () {
             var response = JSON.parse(ajax.response);
             if (!response.error) {
-                $location.url('/track/' + response.id);
+                // $location.url(`/track/${response.id}`);
             } else {
                 new Noty({
                     text: 'ERROR: ' + response.error,

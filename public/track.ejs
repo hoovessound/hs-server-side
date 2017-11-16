@@ -26,6 +26,9 @@
         <%}%>
         <div class="fa fa-heart fave <%=isFave%>"></div>
         <h1 id="title"><%=track.title%></h1>
+        <div id="tags">
+        
+        </div>
         <p>By <a href="@<%=track.author.username%>">@<%=track.author.username%></a></p>
         <div class="playPuaseButton material-icons" fullname="<%=track.author.fullName%>" username="<%=track.author.username%>" title="<%=track.title%>" trackid="<%=track.id%>" onclick="playMusic(this)">play_arrow</div><br>
         <a class="share btn btn-info">Widget</a>

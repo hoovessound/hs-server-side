@@ -6,7 +6,30 @@
     <%}else{%>
     <form method="post" enctype="multipart/form-data" id="trackEditForm" trackid="<%=track.id%>">
         <p>Title: <input type="text" name="title" value="<%=track.title%>"></p>
-        <p>Tags: <input type="text" name="tags" value="<%=track.tags%>"></p>
+        <p>Tags: </p>
+        <div id="tags">
+            <style>
+                .display div{
+                    background: #CCC;
+                    margin: 0.5em;
+                    padding: 0.5em;
+                    border-radius: 10px;
+                    display: inline-block;
+                    cursor: pointer;
+                }
+
+                .display div:hover{
+                    text-decoration:line-through;
+                }
+            </style>
+            <div class="display">
+                <%track.tags.map(tag => {%>
+                    <div onclick="removeTag(this)" trackid="<%=track.id%>" tagname="<%=tag%>"># <%=tag%></div>
+                <%})%>
+            </div>
+            <input type="text" id="tagInput" trackid="<%=track.id%>">
+        </div>
+        <br>
         <p>Description: <textarea name="description" id="description"><%=track.description%></textarea></p>
         <p>Cover Image: <input type="file" name="image"></p>
         <%if(track.private){%>
@@ -18,4 +41,5 @@
         <button class="btn btn-success" ng-controller="editTrack">Update</button>
     </form>
     <%}%>
+    <script src="/static/js/angular/tags.js"></script>
 </div>

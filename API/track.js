@@ -18,6 +18,7 @@ const easyimage = require('easyimage');
 const request = require('request');
 const escape = require('escape-html');
 const moment = require('moment');
+const escapeHtml = require('escape-html')
 
 class FindTrack {
 
@@ -211,7 +212,6 @@ class FindTrack {
             console.log(error);
         }
     }
-
 }
 
 router.get('/:id', (req, res) => {
@@ -390,58 +390,6 @@ router.post('/edit/:id?', (req, res) => {
                             track.description = escape(fields.description);
                         }
 
-                        if(fields.tags){
-                            // Check if the tag already exists
-                            const tags = fields.tags.split(',');
-                            tags.forEach(tag => {
-                                Tags.findOne({
-                                    name: tag,
-                                })
-                                .then(tagInfo => {
-                                    if(!tagInfo){
-                                        // Tag does not exists
-
-                                        // Make a new one
-                                        new Tags({
-                                            name: tag,
-                                            tracks:[
-                                                track.id,
-                                            ]
-                                        })
-                                        .save()
-                                        .then(() => {
-                                            // Update the track itself
-                                            track.tags.push(tag);
-                                            return Tracks.update({
-                                                _id: track._id,
-                                            }, track);
-                                        })
-                                        .catch(error => {
-                                            console.log(error);
-                                        })
-                                    }else{
-                                        // The tag already exists
-                                        tagInfo.tracks.push(track.id);
-                                        track.tags.push(tag);
-                                        Tags.update({
-                                            _id: tagInfo._id,
-                                        }, tagInfo)
-                                        .then(() => {
-                                            return Tracks.update({
-                                                _id: track._id,
-                                            }, track);
-                                        })
-                                        .catch(error => {
-                                            console.log(error);
-                                        })
-                                    }
-                                })
-                                .catch(error => {
-                                    console.log(error);
-                                })
-                            })
-                        }
-
                         if(fields.title){
                             // Check if the new title match the old title
                             if(fields.title !== track.title){
@@ -515,5 +463,123 @@ router.post('/comment/:id?', (req, res) => {
 
     findTrack.addComment(trackid);
 });
+
+router.post('/tag/:trackid?', (req, res) => {
+    const user = req.hsAuth.user;
+    let tag = req.body.tag;
+    tag = escapeHtml(tag);
+    tag = tag.replace(/ /g, '_');
+    tag = tag.replace(/[^a-zA-Z0-9_]/g, '');
+    // Find the track
+    Tracks.findOne({
+        id: req.params.trackid,
+    })
+    .then(track => {
+        if(!track){
+            res.json({
+                error: 'Can\'t not that track id',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            if(!track.tags.includes(tag)){
+                track.tags.push(tag);
+                return Tracks.update({
+                    _id: track._id,
+                }, track)
+            }else{
+                res.json({
+                    tag,
+                    message: 'Success',
+                    trackId: req.params.trackid,
+                })
+            }
+        }
+    })
+    .then(() => {
+        return Tags.findOne({
+            name: tag,
+        })
+    })
+    .then(tagInfo => {
+        if(!tagInfo){
+            // The tag registry didn't have this tag
+            return new Tags({
+                name: tag,
+                tracks: [
+                    req.params.trackid
+                ]
+            })
+            .save()
+        }else{
+            // The tag already exists
+            return tagInfo.tracks.push(req.params.trackid);
+        }
+    })
+    .then(() => {
+        res.json({
+            tag,
+            message: 'Success',
+            trackId: req.params.trackid,
+        })
+    })
+    .catch(error => {
+        console.log(error);
+    })
+});
+
+router.delete('/tag/:trackid?', (req, res) => {
+    const user = req.hsAuth.user;
+    let tag = req.body.tag;
+    tag = escapeHtml(tag);
+    tag = tag.replace(/ /g, '_');
+    tag = tag.replace(/[^a-zA-Z0-9_]/g, '');
+    // Find the track
+    Tracks.findOne({
+        id: req.params.trackid,
+    })
+    .then(track => {
+        if(!track){
+            res.json({
+                error: 'Can\'t not that track id',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            if(track.tags.includes(tag)){
+                track.tags.splice(track.tags.indexOf(tag), 1);
+                return Tracks.update({
+                    _id: track._id,
+                }, track);
+            }else{
+                res.json({
+                    tag,
+                    message: 'Success',
+                });
+            }
+        }
+    })
+    .then(() => {
+        // Update the tag registry
+        return Tags.findOne({
+            name: tag,
+        })
+    })
+    .then(tagInfo => {
+        tagInfo.tracks.splice(tagInfo.tracks.indexOf(tag), 1);
+        return Tags.update({
+            _id: tagInfo._id,
+        }, tagInfo);
+    })
+    .then(() => {
+        res.json({
+            tag,
+            message: 'Success',
+        });
+    })
+    .catch(error => {
+        console.log(error);
+    })
+})
 
 module.exports = router;

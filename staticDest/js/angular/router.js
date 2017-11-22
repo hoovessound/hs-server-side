@@ -38,6 +38,10 @@ angular.module('hsRoutes', ['ngRoute']).config(function ($routeProvider, $locati
         templateUrl: function templateUrl(params) {
             return '/render/user/' + params.username;
         }
+    }).when('/tags/:tag', {
+        templateUrl: function templateUrl(params) {
+            return '/render/tags/' + params.tag;
+        }
     }).when('/me/apps', {
 
         templateUrl: function templateUrl() {

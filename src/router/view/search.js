@@ -4,6 +4,7 @@ const rp = require('request-promise');
 const fullurl = require('fullurl');
 const Users = require('../../../schema/Users');
 const Tracks = require('../../../schema/Tracks');
+const Tags = require('../../../schema/Tags');
 
 router.get('/:query?', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
@@ -62,11 +63,18 @@ router.get('/:query?', (req, res) => {
                         ]
                     }, {
                         file: 0,
+                    }),
+                    Tags.findOne({
+                        name: req.params.query,
+                    }, {
+                        tracks: 0,
                     })
                 ])
                 .then(response => {
                     // Fetch the tracks author info
                     const tracks = response[1];
+                    const tags = response[2];
+                    console.log(tags)
                     if(tracks.length >= 1){
                         tracks.forEach((track, index) => {
                             return Users.findOne({
@@ -85,6 +93,7 @@ router.get('/:query?', (req, res) => {
                                         tracks,
                                         full_address,
                                         token,
+                                        tags,
                                     });
                                 }
                             })
@@ -99,6 +108,7 @@ router.get('/:query?', (req, res) => {
                             tracks: [],
                             full_address,
                             token,
+                            tags,
                         });
                     }
                     

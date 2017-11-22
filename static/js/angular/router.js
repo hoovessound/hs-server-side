@@ -50,6 +50,11 @@ angular.module('hsRoutes', ['ngRoute'])
                     return `/render/user/${params.username}`;
                 },
             })
+            .when('/tags/:tag', {
+                templateUrl: function(params){
+                    return `/render/tags/${params.tag}`
+                }
+            })
             .when('/me/apps', {
 
                 templateUrl: function () {

@@ -8,21 +8,7 @@
         <p>Title: <input type="text" name="title" value="<%=track.title%>"></p>
         <p>Tags: </p>
         <div id="tags">
-            <style>
-                .display div{
-                    background: #CCC;
-                    margin: 0.5em;
-                    padding: 0.5em;
-                    border-radius: 10px;
-                    display: inline-block;
-                    cursor: pointer;
-                }
-
-                .display div:hover{
-                    text-decoration:line-through;
-                }
-            </style>
-            <div class="display">
+            <div class="tags">
                 <%track.tags.map(tag => {%>
                     <div onclick="removeTag(this)" trackid="<%=track.id%>" tagname="<%=tag%>"># <%=tag%></div>
                 <%})%>

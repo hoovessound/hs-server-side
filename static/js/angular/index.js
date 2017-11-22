@@ -7,6 +7,7 @@ var hsAngular = angular.module('hs', [
     'masterPlayerTitle',
     'getMoreContent',
     'uploadTrack',
+    'track',
 ]);
 
 hsAngular.run(function($rootScope) {

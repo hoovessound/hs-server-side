@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
+const Tags = require('../schema/Tags');
 
-router.post('/:query?', (req, res) => {
-    const query = req.body.query;
+router.get('/:query?', (req, res) => {
+    const query = req.params.query;
     if(typeof query === 'undefined'){
         res.json({
             error: true,
@@ -68,12 +69,20 @@ router.post('/:query?', (req, res) => {
             __v: 0,
             comments: 0,
             fave: 0,
+        }),
+        Tags.findOne({
+            name: req.params.query,
+        }, {
+            _id: 0,
+            __v: 0,
+            tracks: 0,
         })
     ])
     .then(response => {
         res.json({
             users: response[0],
             tracks: response[1],
+            tags: response[2],
         })
     })
 });

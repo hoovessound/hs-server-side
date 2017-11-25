@@ -168,8 +168,24 @@ class FindTrack {
                 });
                 return false;
             }
-
-            this.res.json(track.comments);
+            if(track.comments.length <= 0){
+                this.res.json(track.comments)
+            }else{
+                track.comments.map((comment, index) => {
+                    Users.findOne({
+                        id: comment.author,
+                    })
+                    .then(author => {
+                        track.comments[index].author = {
+                            username: author.username,
+                            fullName: author.fullName,
+                        }
+                        if((index + 1) === track.comments.length){
+                            this.res.json(track.comments)
+                        }
+                    })
+                })
+            }
         }
         catch(error){
             console.log(error)

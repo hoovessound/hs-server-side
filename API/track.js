@@ -36,6 +36,7 @@ class FindTrack {
                 __v: 0,
                 _id: 0,
                 comments: 0,
+                fave: 0,
             })
 
             if(!this.req.query.bypass){
@@ -59,7 +60,18 @@ class FindTrack {
                 return false;
             }
 
-            this.res.json(track);
+            // Find the author
+
+            Users.findOne({
+                id: track.author
+            })
+            .then(author => {
+                track.author = {
+                    username: author.username,
+                    fullname: author.fullName,
+                }
+                this.res.json(track);
+            })
         }
         catch(error){
             console.log(error)

@@ -37,7 +37,17 @@ router.get('/', (req, res) => {
                 if(tracks.length === finish ){
                     // Finish
                     res.json({
-                        tracks,
+                        id: track.id,
+                        title: track.title,
+                        author: {
+                            username,
+                            fullName
+                        },
+                        uploadDate: track.uploadDate,
+                        description: track.description,
+                        tags: track.tags,
+                        private: track.private,
+                        coverImage: track.coverImage,
                     })
                 }
             })

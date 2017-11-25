@@ -32,11 +32,14 @@ class FindTrack {
             const track = await Tracks.findOne({
                 id,
             }, {
-                file: 0,
-                __v: 0,
-                _id: 0,
-                comments: 0,
-                fave: 0,
+                id: 1,
+                title: 1,
+                author: 1,
+                uploadDate: 1,
+                description: 1,
+                tags: 1,
+                private: 1,
+                coverImage: 1,
             })
 
             if(!this.req.query.bypass){

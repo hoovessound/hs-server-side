@@ -130,10 +130,7 @@ router.post('/', (req, res) => {
                                 location: path.join(`${__dirname}/../tracks/${newAudioId}`),
                                 extend: false,
                             },
-                            author: {
-                                username: user.username,
-                                fullName: user.fullName,
-                            },
+                            author: user.id,
                             uploadDate,
                             description,
                             private: true,

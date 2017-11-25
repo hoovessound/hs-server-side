@@ -9,6 +9,15 @@ router.get('/', (req, res) => {
     // Find tracks
     Tracks.find({
         private: false,
+    }, {
+        id: 1,
+        title: 1,
+        author: 1,
+        uploadDate: 1,
+        description: 1,
+        tags: 1,
+        private: 1,
+        coverImage: 1,
     })
     .limit(10)
     .skip(offset)
@@ -36,19 +45,7 @@ router.get('/', (req, res) => {
                 finish++;
                 if(tracks.length === finish ){
                     // Finish
-                    res.json({
-                        id: track.id,
-                        title: track.title,
-                        author: {
-                            username,
-                            fullName
-                        },
-                        uploadDate: track.uploadDate,
-                        description: track.description,
-                        tags: track.tags,
-                        private: track.private,
-                        coverImage: track.coverImage,
-                    })
+                    res.json(tracks)
                 }
             })
             .catch(error => {

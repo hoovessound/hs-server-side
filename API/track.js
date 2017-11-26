@@ -234,7 +234,9 @@ class FindTrack {
             }, track);
 
             this.res.json({
-                commentObject,
+                id: genId(),
+                postDate: moment()._d,
+                comment: comment,
                 author: {
                     username: this.req.hsAuth.user.username,
                     fullName: this.req.hsAuth.user.fullName,

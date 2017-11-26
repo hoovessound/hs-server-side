@@ -263,7 +263,7 @@ router.get('/:id', (req, res) => {
     findTrack.findById(ID);
 });
 
-router.post('/fave/:id?', (req, res) => {
+router.post('/favorite/:id?', (req, res) => {
     const id = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (typeof id === 'undefined') {

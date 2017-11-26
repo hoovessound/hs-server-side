@@ -18,7 +18,8 @@ const easyimage = require('easyimage');
 const request = require('request');
 const escape = require('escape-html');
 const moment = require('moment');
-const escapeHtml = require('escape-html')
+const escapeHtml = require('escape-html');
+const genId = require('../src/helper/genId');
 
 class FindTrack {
 
@@ -222,6 +223,7 @@ class FindTrack {
             const comment = escape(this.req.body.comment);
 
             const commentObject = {
+                id: genId(),
                 author: this.req.hsAuth.user.id,
                 postDate: moment()._d,
                 comment: comment,

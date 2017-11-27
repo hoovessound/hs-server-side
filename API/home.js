@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
         tags: 1,
         private: 1,
         coverImage: 1,
+        _id: 0,
     })
     .limit(10)
     .skip(offset)

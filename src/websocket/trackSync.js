@@ -16,8 +16,7 @@ module.exports = function (socket) {
                     }
                 }
             }
-            console.log(payload.trackID)
-            console.log(typeof payload.trackID)
+            
             user.lastPlay = {
                 date: new Date(),
                 trackID: payload.trackID,

@@ -112,6 +112,8 @@ router.use('/settings', require('../../../API/settings'));
 
 router.use('/notification', require('./../../../API/notification'));
 
+router.use('/events', require('./../../../API/events'));
+
 router.all('*', (req, res) => {
     res.status(404);
     res.json({

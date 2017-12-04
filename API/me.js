@@ -21,6 +21,7 @@ class Me {
             banner: this.req.hsAuth.user.banner,
             icon: this.req.hsAuth.user.icon,
             tracks: this.req.hsAuth.user.tracks,
+            history: this.req.hsAuth.user.lastPlay,
         });
     }
 

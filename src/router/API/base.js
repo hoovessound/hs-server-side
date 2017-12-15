@@ -16,14 +16,14 @@ router.use('/oauth2/thirdparty/facebook', require('../../../API/auth/thirdparty/
 
 router.use(cors());
 
-router.use(limiter({
-    duration: 900000, // 15 min
-    max: 500,
-    accessLimited: {
-        error: 'Too many request for this IP address, please read the API rate limit docs',
-        code: 'service_lock_down',
-    }
-}));
+// router.use(limiter({
+//     duration: 900000, // 15 min
+//     max: 500,
+//     accessLimited: {
+//         error: 'Too many request for this IP address, please read the API rate limit docs',
+//         code: 'service_lock_down',
+//     }
+// }));
 
 // Basic API auth
 router.use((req, res, next) => {

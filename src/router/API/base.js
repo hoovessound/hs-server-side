@@ -112,7 +112,10 @@ router.use('/settings', require('../../../API/settings'));
 
 router.use('/notification', require('./../../../API/notification'));
 
+router.use('/doodle', require('./../../../API/doodle'));
+
 router.use('/events', require('./../../../API/events'));
+
 
 router.all('*', (req, res) => {
     res.status(404);

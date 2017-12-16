@@ -10,6 +10,8 @@ const moment = require('moment');
 const url = require('url');
 const parseDomain = require('parse-domain');
 
+const Doodles = require('../../../schema/Doodles');
+
 router.use(csurf());
 
 // Parse the scope query string
@@ -77,20 +79,28 @@ router.use((req, res, next) => {
                     }
                     next();
                 }else{
-                    res.render('auth/login', {
-                        error: true,
-                        message: 'Your redirect url is not white listed yet',
-                        csrfToken: req.csrfToken(),
-                    });
+                    fetchDoodle()
+                    .then(background => {
+                        res.render('auth/login', {
+                            error: true,
+                            message: 'Your redirect url is not white listed yet',
+                            csrfToken: req.csrfToken(),
+                            background,
+                        });
+                    })
                     return false;
                 }
 
             }else{
-                res.render('auth/login', {
-                    error: true,
-                    message: 'Bad client ID',
-                    csrfToken: req.csrfToken(),
-                });
+                fetchDoodle()
+                .then(background => {
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Bad client ID',
+                        csrfToken: req.csrfToken(),
+                        background,
+                    });
+                })
                 return false;
             }
         })
@@ -98,6 +108,28 @@ router.use((req, res, next) => {
         next();
     }
 })
+
+function fetchDoodle(){
+    return new Promise((resolve, reject) => {
+        Doodles.count()
+        .then(count => {
+            const random = Math.floor(Math.random() * count);
+            return Doodles.findOne().skip(random);
+        })
+        .then(artWork => {
+            console.log(artWork)
+            resolve({
+                id: artWork.id,
+                image: artWork.image,
+                used: artWork.used,
+                author: artWork.author,
+            });
+        })
+        .catch(error => {
+            reject(error);
+        })
+    })
+}
 
 router.get('/', csurf(), (req, res) => {
     // render th login page
@@ -109,12 +141,19 @@ router.get('/', csurf(), (req, res) => {
     req.session.rawQuery = rawQuery;
 
     if(service){
-        res.render('auth/login', {
-            error: null,
-            message: null,
-            csrfToken: req.csrfToken(),
-            oAuth: req.query.client_id ? true : false,
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/login', {
+                error: null,
+                message: null,
+                csrfToken: req.csrfToken(),
+                oAuth: req.query.client_id ? true : false,
+                background,
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }else{
         Users.findOne({
             token: oAuthToken,
@@ -128,36 +167,54 @@ router.get('/', csurf(), (req, res) => {
                 // Fastforward to permission page
     
                 const rawQuery = url.parse(req.url).query;
-                res.render('auth/permission', {
-                    appName: req.hsAuth.app.name,
-                    csrfToken: req.csrfToken(),
-                    error: null,
-                    message: null,
-                    rawQuery,
-                    uid: user._id,
-                    user,
-                    scope: req.scopeInAction.parse,
-                });
+
+                fetchDoodle(background => {
+                    res.render('auth/permission', {
+                        appName: req.hsAuth.app.name,
+                        csrfToken: req.csrfToken(),
+                        error: null,
+                        message: null,
+                        rawQuery,
+                        uid: user._id,
+                        user,
+                        scope: req.scopeInAction.parse,
+                        background,
+                    });
+                })
     
             }else{
     
                 // Didn't have oAuth token
 
                 if(!clientId){
-                    res.render('auth/login', {
-                        error: true,
-                        message: 'Please pass in your client ID',
-                        csrfToken: req.csrfToken(),
-                    });
+                    fetchDoodle()
+                    .then(background => {
+                        res.render('auth/login', {
+                            error: true,
+                            message: 'Please pass in your client ID',
+                            csrfToken: req.csrfToken(),
+                            background,
+                        });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
                     return false;
                 }else{
         
                     if(!redirect){
-                        res.render('auth/login', {
-                            error: true,
-                            message: 'Missing the redirect url',
-                            csrfToken: req.csrfToken(),
-                        });
+                        fetchDoodle()
+                        .then(background => {
+                            res.render('auth/login', {
+                                error: true,
+                                message: 'Missing the redirect url',
+                                csrfToken: req.csrfToken(),
+                                background,
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
                     }
         
                     oAuthApps.findOne({
@@ -165,19 +222,33 @@ router.get('/', csurf(), (req, res) => {
                     })
                     .then(app =>{
                         if(app === null) {
-                            res.render('auth/login', {
-                                error: true,
-                                message: 'Bad client ID',
-                                csrfToken: req.csrfToken(),
-                            });
+                            fetchDoodle()
+                            .then(background => {
+                                res.render('auth/login', {
+                                    error: true,
+                                    message: 'Bad client ID',
+                                    csrfToken: req.csrfToken(),
+                                    background,
+                                });
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
                             return false;
                         }
         
-                        res.render('auth/login', {
-                            error: null,
-                            message: null,
-                            csrfToken: req.csrfToken(),
-                        });
+                        fetchDoodle()
+                        .then(background => {
+                            res.render('auth/login', {
+                                error: null,
+                                message: null,
+                                csrfToken: req.csrfToken(),
+                                background,
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        })
         
                     })
                     .catch(error => {
@@ -201,11 +272,18 @@ router.post('/', csurf(), (req, res) => {
     let app;
 
     if(!redirect){
-        res.render('auth/login', {
-            error: true,
-            message: 'Missing the redirect url',
-            csrfToken: req.csrfToken(),
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/login', {
+                error: true,
+                message: 'Missing the redirect url',
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
 
     // Check the content type
@@ -220,11 +298,15 @@ router.post('/', csurf(), (req, res) => {
 
     if(service !== 'hs_service_login'){
         if(!clientId){
-            res.render('auth/login', {
-                error: true,
-                message: 'Please pass in your client ID',
-                csrfToken: req.csrfToken(),
-            });
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Please pass in your client ID',
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            })
             return false;
         }
     }
@@ -232,22 +314,30 @@ router.post('/', csurf(), (req, res) => {
     // find the username
     if(typeof req.body.email === 'undefined'){
         let msg = 'Please enter your email address';
-        res.render('auth/login', {
-            error: true,
-            message: msg,
-            csrfToken: req.csrfToken(),
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/login', {
+                error: true,
+                message: msg,
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
         return false;
     }
 
     if(typeof req.body.password === 'undefined'){
         let msg = 'Please enter the password';
-        res.render('auth/login', {
-            error: true,
-            message: msg,
-            code: 'missing_require_fields',
-            csrfToken: req.csrfToken(),
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/login', {
+                error: true,
+                message: msg,
+                code: 'missing_require_fields',
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
 
         return false;
     }
@@ -258,11 +348,15 @@ router.post('/', csurf(), (req, res) => {
     .then(dbApp => {
         if(service !== 'hs_service_login') {
             if (dbApp === null) {
-                res.render('auth/login', {
-                    error: true,
-                    message: 'Bad client ID',
-                    csrfToken: req.csrfToken(),
-                });
+                fetchDoodle()
+                .then(background => {
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Bad client ID',
+                        csrfToken: req.csrfToken(),
+                        background,
+                    });
+                })
                 return false;
             }
             app = dbApp;
@@ -273,12 +367,16 @@ router.post('/', csurf(), (req, res) => {
         .then(user => {
             if(user === null){
                 let msg = 'Incorrect email or password';
-                res.render('auth/login', {
-                    error: null,
-                    message: null,
-                    pwdError: msg,
-                    csrfToken: req.csrfToken(),
-                });
+                fetchDoodle()
+                .then(background => {
+                    res.render('auth/login', {
+                        error: null,
+                        message: null,
+                        pwdError: msg,
+                        csrfToken: req.csrfToken(),
+                        background,
+                    });
+                })
                 return false;
             }else{
                 // Check for the password
@@ -296,26 +394,34 @@ router.post('/', csurf(), (req, res) => {
                         if(service === 'hs_service_login'){
                             res.redirect(redirect);
                         }else{
-                            res.render('auth/permission', {
-                                appName: app.name,
-                                csrfToken: req.csrfToken(),
-                                error: null,
-                                message: null,
-                                rawQuery,
-                                uid: user._id,
-                                user,
-                                scope: req.scopeInAction.parse,
-                            });
+                            fetchDoodle()
+                            .then(background => {
+                                res.render('auth/permission', {
+                                    appName: app.name,
+                                    csrfToken: req.csrfToken(),
+                                    error: null,
+                                    message: null,
+                                    rawQuery,
+                                    uid: user._id,
+                                    user,
+                                    scope: req.scopeInAction.parse,
+                                    background,
+                                });
+                            })
                         }
                     }else{
                         // Incorrect username or password
                         let msg = 'Incorrect email or password';
-                        res.render('auth/login', {
-                            error: null,
-                            message: null,
-                            pwdError: msg,
-                            csrfToken: req.csrfToken(),
-                        });
+                        fetchDoodle()
+                        .then(background => {
+                            res.render('auth/login', {
+                                error: null,
+                                message: null,
+                                pwdError: msg,
+                                csrfToken: req.csrfToken(),
+                                background,
+                            });
+                        })
                     }
                 });
             }
@@ -332,11 +438,15 @@ router.post('/permission', csurf(), (req, res) => {
     const uid = req.body.uid;
 
     if(!uid){
-        res.render('auth/login', {
-            error: true,
-            message: 'Missing UID',
-            csrfToken: req.csrfToken(),
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/login', {
+                error: true,
+                message: 'Missing UID',
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
         return false;
     }
 
@@ -350,11 +460,15 @@ router.post('/permission', csurf(), (req, res) => {
     })
     .then(app => {
         if(app === null) {
-            res.render('auth/login', {
-                error: true,
-                message: 'Bad client ID',
-                csrfToken: req.csrfToken(),
-            });
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Bad client ID',
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            })
             return false;
         }
 
@@ -389,11 +503,15 @@ router.post('/permission', csurf(), (req, res) => {
     })
     .catch(error => {
         if(error.message.includes('Cast to ObjectId failed for value')){
-            res.render('auth/login', {
-                error: true,
-                message: 'Bad UID',
-                csrfToken: req.csrfToken(),
-            });
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Bad UID',
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            })
             return false;
         }else{
             console.log(error)

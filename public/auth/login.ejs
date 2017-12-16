@@ -10,6 +10,15 @@
 </head>
 <body>
 <div id="app">
+    <style>
+        html{
+            background: url(<%=background.image%>);
+            background-repeat: no-repeat;
+            background-size: cover;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
     <%if(error){%>
     <div id="messages" class="error">
         <p class="title">Error :/</p>
@@ -41,6 +50,10 @@
     <a href="/api/auth/register">Register</a><br>
     <a href="/api/auth/changepassword">Forgot Password</a>
     <%}%>
+    <div class="bgAuthor">
+        Artwork by: <br>
+        <a href="<%=background.author.link%>" target="_blank"><%=background.author.name%></a>
+    </div>
 </div>
 </body>
 </html>

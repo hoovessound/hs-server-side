@@ -16,6 +16,7 @@ const compression = require('compression');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const Users = require('../schema/Users');
+const Doodles = require('../schema/Doodles');
 const cookie = require('cookie');
 const request = require('request');
 const csurf = require('csurf');

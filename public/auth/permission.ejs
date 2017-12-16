@@ -13,6 +13,17 @@
 </head>
 <body>
 <div id="app">
+
+    <style>
+        html{
+            background: url(<%=background.image%>);
+            background-repeat: no-repeat;
+            background-size: cover;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+
     <%if(error){%>
     <div id="messages" class="error">
         <%}else{%>
@@ -47,6 +58,10 @@
             <%}%>
             <button class="btn btn-success" type="submit" name="allow" value="allow">Allow</button>
             <button class="btn btn-danger" type="submit" name="denied" value="denied">Denied</button>
+            <div class="bgAuthor">
+                Artwork by: <br>
+                <a href="<%=background.author.link%>" target="_blank"><%=background.author.name%></a>
+            </div>
         </form>
     </div>
 </body>

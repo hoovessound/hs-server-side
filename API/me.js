@@ -13,7 +13,7 @@ class Me {
         this.res.json({
             id: this.req.hsAuth.user.id,
             username: this.req.hsAuth.user.username,
-            fullname: this.req.hsAuth.user.fullname,
+            fullname: this.req.hsAuth.user.fullName,
             email: this.req.hsAuth.user.email,
             icon: this.req.hsAuth.user.icon,
             roles: this.req.hsAuth.user.roles,

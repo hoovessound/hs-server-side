@@ -3,36 +3,48 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const randomstring = require('randomstring');
+const Doodles = require('../../schema/Doodles');
 const crypto = require('crypto');
 const csurf = require('csurf');
 const genId = require('../../src/helper/genId');
 
+function fetchDoodle(){
+    return new Promise((resolve, reject) => {
+        Doodles.count()
+        .then(count => {
+            const random = Math.floor(Math.random() * count);
+            return Doodles.findOne().skip(random);
+        })
+        .then(artWork => {
+            resolve({
+                id: artWork.id,
+                image: artWork.image,
+                used: artWork.used,
+                author: artWork.author,
+            });
+        })
+        .catch(error => {
+            console.log(error)
+            reject(error);
+        })
+    })
+}
+
 router.use(csurf());
 
 router.get('/', csurf(), (req, res) => {
-    const sudo = req.query.sudo;
-    if(!sudo){
-        res.send('<h1>You will be <a href="https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link">Redirect</a> to sign up as a open beta tester in 5 seconds later</h1><script>setTimeout(function(){window.open("https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link", "_self")}, 5000)</script>')
-        return false;
-    }
-    res.render('auth/register', {
-        error: false,
-        message: null,
-        csrfToken: req.csrfToken(),
-    });
+    fetchDoodle()
+    .then(background => {
+        res.render('auth/register', {
+            error: false,
+            message: null,
+            csrfToken: req.csrfToken(),
+            background,
+        });
+    })
 });
 
 router.post('/', csurf(), (req, res) => {
-    const sudo = req.query.sudo;
-    if(!sudo){
-        res.json({
-            error: true,
-            msg: 'Please sign up as a open beta tester at https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
-            code: 'service_lock_down',
-            url: 'https://docs.google.com/forms/d/e/1FAIpQLScPxrOxzTVM2wc2NJMZ2tBOpnOhCSHzpU6QzxutE9Su_wXofA/viewform?usp=sf_link',
-        })
-        return false;
-    }
     const redirect = req.query.redirect || req.protocol + "://" + req.headers.host;
 
     // Check the content type
@@ -65,11 +77,16 @@ router.post('/', csurf(), (req, res) => {
     for(let key in policy){
         if(!req.body.password.match(policy[key].query)){
 
-            res.render('auth/register', {
-                error: true,
-                message: policy[key].msg,
-                code: 'against_security_policy',
-            });
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/register', {
+                    error: true,
+                    message: policy[key].msg,
+                    csrfToken: req.csrfToken(),
+                    code: 'against_security_policy',
+                    background,
+                });
+            })
             return false;
         }
     }
@@ -77,37 +94,57 @@ router.post('/', csurf(), (req, res) => {
     // Check require fields
     if(typeof req.body.username == 'undefined'){
         let msg = 'Missing the username fields';
-        res.render('auth/register', {
-            error: true,
-            message: msg,
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/register', {
+                error: true,
+                message: msg,
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
         return false;
     }
 
     if(typeof req.body.password == 'undefined'){
         let msg = 'Missing the password fields';
-        res.render('auth/register', {
-            error: true,
-            message: msg,
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/register', {
+                error: true,
+                message: msg,
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
         return false;
     }
 
     if(typeof req.body.fullname == 'undefined'){
         let msg = 'Missing the fullname fields';
-        res.render('auth/register', {
-            error: true,
-            message: msg,
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/register', {
+                error: true,
+                message: msg,
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
         return false;
     }
 
     if(typeof req.body.email == 'undefined'){
         let msg = 'Missing the email fields';
-        res.render('auth/register', {
-            error: true,
-            message: msg,
-        });
+        fetchDoodle()
+        .then(background => {
+            res.render('auth/register', {
+                error: true,
+                message: msg,
+                csrfToken: req.csrfToken(),
+                background,
+            });
+        })
         return false;
     }
 
@@ -117,10 +154,15 @@ router.post('/', csurf(), (req, res) => {
     }).then(user => {
         if(user !== null){
             let msg = 'Username is already taken';
-            res.render('auth/register', {
-                error: true,
-                message: msg,
-            });
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/register', {
+                    error: true,
+                    message: msg,
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            })
             return false;
         }else{
             // Hash the password

@@ -54,61 +54,6 @@ router.use((req, res, next) => {
     next();
 });
 
-router.use((req, res, next) => {
-    // Check if the redirect url is match the DB one
-    const service = req.query.service;
-    const redirect = req.query.redirect;
-    const clientId = req.query.client_id;
-    if(!service) {
-        return oAuthApps.findOne({
-            clientId,
-        })
-        .then(app => {
-            if(app) {
-
-                let find = false;
-                app.callbackUrl.forEach(allowUrl => {
-                    const clientHost = url.parse(redirect).host;
-                    if(clientHost === allowUrl || allowUrl === '*'){
-                        find = true;
-                    }
-                });
-                if(find) {
-                    req.hsAuth ={
-                        app,
-                    }
-                    next();
-                }else{
-                    fetchDoodle()
-                    .then(background => {
-                        res.render('auth/login', {
-                            error: true,
-                            message: 'Your redirect url is not white listed yet',
-                            csrfToken: req.csrfToken(),
-                            background,
-                        });
-                    })
-                    return false;
-                }
-
-            }else{
-                fetchDoodle()
-                .then(background => {
-                    res.render('auth/login', {
-                        error: true,
-                        message: 'Bad client ID',
-                        csrfToken: req.csrfToken(),
-                        background,
-                    });
-                })
-                return false;
-            }
-        })
-    }else{
-        next();
-    }
-})
-
 function fetchDoodle(){
     return new Promise((resolve, reject) => {
         Doodles.count()

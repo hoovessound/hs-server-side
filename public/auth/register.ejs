@@ -9,6 +9,8 @@
 </head>
 <body>
 
+    
+
     <%if(error){%>
         <div id="messages" class="error">
     <%}else{%>
@@ -29,5 +31,6 @@
     </form>
     <a href="/api/auth/login">Login</a>
     <script src="/static/js/register.js"></script>
+    <%-include('../includes/artwork')%>
 </body>
 </html>

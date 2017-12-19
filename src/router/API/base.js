@@ -6,6 +6,11 @@ const oAuthApps = require('../../../schema/oAuthApps');
 const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
 
+var myLogger = function (req, res, next) {
+    console.log('LOGGED')
+    next()
+  }
+
 router.use('/widget', require('../../../API/widget'));
 
 router.use('/oauth2/token/access', require('../../../API/auth/token/accessToken'));
@@ -16,14 +21,14 @@ router.use('/oauth2/thirdparty/facebook', require('../../../API/auth/thirdparty/
 
 router.use(cors());
 
-// router.use(limiter({
-//     duration: 900000, // 15 min
-//     max: 500,
-//     accessLimited: {
-//         error: 'Too many request for this IP address, please read the API rate limit docs',
-//         code: 'service_lock_down',
-//     }
-// }));
+router.use(limiter({
+    // duration: 900000, // 15 min
+    max: 1,
+    accessLimited: {
+        error: 'Too many request for this IP address, please read the API rate limit docs',
+        code: 'service_lock_down',
+    }
+}));
 
 // Basic API auth
 router.use((req, res, next) => {
@@ -50,6 +55,7 @@ router.use((req, res, next) => {
                 req.hsAuth = {
                     token,
                     user,
+                    isNormalApiCall: false,
                 }
                 next();
             }
@@ -67,7 +73,7 @@ router.use((req, res, next) => {
         })
     }else{
         // Normal API calls
-        const accessToken = req.headers.authorization || req.headers.access_token;
+        const accessToken = req.headers.authorization || req.headers.access_token || req.query.access_token;
         let _rightAccess;
         AccessTokes.findOne({
             token: accessToken,
@@ -121,7 +127,7 @@ router.all('*', (req, res) => {
     res.status(404);
     res.json({
         error: 'API endpoint not found',
-        docs_url: 'https://hoovessound.ml/developer/docs',
+        docs_url: 'https://developer.hoovessound.ml/api/docs',
     });
 });
 

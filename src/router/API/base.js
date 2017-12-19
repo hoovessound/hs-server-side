@@ -6,11 +6,6 @@ const oAuthApps = require('../../../schema/oAuthApps');
 const Users = require('../../../schema/Users');
 const AccessTokes = require('../../../schema/AccessTokes');
 
-var myLogger = function (req, res, next) {
-    console.log('LOGGED')
-    next()
-  }
-
 router.use('/widget', require('../../../API/widget'));
 
 router.use('/oauth2/token/access', require('../../../API/auth/token/accessToken'));
@@ -23,7 +18,7 @@ router.use(cors());
 
 router.use(limiter({
     // duration: 900000, // 15 min
-    max: 1,
+    max: 500,
     accessLimited: {
         error: 'Too many request for this IP address, please read the API rate limit docs',
         code: 'service_lock_down',

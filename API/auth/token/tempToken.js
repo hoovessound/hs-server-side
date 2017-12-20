@@ -62,7 +62,6 @@ function fetchDoodle(){
             return Doodles.findOne().skip(random);
         })
         .then(artWork => {
-            console.log(artWork)
             resolve({
                 id: artWork.id,
                 image: artWork.image,
@@ -84,6 +83,7 @@ router.get('/', csurf(), (req, res) => {
     const oAuthToken = req.cookies['oauth-token'];
     const rawQuery = url.parse(req.url).query;
     req.session.rawQuery = rawQuery;
+    let _app;
 
     if(service){
         fetchDoodle()
@@ -104,84 +104,87 @@ router.get('/', csurf(), (req, res) => {
             token: oAuthToken,
         })
         .then(user => {
-            if(user){
-                // Have OAuth tokekn
     
-                // Logined user
-    
-                // Fastforward to permission page
-    
-                const rawQuery = url.parse(req.url).query;
+            // Didn't have oAuth token
 
-                fetchDoodle(background => {
-                    res.render('auth/permission', {
-                        appName: req.hsAuth.app.name,
+            if(!clientId){
+                fetchDoodle()
+                .then(background => {
+                    res.render('auth/login', {
+                        error: true,
+                        message: 'Please pass in your client ID',
                         csrfToken: req.csrfToken(),
-                        error: null,
-                        message: null,
-                        rawQuery,
-                        uid: user._id,
-                        user,
-                        scope: req.scopeInAction.parse,
                         background,
                     });
                 })
-    
+                .catch(error => {
+                    console.log(error);
+                })
+                return false;
             }else{
     
-                // Didn't have oAuth token
-
-                if(!clientId){
+                if(!redirect){
                     fetchDoodle()
                     .then(background => {
                         res.render('auth/login', {
                             error: true,
-                            message: 'Please pass in your client ID',
+                            message: 'Missing the redirect url',
                             csrfToken: req.csrfToken(),
                             background,
                         });
                     })
                     .catch(error => {
-                        console.log(error);
+                        console.log(error)
                     })
                     return false;
-                }else{
-        
-                    if(!redirect){
+                }
+    
+                oAuthApps.findOne({
+                    clientId,
+                })
+                .then(app =>{
+                    if(app === null) {
                         fetchDoodle()
                         .then(background => {
                             res.render('auth/login', {
                                 error: true,
-                                message: 'Missing the redirect url',
+                                message: 'Bad client ID',
                                 csrfToken: req.csrfToken(),
                                 background,
                             });
                         })
                         .catch(error => {
-                            console.log(error)
+                            console.log(error);
                         })
+                        return false;
                     }
-        
-                    oAuthApps.findOne({
-                        clientId,
-                    })
-                    .then(app =>{
-                        if(app === null) {
-                            fetchDoodle()
-                            .then(background => {
-                                res.render('auth/login', {
-                                    error: true,
-                                    message: 'Bad client ID',
-                                    csrfToken: req.csrfToken(),
-                                    background,
-                                });
-                            })
-                            .catch(error => {
-                                console.log(error);
-                            })
-                            return false;
-                        }
-        
+                    _app = app;
+                    
+                    if(user){
+                        // Have OAuth tokekn
+
+                        // Logined user
+            
+                        // Fastforward to permission page
+            
+                        const rawQuery = url.parse(req.url).query;
+
+                        fetchDoodle()
+                        .then(background => {
+                            console.log(req.hsAuth)
+                            res.render('auth/permission', {
+                                appName: _app.name,
+                                csrfToken: req.csrfToken(),
+                                error: null,
+                                message: null,
+                                rawQuery,
+                                uid: user._id,
+                                user,
+                                scope: req.scopeInAction.parse,
+                                background,
+                            });
+                        })
+                    }else{
                         fetchDoodle()
                         .then(background => {
                             res.render('auth/login', {
@@ -194,12 +197,12 @@ router.get('/', csurf(), (req, res) => {
                         .catch(error => {
                             console.log(error);
                         })
-        
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
-                }
+                    }
+    
+                })
+                .catch(error => {
+                    console.log(error);
+                });
             }
         })
         .catch(error => {

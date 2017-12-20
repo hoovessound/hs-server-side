@@ -179,55 +179,9 @@ app.use(subdomain('id', require('./router/ID/id')));
 
 app.use(subdomain('stream', require('../API/listen')));
 
-io.on('connection', (socket) => {
-    const clientCookie = cookie.parse(socket.handshake.headers.cookie);
-    const token = clientCookie['oauth-token'];
+// app.use(subdomain('developer', require('../API/listen')));
 
-    // Testing message
-    socket.emit('init:testing', {
-        msg: 'Your client had connected to the HoovesSound web socket services, please enjoy :D',
-        yourId: socket.id,
-    });
-
-    Users.findOne({
-        token,
-    })
-    .then(user => {
-
-        if (user === null) {
-            socket.emit('error:reload');
-            return false;
-        }
-
-        if (typeof socketConnection[user.username] === 'undefined') {
-            socketConnection[user.username] = {};
-        }
-        socketConnection[user.username][socket.id] = socket;
-        module.exports.socketConnection = socketConnection;
-
-        socket.on('disconnect', () => {
-            delete socketConnection[user.username][socket.id];
-            module.exports.socketConnection = socketConnection;
-            if (socketConnection[user.username].length <= 0) {
-                // No more connected client
-                user.lastPlay.isPlaying = false;
-                Users.update({
-                    _id: user._id,
-                }, user)
-                .catch(error => {
-                    console.log(error);
-                })
-            }
-        });
-
-        // Call the track sync feature
-        require('./websocket/trackSync')(socket);
-
-    })
-    .catch(error => {
-        console.log(error);
-    })
-});
+app.use(subdomain('console.developer', require('./router/view/oAuthApp')));
 
 app.use(csurf());
 app.use(function (err, req, res, next) {
@@ -237,5 +191,3 @@ app.use(function (err, req, res, next) {
         error: 'Incorrect CSRF token',
     })
 });
-
-app.use('/', require('./router/view/base'));

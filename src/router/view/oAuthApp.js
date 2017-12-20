@@ -60,12 +60,12 @@ router.post('/', csurf(), (req, res) => {
                 const description = req.body.description;
                 let callbackUrl = req.body.callbackurl;
                 if(!name){
-                    res.redirect('/me/apps?error=Please enter the app name');
+                    res.redirect('/error=Please enter the app name');
                     return false;
                 }
 
                 if(!callbackUrl){
-                    res.redirect('/me/apps?error=Please enter the white domain');
+                    res.redirect('/?error=Please enter the white domain');
                     return false;
                 }
 
@@ -131,7 +131,7 @@ router.post('/update', csurf(), (req, res) => {
         })
         .then(app => {
             if(!app) {
-                res.redirect('/me/apps?error=Something when wrong, please try again');
+                res.redirect('/?error=Something when wrong, please try again');
                 return false;
             }else{
                 app.name = req.body.appName;
@@ -142,7 +142,7 @@ router.post('/update', csurf(), (req, res) => {
             }
         })
         .then(() => {
-            res.redirect('/me/apps?success=true');
+            res.redirect('/?success=true');
         })
     }
 });

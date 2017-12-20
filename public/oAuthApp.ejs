@@ -1,44 +1,75 @@
-<script src='https://www.google.com/recaptcha/api.js'></script>
-<div id="oAuthApp" class="container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HoovesSound | Music For Bronies Music For Everyone</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/noty@3.1.2/lib/noty.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-noty/2.4.1/jquery.noty.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noty@3.1.2/lib/noty.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+</head>
+<body>
+    <div id="app">
+        <div id="oAuthApp" class="container">
 
-    <%if(typeof query.error !== 'undefined'){%>
-    <div class="errorMessage">
-        <p><%=query.error%></p>
+            <%if(typeof query.error !== 'undefined'){%>
+            <div class="errorMessage">
+                <p style="color: red;"><%=query.error%></p>
+            </div>
+            <%}%>
+
+            <%if(typeof query.success !== 'undefined'){%>
+                <div class="successMessage">
+                    <p style="color: lightgreen;">Success</p>
+                </div>
+                <%}%>
+        
+            <div class="myApps">
+                <h3>My apps</h3>
+                <%if(apps.length >= 1){%>
+                <%apps.map(app => {%>
+                <div class="card">
+                    <form class="app" action="/update" method="post">
+                        <input name="appName" value="<%=app.name%>">
+                        <p>Client ID: <input type="text" value="<%=app.clientId%>" onmouseenter="this.select()" onmouseleave="this.blur()" readonly></p>
+                        <p>Client Secret: <input type="password" value="<%=app.clientSecret%>" onmouseenter="this.select(); this.type = 'text';" onmouseleave="this.blur(); this.type = 'password';" readonly></p>
+                        <textarea name="callbackurl" id="callbackurl"><%app.callbackUrl.map(url => {%><%=url%><%})%></textarea>
+                        <input type="hidden" name="_clientid" value="<%=app.clientId%>">
+                        <input type="hidden" name="_csrf" value="<%-csrfToken%>">
+                        <br>
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </form>
+                </div>
+                <%})%>
+                <%}else{%>
+                    <p>Looks like you didn't have an app setup yet, you can do so by registering a new app using the form below</p>
+                <%}%>
+            </div>
+        
+            <hr>
+        
+            <form class="newApp" method="post" action="">
+                <h3>Create a new app</h3>
+                <input type="hidden" name="_csrf" value="<%-csrfToken%>">
+                <p>Name (*): <input type="text" name="name" placeholder="My app"></p>
+                <p>Description: <textarea name="description" placeholder="Simple demo app"></textarea></p>
+                <p>White List Domain(s) (*):</p>
+                <p>One per line</p>
+                <textarea type="url" name="callbackurl" placeholder="localhost:3000 or *"></textarea>
+                <!--<div class="g-recaptcha" data-sitekey="6LcfXy4UAAAAAKmVgFA2Ol0OR9x_jKXRA1NI46-C"></div>-->
+                <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+        
+        </div>
     </div>
-    <%}%>
-
-    <div class="myApps">
-        <h3>My apps</h3>
-        <%if(apps.length >= 1){%>
-        <%apps.map(app => {%>
-        <form class="app" action="/render/oauth-app/update" method="post">
-            <input name="appName" value="<%=app.name%>">
-            <p>Client ID: <input type="text" value="<%=app.clientId%>" onmouseenter="this.select()" onmouseleave="this.blur()" readonly></p>
-            <p>Client Secret: <input type="password" value="<%=app.clientSecret%>" onmouseenter="this.select(); this.type = 'text';" onmouseleave="this.blur(); this.type = 'password';" readonly></p>
-            <textarea name="callbackurl" id="callbackurl"><%app.callbackUrl.map(url => {%><%=url%><%})%></textarea>
-            <input type="hidden" name="_clientid" value="<%=app.clientId%>">
-            <input type="hidden" name="_csrf" value="<%-csrfToken%>">
-            <br>
-            <button type="submit" class="btn btn-success">Update</button>
-        </form>
-        <%})%>
-        <%}else{%>
-          <p>Looks like you didn't have an app setup yet, you can do so by registering a new app using the form below</p>
-        <%}%>
-    </div>
-
-    <hr>
-
-    <form class="newApp" method="post" action="/render/oauth-app">
-        <h3>Create a new app</h3>
-        <input type="hidden" name="_csrf" value="<%-csrfToken%>">
-        <p>Name (*): <input type="text" name="name" placeholder="My app"></p>
-        <p>Description: <textarea name="description" placeholder="Simple demo app"></textarea></p>
-        <p>White List Domain(s) (*):</p>
-        <p>One per line</p>
-        <textarea type="url" name="callbackurl" placeholder="localhost:3000 or *"></textarea>
-        <!--<div class="g-recaptcha" data-sitekey="6LcfXy4UAAAAAKmVgFA2Ol0OR9x_jKXRA1NI46-C"></div>-->
-        <button type="submit" class="btn btn-success">Submit</button>
-    </form>
-
-</div>
+</body>
+</html>

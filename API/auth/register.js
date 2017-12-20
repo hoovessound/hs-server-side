@@ -7,6 +7,7 @@ const Doodles = require('../../schema/Doodles');
 const crypto = require('crypto');
 const csurf = require('csurf');
 const genId = require('../../src/helper/genId');
+const parseDomain = require('parse-domain');
 
 function fetchDoodle(){
     return new Promise((resolve, reject) => {
@@ -190,13 +191,16 @@ router.post('/', csurf(), (req, res) => {
                         .then(user => {
                             // save the token into the cookie
                             if(req.query.no_cookie !== 'true'){
-                                res.cookie('oauth-token', token, {
-                                    maxAge: 365 * 24 * 60 * 60,
-                                    httpOnly: true,
+                                const domain = parseDomain(req.hostname);
+                                res.cookie('oauth-token', user.token, {
+                                    maxAge: 3600 * 1000 * 24 * 365 * 10,
+                                    httpOnly: false,
+                                    // cors all HS subdomains
+                                    domain: `.${domain.domain}.${domain.tld}`,
                                 });
                             }
                             // redirect the user into the redirect url
-                            res.redirect(`${redirect}?success=true&token=${token}`);
+                            res.redirect(`${domain.domain}.${domain.tld}`);
                         })
                         .catch(error => {
                             console.log(error);

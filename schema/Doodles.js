@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const DoodlesSchema = new Schema({
     id: String, // Random ID
+    title: String, // The title of this doodle
     author: {
         source: String, // The source EP: deviantart, facebook
         name: String, // Author's name
@@ -13,6 +14,10 @@ const DoodlesSchema = new Schema({
         // How many times this image has been used
         type: Number,
         default: 0,
+    },
+    pending: {
+        type: Boolean,
+        default: true,
     }
 });
 module.exports = mongoose.model('doodles', DoodlesSchema);

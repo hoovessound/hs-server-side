@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const oAuthAppsSchema = new Schema({
-    author: Schema.Types.ObjectId,
+    author: String,
     createDate: Date,
     name: String,
     clientId: String,

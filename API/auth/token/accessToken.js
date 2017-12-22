@@ -51,7 +51,7 @@ router.post('/', (req, res) => {
     .then(rightAccess => {
         if(!rightAccess){
             res.json({
-                error: 'Can\'t not that temporary token',
+                error: 'Can\'t not that authorization token',
                 code: 'unexpected_result',
             });
             return false;
@@ -73,6 +73,7 @@ router.post('/', (req, res) => {
         // Give this application an access token
 
         // If the user did have an access toke before and have the same scope permission
+
         AccessTokes.findOne({
             'author.user': rightAccess.author.user,
             permission: rightAccess.permission,
@@ -116,6 +117,7 @@ router.post('/', (req, res) => {
             // Save the new access token and remove the temporary token
             const currentTime = moment()._d;
             const endTime = moment(currentTime).add(1, 'years');
+            console.log(rightAccess.author.app)
             return new AccessTokes({
                 token: accessToken,
                 timestamp: {

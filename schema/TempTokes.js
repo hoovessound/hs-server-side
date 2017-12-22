@@ -7,8 +7,8 @@ const TempTokesSchema = new Schema({
         end: Date,
     },
     author: {
-        app: Schema.Types.ObjectId,
-        user: Schema.Types.ObjectId
+        app: String,
+        user: String,
     },
     permission: Array,
 });

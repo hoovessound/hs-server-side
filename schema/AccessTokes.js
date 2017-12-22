@@ -7,19 +7,9 @@ const AccessTokesSchema = new Schema({
         end: Date,
     },
     author: {
-        app: Schema.Types.ObjectId,
-        user: Schema.Types.ObjectId,
+        app: String,
+        user: String,
     },
     permission: Array,
-    rateLimit: {
-        official: {
-            type: Boolean,
-            default: false
-        },
-        used: {
-            type: Number,
-            default: 0,
-        },
-    }
 });
 module.exports = mongoose.model('accesstoke', AccessTokesSchema);

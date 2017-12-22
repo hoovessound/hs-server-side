@@ -178,7 +178,7 @@ router.get('/', csurf(), (req, res) => {
                                 error: null,
                                 message: null,
                                 rawQuery,
-                                uid: user._id,
+                                uid: user.id,
                                 user,
                                 scope: req.scopeInAction.parse,
                                 background,
@@ -350,7 +350,7 @@ router.post('/', csurf(), (req, res) => {
                                     error: null,
                                     message: null,
                                     rawQuery,
-                                    uid: user._id,
+                                    uid: user.id,
                                     user,
                                     scope: req.scopeInAction.parse,
                                     background,
@@ -399,9 +399,23 @@ router.post('/permission', csurf(), (req, res) => {
     }
 
     return Users.findOne({
-        _id: uid,
+        id: uid,
     })
     .then(user => {
+
+        if(!user){
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Bad UID',
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            })
+            return false;
+        }
+
         return oAuthApps.findOne({
             clientId,
         })
@@ -435,7 +449,7 @@ router.post('/permission', csurf(), (req, res) => {
                     end: endTime,
                 },
                 author: {
-                    app: app._id,
+                    app: app.clientId,
                     user: uid,
                 },
                 permission: req.scopeInAction.raw,

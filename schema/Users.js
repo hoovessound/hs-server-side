@@ -18,7 +18,6 @@ const usersSchema = new Schema({
     },
     fave: Array,
     roles: Array,
-    notification: Array,
     lastPlay: {
         date: Schema.Types.Date,
         trackID: String,

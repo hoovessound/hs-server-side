@@ -82,7 +82,7 @@ router.use((req, res, next) => {
                 });
                 return false;
             }
-            return Users.findOne({_id: rightAccess.author.user});
+            return Users.findOne({id: rightAccess.author.user});
         })
         .then(user => {
             // Rate limit control

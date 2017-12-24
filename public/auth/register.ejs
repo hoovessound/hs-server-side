@@ -5,31 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/css/register.css">
     <title>HoovesSounds | Register</title>
 </head>
 <body>
 
-    
-
-    <%if(error){%>
-        <div id="messages" class="error">
-    <%}else{%>
-        <div id="messages">
-    <%}%>
-        <%=message%>
+    <div id="app">
+        <%if(error){%>
+            <div id="messages" class="error">
+        <%}else{%>
+            <div id="messages">
+        <%}%>
+            <%=message%>
+        </div>
+        <div class="icon"></div>
+        <h1>Register</h1>
+        <form id="loginForm"  method="post" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+            <p>Username: <input type="text" class="username" value="" name="username"></p>
+            <p>Password: <input type="password" class="password" value="" name="password"></p>
+            <p>Email: <input type="email" class="email" value="" name="email"></p>
+            <p>Full Name: <input type="text" class="fullname" value="" name="fullname"></p>
+            <button type="submit" class="btn waves-effect waves-default">Register</button>
+        </form>
+        <script src="/register.js"></script>
+        <%-include('../includes/artwork')%>
     </div>
-
-    <div class="icon"></div>
-    <h1>Register</h1>
-    <form id="loginForm"  method="post" enctype="application/x-www-form-urlencoded">
-        <input type="hidden" name="_csrf" value="<%=csrfToken%>">
-        <p>Username: <input type="text" class="username" value="" name="username"></p>
-        <p>Password: <input type="password" class="password" value="" name="password"></p>
-        <p>Email: <input type="email" class="email" value="" name="email"></p>
-        <p>Full Name: <input type="text" class="fullname" value="" name="fullname"></p>
-        <button type="submit" class="btn waves-effect waves-default">Register</button>
-    </form>
-    <script src="/register.js"></script>
-    <%-include('../includes/artwork')%>
 </body>
 </html>

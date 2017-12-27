@@ -38,6 +38,7 @@ class Me {
             track.author = {
                 username: author.username,
                 fullname: author.fullName,
+                id: author.id,
             }
             responseObject.push({
                 id: track.id,

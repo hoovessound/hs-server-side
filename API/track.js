@@ -158,6 +158,8 @@ class FindTrack {
     }
 
     async getComment(trackId){
+        const req = this.req;
+        const res = this.res;
         try{
             const track = await Tracks.findOne({
                 id: trackId,
@@ -170,22 +172,30 @@ class FindTrack {
                 });
                 return false;
             }
-            if(track.comments.length <= 0){
-                this.res.json(track.comments)
-            }else{
-                track.comments.map((comment, index) => {
-                    Users.findOne({
+
+            async function getUser(comment, index){
+                try{
+                    const user = await Users.findOne({
                         id: comment.author,
                     })
-                    .then(author => {
-                        track.comments[index].author = {
-                            username: author.username,
-                            fullName: author.fullName,
-                        }
-                        if((index + 1) === track.comments.length){
-                            this.res.json(track.comments)
-                        }
-                    })
+                    track.comments[index]['author'] = {
+                        username: user.username,
+                        fullName: user.fullName,
+                    }
+                    if((index + 1) === track.comments.length){
+                        res.json(track.comments)
+                    }
+                }
+                catch(error){
+                    console.log(error);
+                }
+            }
+
+            if(track.comments.length <= 0){
+                this.res.json([]);
+            }else{
+                track.comments.map((comment, index) => {
+                    getUser(comment, index);
                 })
             }
         }

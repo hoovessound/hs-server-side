@@ -43,6 +43,7 @@ class Notification {
                 return({
                     username: user.username,
                     fullname: user.fullName,
+                    id: user.id,
                 });
             }
             catch(error){
@@ -65,7 +66,7 @@ class Notification {
     async send(){
         const req = this.req;
         const res = this.res;
-        const senderId = req.hsAuth.user.id;
+        const user = req.hsAuth.user;
 
         if(!req.body.to){
             res.json({
@@ -97,7 +98,11 @@ class Notification {
             message: htmlEscape(req.body.message),
             icon: req.body.icon,
             date: new Date(),
-            author: senderId,
+            author: {
+                username: user.username,
+                fullname: user.fullName,
+                id: user.id,
+            },
             receiver: req.body.to,
             read: false,
         }

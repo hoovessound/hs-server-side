@@ -30,29 +30,32 @@ router.get('/', (req, res) => {
                 tracks: [],
             })
             return false;
-        }
-        let finish = 0;
-        tracks.forEach((track, index) => {
-            return Users.findOne({
-                id: track.author,
+        }else{
+            const jobs = [];
+            async function fetchUser(id){
+                const user = await Users.findOne({
+                    id,
+                });
+                return({
+                    username: user.username,
+                    fullname: user.fullName,
+                    id: user.id,
+                });
+            }
+            tracks.map(track => {
+                jobs.push(fetchUser(track.author));
             })
-            .then(user => {
-                const username = user.username;
-                const fullName = user.fullName;
-                tracks[index].author = {
-                    username,
-                    fullName,
-                };
-                finish++;
-                if(tracks.length === finish ){
-                    // Finish
-                    res.json(tracks)
-                }
+            Promise.all(jobs)
+            .then(authors => {
+                authors.map((author, index) => {
+                    tracks[index].author = author;
+                });
+                res.json(tracks);
             })
             .catch(error => {
                 console.log(error);
             })
-        })
+        }
     })
     .catch(error => {
         console.log(error);

@@ -7,7 +7,7 @@ const NotificationSchema = new Schema({
     message: String, // The message of this payload
     icon: String, // The picture of this payload
     data: Date, // The sent date
-    author: String, // The author HS UUID
+    author: Schema.Types.Mixed, // The author HS UUID
     receiver: String, // The receiver HS UUID
     read: Boolean, // Is the receiver read this payload yet
 });

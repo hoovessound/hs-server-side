@@ -15,7 +15,7 @@ class Notification {
         const req = this.req;
         const res = this.res;
         const user = req.hsAuth.user;
-        const response = await Notifications
+        const notifications = await Notifications
         .find({
             receiver: user.id,
         }, {
@@ -30,8 +30,36 @@ class Notification {
             read: 1,
             _id: 0,
         })
-        .limit(5)
-        res.json(response)
+        .limit(5);
+
+        // Fetch the author
+        const jobs = [];
+
+        async function fetchAuthor(id) {
+            try{
+                const user = await Users.findOne({
+                    id,
+                });
+                return({
+                    username: user.username,
+                    fullname: user.fullName,
+                });
+            }
+            catch(error){
+                console.log(error);
+            }
+        }
+
+        notifications.map(payload => {
+            jobs.push(fetchAuthor(payload.author));
+        })
+        
+        const authors = await Promise.all(jobs);
+
+        authors.map((author, index) => {
+            notifications[index].author = author;
+        });
+        res.json(notifications);
     }
 
     async send(){

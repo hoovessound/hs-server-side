@@ -178,13 +178,10 @@ class FindTrack {
                     const user = await Users.findOne({
                         id: comment.author,
                     })
-                    track.comments[index]['author'] = {
+                    return ({
                         username: user.username,
                         fullName: user.fullName,
-                    }
-                    if((index + 1) === track.comments.length){
-                        res.json(track.comments)
-                    }
+                    });
                 }
                 catch(error){
                     console.log(error);
@@ -194,8 +191,20 @@ class FindTrack {
             if(track.comments.length <= 0){
                 this.res.json([]);
             }else{
+                const jobs = []
                 track.comments.map((comment, index) => {
-                    getUser(comment, index);
+                    jobs.push(getUser(comment, index));
+                });
+                return Promise.all(jobs)
+                .then(response => {
+                    response.map((author, index) => {
+                        // Put the author back in the correct spot
+                        track.comments[index].author = author;
+                    });
+                    res.json(track.comments)
+                })
+                .catch(error => {
+                    console.log(error);
                 })
             }
         }

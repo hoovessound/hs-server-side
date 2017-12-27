@@ -23,77 +23,59 @@ const csurf = require('csurf');
 const subdomain = require('express-subdomain');
 const url = require('url');
 const parseDomain = require('parse-domain');
+require('dotenv').config();
 
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
 
-// Settings up MongoDB
-if (process.env.DB) {
-    module.exports.db = {
-        url: process.env.DB,
+const envs = [
+    'DB',
+    'GCS_AUTH',
+    'MAILGUN_KEY',
+    'MAILGUN_DOMAIN',
+    'FILEZIGZAG_TOKEN',
+    'FB_CLIENT_ID',
+    'FB_SECRET',
+    'PV_CLIENT_ID',
+    'PV_SECRET',
+    'RECAPTCHA',
+];
+
+envs.map(env => {
+    if(process.env[env]){
+        console.log(`ENV CHECK: ${color.blue(env)} ${color.green('PASS')} `);
+    }else{ 
+        console.log(`ENV CHECK: ${color.yellow(env)} ${color.red('FAIL')} `);
+        process.exit();
     }
-    console.log(`MongoDB status: ${color.green('OK')}`);
-}else{
-    console.log(`Please set up the  ${color.yellow('$DB')} environmental variable`);
-    process.exit();
+});
+
+module.exports.db = {
+    url: process.env.DB,
 }
 
-// Settings up Google Cloud Platform
-if (process.env.GCS_AUTH) {
-    const gcsAuth = JSON.parse(process.env.GCS_AUTH);
-    // Create that file
-    if (!fsp.existsSync(path.join(`${__dirname}/../gcsAuth`))) {
-        console.log('Creating the gcsAuth directory');
-        fsp.mkdirSync(path.join(`${__dirname}/../gcsAuth`));
-    }
-    const gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
-    fsp.writeFileSync(gcsPath, process.env.GCS_AUTH);
-    module.exports.gcsPath = gcsPath;
-    console.log(`Google Cloud Storage status: ${color.green('OK')}`);
-}else{
-    console.log(`Please set up the  ${color.yellow('$GCS_AUTH')} environmental variable`);
-    process.exit();
+const gcsAuth = JSON.parse(process.env.GCS_AUTH);
+// Create that file
+if (!fsp.existsSync(path.join(`${__dirname}/../gcsAuth`))) {
+    console.log('Creating the gcsAuth directory');
+    fsp.mkdirSync(path.join(`${__dirname}/../gcsAuth`));
+}
+const gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
+fsp.writeFileSync(gcsPath, process.env.GCS_AUTH);
+module.exports.gcsPath = gcsPath;
+
+module.exports.mailgun = {
+    key: process.env.MAILGUN_KEY,
 }
 
-// Settings up Mailgun
-if (process.env.MAILGUN_KEY) {
-    module.exports.mailgun = {
-        key: process.env.MAILGUN_KEY,
-    }
-} else {
-    console.log(`Please set up the  ${color.yellow('$MAILGUN_KEY')} environmental variable`);
-    process.exit();
-}
+module.exports.mailgun.domain = process.env.MAILGUN_DOMAIN;
 
-if (process.env.MAILGUN_DOMAIN) {
-    module.exports.mailgun.domain = process.env.MAILGUN_DOMAIN;
-    console.log(`Mailgun services status: ${color.green('OK')}`);
-}else{
-    console.log(`Please set up the  ${color.yellow('$MAILGUN_DOMAIN')} environmental variable`);
-    process.exit();
-}
-
-// Settings up FileZigZag
-if(process.env.FILEZIGZAG_TOKEN){
-    module.exports.filezizgag = {
-        key:  process.env.FILEZIGZAG_TOKEN,
-    }
-    console.log(`FileZiZgag services status: ${color.green('OK')}`);
-}else{
-    console.log(`Please set up the  ${color.yellow('$FILEZIGZAG_TOKEN')} environmental variable`);
-    process.exit();
+module.exports.filezizgag = {
+    key:  process.env.FILEZIGZAG_TOKEN,
 }
 
 // Setting up the app port
 const port = 3000;
-const sslPath = function (fileName) {
-    const p = path.join(`/etc/letsencrypt/live/hoovessound.ml/${fileName}`);
-    if(fs.existsSync(p)){
-        return fs.readFileSync(p, 'utf-8');
-    }else{
-        return null
-    }
-};
 
 // Check of require directory
 fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
@@ -116,9 +98,6 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
 }).catch(error => {
     console.log(error);
 });
-
-// GCS Auth Token Path
-module.exports.gcsPath = path.join(`${__dirname}/../gcsAuth/gcsAuthToken.json`);
 
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended: true}));

@@ -1574,6 +1574,10 @@ dot-prop@^4.1.0:
   dependencies:
     is-obj "^1.0.0"
 
+dotenv@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-4.0.0.tgz#864ef1379aced55ce6f95debecdce179f7a0cd1d"
+
 download-file@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/download-file/-/download-file-0.1.5.tgz#ca50ba64d9094b0c8702ef9fff92d2189e141117"
@@ -1830,9 +1834,9 @@ expect-ct@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.0.tgz#52735678de18530890d8d7b95f0ac63640958094"
 
-"express-better-ratelimit_hs_specific@https://github.com/felixfong227/express-better-ratelimit_hs_specific":
+"express-better-ratelimit_hs_specific@https://github.com/hoovessound/express-better-ratelimit_hs_specific":
   version "1.1.2"
-  resolved "https://github.com/felixfong227/express-better-ratelimit_hs_specific#b25f61ceadf49b375bf25d5bb7c19be66bda53be"
+  resolved "https://github.com/hoovessound/express-better-ratelimit_hs_specific#e6ecd0d401fc0f1940ce87e2ad73b2d2c6beee35"
   dependencies:
     ipchecker "*"
 

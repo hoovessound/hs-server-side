@@ -7,3 +7,4 @@ encrypt_pack.tar
 gcsAuth
 .gulp-scss-cache
 .sass-cache
+.env

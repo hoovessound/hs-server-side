@@ -4,3 +4,4 @@ usersContent
 gcsAuth
 .gulp-scss-cache
 .sass-cache
+.env

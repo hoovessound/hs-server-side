@@ -26,15 +26,13 @@ class Image {
         }
     }
 
-    async findCoverart(id){
+    async findTrackCoverart(id){
         const req = this.req;
         const res = this.res;
         const track = await Tracks.findOne({id});
         if(!track){
-            res.json({
-                error: 'Track does not exists',
-                code: 'unexpected_result',
-            });
+            const defaultImage = 'https://storage.googleapis.com/hs-static/missing_track.jpg';
+            rp.get(defaultImage).pipe(res);
             return false;
         }else{
             rp.get(track.coverImage).pipe(res);
@@ -79,24 +77,27 @@ router.get('/:type?/:argument?', (req, res) => {
 
     switch(type){
 
+        case 'avatar':{
+            image.findUserAvatar(argument);
+            break;
+        }
+
+        case 'coverart': {
+            image.findTrackCoverart(argument);
+            break;
+        }
+
+        case 'banner': {
+            image.findUserBanner(argument);
+            break;
+        }
+
         default:{
             res.json({
                 error: 'Unsupport type of image',
                 code: 'unexpected_result',
             });
             return false;
-        }
-
-        case 'avatar':{
-            image.findUserAvatar(argument);
-        }
-
-        case 'coverart': {
-            image.findCoverart(argument);
-        }
-
-        case 'banner': {
-            image.findUserBanner(argument);
         }
     }
 });

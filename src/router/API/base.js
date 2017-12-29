@@ -25,6 +25,14 @@ router.use(limiter({
     }
 }));
 
+// Authorized-free APIs
+
+router.use('/tracks', require('../../../API/home'));
+
+router.use('/image', require('./../../../API/image'));
+
+router.use('/search', require('../../../API/search'));
+
 // Basic API auth
 router.use((req, res, next) => {
     const bypass = req.query.bypass;
@@ -99,15 +107,11 @@ router.use((req, res, next) => {
 });
 
 
-router.use('/tracks', require('../../../API/home'));
-
 router.use('/me', require('../../../API/me'));
 
 router.use('/upload', require('../../../API/upload'));
 
 router.use('/track', require('../../../API/track'));
-
-router.use('/search', require('../../../API/search'));
 
 router.use('/settings', require('../../../API/settings'));
 

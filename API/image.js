@@ -11,7 +11,7 @@ class Image {
         this.res = res;
     }
 
-    async findAvatar(username){
+    async findUserAvatar(username){
         const req = this.req;
         const res = this.res;
         const user = await Users.findOne({username});
@@ -38,6 +38,21 @@ class Image {
             return false;
         }else{
             rp.get(track.coverImage).pipe(res);
+        }
+    }
+
+    async findUserBanner(username){
+        const req = this.req;
+        const res = this.res;
+        const user = await Users.findOne({username});
+        if(!user){
+            res.json({
+                error: 'User does not exists',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            rp.get(user.banner).pipe(res);
         }
     }
 }
@@ -73,11 +88,15 @@ router.get('/:type?/:argument?', (req, res) => {
         }
 
         case 'avatar':{
-            image.findAvatar(argument);
+            image.findUserAvatar(argument);
         }
 
         case 'coverart': {
             image.findCoverart(argument);
+        }
+
+        case 'banner': {
+            image.findUserBanner(argument);
         }
     }
 });

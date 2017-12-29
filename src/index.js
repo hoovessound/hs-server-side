@@ -158,8 +158,6 @@ app.use(subdomain('id', require('./router/ID/id')));
 
 app.use(subdomain('stream', require('../API/listen')));
 
-app.use(subdomain('image', require('../API/image')));
-
 // app.use(subdomain('developer', require('../API/listen')));
 
 app.use(subdomain('console.developer', require('./router/view/oAuthApp')));

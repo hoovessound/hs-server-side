@@ -25,7 +25,7 @@ router.use(limiter({
     }
 }));
 
-// Authorized-free APIs
+// Authoriz-free APIs
 
 router.use('/tracks', require('../../../API/home'));
 

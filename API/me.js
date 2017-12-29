@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
+const parseDomain = require('parse-domain');
 
 class Me {
     constructor(req, res){
@@ -10,26 +11,33 @@ class Me {
     }
 
     async findThisUserTracks(){
+        const req = this.req;
+        const res = this.res;
+        const hsAuth = req.hsAuth;
+        let hostname = req.hostname;
+        if(process.env.NODE_ENV !== 'production'){
+            hostname += ':3000';
+        }
         this.res.json({
-            id: this.req.hsAuth.user.id,
-            username: this.req.hsAuth.user.username,
-            fullname: this.req.hsAuth.user.fullName,
-            email: this.req.hsAuth.user.email,
-            icon: this.req.hsAuth.user.icon,
-            roles: this.req.hsAuth.user.roles,
-            fave: this.req.hsAuth.user.fave,
-            banner: this.req.hsAuth.user.banner,
-            icon: this.req.hsAuth.user.icon,
-            tracks: this.req.hsAuth.user.tracks,
-            history: this.req.hsAuth.user.lastPlay,
+            id: hsAuth.user.id,
+            username: hsAuth.user.username,
+            fullname: hsAuth.user.fullName,
+            email: hsAuth.user.email,
+            icon: `${req.protocol}://${hostname}/image/avatar/${hsAuth.user.username}`,
+            roles: hsAuth.user.roles,
+            fave: hsAuth.user.fave,
+            banner: `${req.protocol}://${hostname}/image/banner/${hsAuth.user.username}`,
+            tracks: hsAuth.user.tracks,
+            history: hsAuth.user.lastPlay,
         });
     }
 
     async findMyFavorites(){
-        const user = this.req.hsAuth.user;
         const req = this.req;
         const res = this.res;
-        const responseObject = []
+        const hsAuth = req.hsAuth;
+        const user = hsAuth.user;
+        const responseObject = [];
         // Find the user favorite track IDs
         for(let faveId of user.fave){
             const track = await Tracks.findOne({id: faveId})

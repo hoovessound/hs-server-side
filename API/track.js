@@ -67,14 +67,20 @@ class FindTrack {
 
             // Find the author
 
-            Users.findOne({
+            return Users.findOne({
                 id: track.author
             })
             .then(author => {
                 track.author = {
                     username: author.username,
                     fullname: author.fullName,
+                    id: author.id,
                 }
+                let hostname = this.req.hostname;
+                if(process.env.NODE_ENV !== 'production'){
+                    hostname += ':3000';
+                }
+                track.coverImage = `${this.req.protocol}://${hostname}/image/coverart/${track.id}`;
                 this.res.json(track);
             })
         }

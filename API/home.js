@@ -44,11 +44,16 @@ router.get('/', (req, res) => {
             }
             tracks.map(track => {
                 jobs.push(fetchUser(track.author));
-            })
+            });
+            let hostname = req.hostname;
+            if(process.env.NODE_ENV !== 'production'){
+                hostname += ':3000';
+            }
             Promise.all(jobs)
             .then(authors => {
                 authors.map((author, index) => {
                     tracks[index].author = author;
+                    tracks[index].coverImage = `${req.protocol}://${hostname}/image/coverart/${tracks[index].id}`;
                 });
                 res.json(tracks);
             })

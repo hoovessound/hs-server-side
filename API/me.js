@@ -56,7 +56,7 @@ class Me {
                 description: track.description,
                 tags: track.tags,
                 private: track.private,
-                coverImage: track.coverImage,
+                coverImage: tracks[index].coverImage = `${req.protocol}://${hostname}/image/coverart/${tracks[index].id}`,
             })
         }
         res.json(responseObject)

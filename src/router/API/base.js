@@ -121,6 +121,8 @@ router.use('/doodle', require('./../../../API/doodle'));
 
 router.use('/events', require('./../../../API/events'));
 
+router.use('/user', require('./../../../API/user'));
+
 
 router.all('*', (req, res) => {
     res.status(404);

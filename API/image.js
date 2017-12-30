@@ -3,6 +3,7 @@ const router = express.Router();
 const Tracks = require('../schema/Tracks');
 const Users = require('../schema/Users');
 const rp = require('request-promise');
+const Jimp = require('jimp');
 
 
 class Image {
@@ -22,7 +23,7 @@ class Image {
             });
             return false;
         }else{
-            rp.get(user.icon).pipe(res);
+            this.resize(user.icon);
         }
     }
 
@@ -35,7 +36,7 @@ class Image {
             rp.get(defaultImage).pipe(res);
             return false;
         }else{
-            rp.get(track.coverImage).pipe(res);
+            this.resize(track.coverImage);
         }
     }
 
@@ -50,9 +51,53 @@ class Image {
             });
             return false;
         }else{
-            rp.get(user.banner).pipe(res);
+            this.resize(user.banner);
         }
     }
+
+    resize(imageUrl){
+        if(!imageUrl){
+            imageUrl = 'https://storage.googleapis.com/hs-static/missing_track.jpg';
+        }
+        const req = this.req;
+        const res = this.res;
+        const rawWith = req.query.width;
+        const rawHeight = req.query.height;
+
+        if(rawWith || rawHeight){
+            Jimp.read(imageUrl, (error, img) => {
+                if(error){
+                    console.log(error);
+                }
+                let width;
+                let height;
+
+                if(rawWith){
+                    width = parseInt(rawWith);
+                }
+
+                if(rawHeight){
+                    height = parseInt(rawHeight);
+                }
+
+                if(rawWith && !rawHeight){
+                    height = parseInt(rawWith);
+                }
+
+                if(rawHeight && !rawWith){
+                    width = parseInt(rawHeight);
+                }
+                img.resize(width, height).getBuffer(Jimp.AUTO, function(e,buffer){
+                    res.type(img.getMIME());
+                    res.end(buffer);
+                });
+            })
+            return false;
+        }else{
+            rp.get(imageUrl).pipe(res);
+        }
+    }
+
 }
 
 router.get('/:type?/:argument?', (req, res) => {

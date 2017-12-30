@@ -71,7 +71,7 @@ class Notification {
         if(!req.body.to){
             res.json({
                 error: 'Missing the "to" field',
-                code: 'unexpected_result',
+                code: 'missing_require_fields',
             });
             return false;
         }
@@ -79,7 +79,7 @@ class Notification {
         if(!req.body.message){
             res.json({
                 error: 'Missing the "message" field',
-                code: 'unexpected_result',
+                code: 'missing_require_fields',
             });
             return false;
         }

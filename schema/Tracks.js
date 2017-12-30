@@ -9,10 +9,7 @@ const tracksSchema = new Schema({
     },
     author: Schema.Types.Mixed,
     uploadDate: Date,
-    coverImage: {
-        type: String,
-        default: 'https://storage.googleapis.com/hs-static/missing_track.jpg',
-    },
+    coverImage: String,
     comments: Array,
     fave: Array,
     description: String,

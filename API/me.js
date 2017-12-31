@@ -37,29 +37,62 @@ class Me {
         const res = this.res;
         const hsAuth = req.hsAuth;
         const user = hsAuth.user;
-        const responseObject = [];
-        // Find the user favorite track IDs
-        for(let faveId of user.fave){
-            const track = await Tracks.findOne({id: faveId})
-            // Fetch the author info
-            const author = await Users.findOne({id: track.author});
-            track.author = {
-                username: author.username,
-                fullname: author.fullName,
-                id: author.id,
-            }
-            responseObject.push({
-                id: track.id,
-                title: track.title,
-                uploadDate: track.uploadDate,
-                author: track.author,
-                description: track.description,
-                tags: track.tags,
-                private: track.private,
-                coverImage: tracks[index].coverImage = `${req.protocol}://${hostname}/image/coverart/${tracks[index].id}`,
-            })
+        const tracksJob = [];
+        const authorsJob = [];
+
+        async function getTrack(id){
+            return await Tracks.findOne({id}, {
+                id: 1,
+                title: 1,
+                author: 1,
+                uploadDate: 1,
+                description: 1,
+                tags: 1,
+                private: 1,
+                coverImage: 1,
+                _id: 0,
+            });
         }
-        res.json(responseObject)
+
+        async function getAuthor(id){
+            return await Users.findOne({id});
+        }
+
+        user.fave.map(id => {
+            tracksJob.push(getTrack(id));
+        })
+
+        let hostname = req.hostname;
+        if(process.env.NODE_ENV !== 'production'){
+            hostname += ':3000';
+        }
+
+        Promise.all(tracksJob)
+        .then(tracks => {
+            // Find the author
+            tracks.map(track => {
+                const authorId = track.author;
+                authorsJob.push(getAuthor(authorId));
+            });
+            Promise.all(authorsJob)
+            .then(authors => {
+                authors.map((author, index) => {
+                    tracks[index].author = {
+                        fullname: author.fullName,
+                        username: author.username,
+                        id: author.id,
+                    }
+                    tracks[index].coverImage = `${req.protocol}://${hostname}/image/coverart/${tracks[index].id}`;
+                });
+                res.json(tracks);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
 
 }

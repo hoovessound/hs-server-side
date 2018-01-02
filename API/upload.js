@@ -104,12 +104,6 @@ router.post('/', (req, res) => {
                 const ext = path.extname(file.name);
                 return fsp.rename(tmp_audioFile, path.join(`${__dirname}/../tracks/${newAudioId}${ext}`))
                 .then(() => {
-                    // Save the track details to the database
-                    // Remove the ext first
-                    file.name = file.name.replace(ext, '');
-                    // Trim down the file name
-                    file.name = file.name.replace(/\W/igm, '');
-                    file.name = file.name.replace(/ /igm, '-');
                     let title = escape(fields.title) || file.name;
                     // Check for the same title
 

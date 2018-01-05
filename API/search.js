@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../schema/Users');
 const Tracks = require('../schema/Tracks');
+const Playlists = require('../schema/Playlists');
 const Tags = require('../schema/Tags');
 
 router.get('/:query?', (req, res) => {
@@ -76,6 +77,16 @@ router.get('/:query?', (req, res) => {
             _id: 0,
             __v: 0,
             tracks: 0,
+        }),
+        Playlists.find({
+            title: regex,
+        }, {
+            id: 1,
+            title: 1,
+            author: 1,
+            tracks: 1,
+            coverImage: 1,
+            _id: 0,
         })
     ])
     .then(response => {
@@ -83,6 +94,7 @@ router.get('/:query?', (req, res) => {
             users: response[0],
             tracks: response[1],
             tags: response[2],
+            playlist: response[3],
         })
     })
 });

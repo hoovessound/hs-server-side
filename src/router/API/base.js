@@ -123,6 +123,8 @@ router.use('/events', require('./../../../API/events'));
 
 router.use('/user', require('./../../../API/user'));
 
+router.use('/playlist', require('./../../../API/playlist'));
+
 
 router.all('*', (req, res) => {
     res.status(404);

@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const Tracks = require('../schema/Tracks');
-const Users = require('../schema/Users');
-const Tags = require('../schema/Tags');
+const Tracks = require('../../schema/Tracks');
+const Users = require('../../schema/Users');
+const Tags = require('../../schema/Tags');
 const mongoose = require('mongoose');
 let status;
 const formidable = require('formidable');
 const path = require('path');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
-    keyFilename: require('../src/index').gcsPath,
+    keyFilename: require('../../src/index').gcsPath,
 });
 const sha256 = require('sha256');
 const randomstring = require('randomstring');
@@ -19,7 +19,7 @@ const request = require('request');
 const escape = require('escape-html');
 const moment = require('moment');
 const escapeHtml = require('escape-html');
-const genId = require('../src/helper/genId');
+const genId = require('../../src/helper/genId');
 
 class FindTrack {
 
@@ -28,83 +28,12 @@ class FindTrack {
         this.req = req;
     }
 
-    async findById(id){
-        try{
-            const track = await Tracks.findOne({
-                id,
-            }, {
-                id: 1,
-                title: 1,
-                author: 1,
-                uploadDate: 1,
-                description: 1,
-                tags: 1,
-                private: 1,
-                coverImage: 1,
-                _id: 0,
-            })
-
-            if(!this.req.query.bypass){
-                if(track.private){
-                    // Check permission
-                    if(!this.req.hsAuth.app.permission.includes('private_track')){
-                        this.res.json({
-                            error: 'Bad permission scoping',
-                            code: 'service_lock_down',
-                        });
-                        return false;
-                    }
-                }
-            }
-
-            if(!track){
-                this.res.json({
-                    error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }
-
-            // Find the author
-
-            return Users.findOne({
-                id: track.author
-            })
-            .then(author => {
-                track.author = {
-                    username: author.username,
-                    fullname: author.fullName,
-                    id: author.id,
-                }
-                let hostname = this.req.hostname;
-                if(process.env.NODE_ENV !== 'production'){
-                    hostname += ':3000';
-                }
-                track.coverImage = `${this.req.protocol}://${hostname}/image/coverart/${track.id}`;
-                this.res.json(track);
-            })
-        }
-        catch(error){
-            console.log(error)
-        }
-    }
-
     async faveOrUnfave(id){
 
         try{
 
             // Check permission
             const user = this.req.hsAuth.user;
-
-            if(!this.req.query.bypass){
-                if(!this.req.hsAuth.app.permission.includes('post_comment')){
-                    this.res.json({
-                        error: 'Bad permission scoping',
-                        code: 'service_lock_down',
-                    });
-                    return false;
-                }
-            }
 
             const authArgument = this.req.body.userid || this.req.headers.token;
             const bypass = this.req.query.bypass;
@@ -139,79 +68,23 @@ class FindTrack {
                         status,
                     });
 
-                    request({
-                        url: `${full_address}/api/notification`,
-                        headers: {
-                            token: this.token,
-                        },
-                        method: 'post',
-                        json: true,
-                        body: {
-                            to: user.id,
-                            title: 'Someone Has Liked Your Track',
-                            body: `${user.username} Has Favorited Your Track`,
-                            link: `${full_address}/track/${user.username}/${track.title}`,
-                            icon: track.coverImage,
-                        }
-                    });
+                    // request({
+                    //     url: `${full_address}/api/notification`,
+                    //     headers: {
+                    //         token: this.token,
+                    //     },
+                    //     method: 'post',
+                    //     json: true,
+                    //     body: {
+                    //         to: user.id,
+                    //         title: 'Someone Has Liked Your Track',
+                    //         body: `${user.username} Has Favorited Your Track`,
+                    //         link: `${full_address}/track/${user.username}/${track.title}`,
+                    //         icon: track.coverImage,
+                    //     }
+                    // });
                 }
 
-            }
-        }
-        catch(error){
-            console.log(error)
-        }
-    }
-
-    async getComment(trackId){
-        const req = this.req;
-        const res = this.res;
-        try{
-            const track = await Tracks.findOne({
-                id: trackId,
-            })
-
-            if(!track){
-                this.res.json({
-                    error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
-                });
-                return false;
-            }
-
-            async function getUser(comment, index){
-                try{
-                    const user = await Users.findOne({
-                        id: comment.author,
-                    })
-                    return ({
-                        username: user.username,
-                        fullName: user.fullName,
-                    });
-                }
-                catch(error){
-                    console.log(error);
-                }
-            }
-
-            if(track.comments.length <= 0){
-                this.res.json([]);
-            }else{
-                const jobs = []
-                track.comments.map((comment, index) => {
-                    jobs.push(getUser(comment, index));
-                });
-                return Promise.all(jobs)
-                .then(response => {
-                    response.map((author, index) => {
-                        // Put the author back in the correct spot
-                        track.comments[index].author = author;
-                    });
-                    res.json(track.comments)
-                })
-                .catch(error => {
-                    console.log(error);
-                })
             }
         }
         catch(error){
@@ -275,20 +148,6 @@ class FindTrack {
     }
 }
 
-router.get('/:id', (req, res) => {
-    const ID = req.params.id;
-    const findTrack = new FindTrack(res,req);
-    if(!ID){
-        res.json({
-            error: true,
-            msg: 'Missing the ID field',
-            code: 'missing_require_fields',
-        });
-        return false;
-    }
-    findTrack.findById(ID);
-});
-
 router.post('/favorite/:id?', (req, res) => {
     const id = req.params.id;
     const findTrack = new FindTrack(res, req);
@@ -316,7 +175,7 @@ router.post('/edit/:id?', (req, res) => {
     }
     
     const form = formidable.IncomingForm({
-        uploadDir: path.join(`${__dirname}/../usersContent`),
+        uploadDir: path.join(`${__dirname}/../../usersContent`),
     });
     form.encoding = 'utf-8';
     form.parse(req, (error, fields, files) => {
@@ -336,8 +195,7 @@ router.post('/edit/:id?', (req, res) => {
 
                 if(!track){
                     res.json({
-                        error: true,
-                        msg: 'can\'t not find your track',
+                        error: 'can\'t not find your track',
                         code: 'unexpected_result',
                     });
                     return false;
@@ -382,8 +240,7 @@ router.post('/edit/:id?', (req, res) => {
                         if(files.image.size > 0){
                             if(!files.image.type.includes('image')){
                                 res.json({
-                                    error: true,
-                                    msg: 'File is not an image type',
+                                    error: 'File is not an image type',
                                     code: 'not_valid_file_type',
                                 });
                                 return false;
@@ -391,7 +248,7 @@ router.post('/edit/:id?', (req, res) => {
                                 const ext = path.extname(files.image.name);
                                 const newID = sha256(randomstring.generate(10));
                                 let fileID = newID + ext;
-                                const coverImagePath = path.join(`${__dirname}/../usersContent/${fileID}`);
+                                const coverImagePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
                                 const gcsCoverImage = gcs.bucket('hs-cover-image');
                                 fsp.rename(files.image.path, coverImagePath).then(() => {
                                     // Resize the image first
@@ -442,7 +299,6 @@ router.post('/edit/:id?', (req, res) => {
                         }
 
                         if(track.private){
-                            track.title = `${escape(fields.title) || track.title}-private:${randomstring.generate(50)}`;
                             writeDB();
                             return false;
                         }
@@ -473,8 +329,7 @@ router.post('/edit/:id?', (req, res) => {
                         }
                         if(!fields.title && !fields.image && !fields.description){
                             res.json({
-                                error: true,
-                                msg: 'You have to pass in one or more argument',
+                                error: 'You have to pass in one or more argument',
                                 code: 'missing_require_fields',
                             });
                             return false;
@@ -487,20 +342,6 @@ router.post('/edit/:id?', (req, res) => {
 
         }
     });
-});
-
-router.get('/comment/:id?', (req, res) => {
-    const trackid = req.params.id;
-    const findTrack = new FindTrack(res, req);
-    if (!trackid) {
-        res.json({
-            error: true,
-            msg: 'Missing the trackid field',
-            code: 'missing_require_fields',
-        });
-        return false;
-    }
-    findTrack.getComment(trackid);
 });
 
 router.post('/comment/:id?', (req, res) => {

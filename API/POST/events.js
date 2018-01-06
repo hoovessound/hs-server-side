@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../schema/Users');
-const Tracks = require('../schema/Tracks');
+const Users = require('../../schema/Users');
+const Tracks = require('../../schema/Tracks');
 
 router.post('/', (req, res) => {
     const eventType = req.body.event;

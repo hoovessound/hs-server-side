@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../schema/Users');
-const Tracks = require('../schema/Tracks');
-const Playlists = require('../schema/Playlists');
-const Tags = require('../schema/Tags');
+const Users = require('../../schema/Users');
+const Tracks = require('../../schema/Tracks');
+const Playlists = require('../../schema/Playlists');
+const Tags = require('../../schema/Tags');
 
 router.get('/:query?', (req, res) => {
     const query = req.params.query;

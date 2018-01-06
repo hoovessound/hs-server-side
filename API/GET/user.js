@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Tracks = require('../schema/Tracks');
-const Users = require('../schema/Users');
-const xFrameOptions = require('x-frame-options')
+const Tracks = require('../../schema/Tracks');
+const Users = require('../../schema/Users');
 
 class User {
     constructor(req, res){

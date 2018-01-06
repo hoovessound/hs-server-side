@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../schema/Users');
-const Tracks = require('../schema/Tracks');
+const Users = require('../../schema/Users');
+const Tracks = require('../../schema/Tracks');
 
 router.get('/', (req, res) => {
 
@@ -24,7 +24,6 @@ router.get('/', (req, res) => {
     .skip(offset)
     .sort({uploadDate: -1})
     .then(tracks => {
-
         if(tracks.length <= 0){
             res.json({
                 tracks: [],

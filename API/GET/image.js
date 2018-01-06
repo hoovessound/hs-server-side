@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Tracks = require('../schema/Tracks');
-const Users = require('../schema/Users');
+const Tracks = require('../../schema/Tracks');
+const Users = require('../../schema/Users');
 const rp = require('request-promise');
 const Jimp = require('jimp');
-
 
 class Image {
     constructor(req, res){

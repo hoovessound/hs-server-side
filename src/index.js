@@ -152,11 +152,11 @@ app.use((req, res, next) => {
 
 // No CSRF check
 
-app.use(subdomain('api', require('./router/API/base')));
+app.use(subdomain('api', require('./router/api')));
 
-app.use(subdomain('id', require('./router/ID/id')));
+app.use(subdomain('id', require('./router/id')));
 
-app.use(subdomain('stream', require('../API/listen')));
+app.use(subdomain('stream', require('../API/GET/listen')));
 
 // app.use(subdomain('developer', require('../API/listen')));
 

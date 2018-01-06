@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Doodles = require('../schema/Doodles');
-const genId = require('../src/helper/genId');
+const Doodles = require('../../schema/Doodles');
+const genId = require('../../src/helper/genId');
 const htmlEscape = require('escape-html');
 
 async function fetchArtWork() {
@@ -65,45 +65,6 @@ class Doodle {
         const artWork = await fetchArtWorks(skip, req.query.random)
         res.json(artWork);
     }
-
-    async postDoodle(){
-        const res = this.res;
-        const req = this.req;
-        const user = req.hsAuth.user;
-        const title = req.body.title ? htmlEscape(req.body.title) : '_NA_';
-        const link = req.body.link ? req.body.link : `https://hoovessound.ml/@${user.username}`;
-        if(!req.body.imgur){
-            res.json({
-                error: 'Missing the "imgur" field',
-                code: 'unexpected_result',
-            });
-            return false;
-        }
-
-        if(!req.body.imgur.startsWith('https://i.imgur.com')){
-            res.json({
-                error: 'Not valid imgur url',
-                code: 'unexpected_result',
-            });
-            return false;
-        }
-        const data = {
-            id: genId(50),
-            title,
-            author: {
-                link,
-                source: 'imgur',
-                name: user.username,
-                id: user.id
-            },
-            image: req.body.imgur,
-            pending: true,
-        }
-        await new Doodles(data).save();
-        res.json(data);
-
-    }
-
 }
 
 router.get('/', (req, res) => {
@@ -116,10 +77,5 @@ router.get('/collections/:skip?', (req, res) => {
     const doodle = new Doodle(req, res);
     doodle.findDoodles(skip);
 });
-
-router.post('/', (req, res) => {
-    const doodle = new Doodle(req, res);
-    doodle.postDoodle();
-})
 
 module.exports = router;

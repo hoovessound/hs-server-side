@@ -38,6 +38,43 @@ class playlist {
                 username: author.username,
                 fullname: author.fullName,
             }
+            // Find tracks
+            const jobs = [];
+            async function fetchTrack(id){
+                return await Tracks.findOne({id}, {
+                    id: 1,
+                    title: 1,
+                    author: 1,
+                    uploadDate: 1,
+                    description: 1,
+                    tags: 1,
+                    private: 1,
+                    coverImage: 1,
+                    _id: 0,
+                });
+            }
+            playlist.tracks.map(id => {
+                jobs.push(fetchTrack(id));
+            });
+            const tracks = await Promise.all(jobs);
+            playlist.tracks = tracks;
+            // Fetch users
+            const usersJobs = [];
+            async function fetchUser(id){
+                const user = await Users.findOne({id});
+                return {
+                    id: user.id,
+                    username: user.username,
+                    fullanme: user.fullName,
+                }
+            }
+            tracks.map(track => {
+                usersJobs.push(fetchUser(track.author));
+            });
+            const users = await Promise.all(usersJobs);
+            users.map((user, index) => {
+                playlist.tracks[index].author = user;
+            });
             res.json(playlist);
         }
         catch(error){

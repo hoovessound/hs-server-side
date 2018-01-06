@@ -2,17 +2,15 @@ const express = require('express');
 const router = express.Router();
 const cors = require('cors');
 const limiter = require('express-better-ratelimit_hs_specific');
-const oAuthApps = require('../../../schema/oAuthApps');
-const Users = require('../../../schema/Users');
-const AccessTokes = require('../../../schema/AccessTokes');
+const oAuthApps = require('../../schema/oAuthApps');
+const Users = require('../../schema/Users');
+const AccessTokes = require('../../schema/AccessTokes');
 
-router.use('/widget', require('../../../API/widget'));
-
-router.use('/oauth2/token/access', require('../../../API/auth/token/accessToken'));
+router.use('/oauth2/token/access', require('../../API/auth/token/accessToken'));
 
 // Third party oAuth
-router.use('/oauth2/thirdparty/poniverse', require('../../../API/auth/thirdparty/poniverse'));
-router.use('/oauth2/thirdparty/facebook', require('../../../API/auth/thirdparty/facebook'));
+router.use('/oauth2/thirdparty/poniverse', require('../../API/auth/thirdparty/poniverse'));
+router.use('/oauth2/thirdparty/facebook', require('../../API/auth/thirdparty/facebook'));
 
 router.use(cors());
 
@@ -27,13 +25,16 @@ router.use(limiter({
 
 // Authoriz-free APIs
 
-router.use('/tracks', require('../../../API/home'));
+// GET APIs
+router.use('/tracks', require('../../API/GET/tracks'));
+router.use('/track', require('../../API/GET/track'));
+router.use('/image', require('../../API/GET/image'));
+router.use('/search', require('../../API/GET/search'))
+router.use('/doodle', require('../../API/GET/doodle'));
+router.use('/playlist', require('../../API/GET/playlist'));
+router.use('/user', require('../../API/GET/user'));
 
-router.use('/image', require('./../../../API/image'));
-
-router.use('/search', require('../../../API/search'));
-
-// Basic API auth
+// Authoriz APIs
 router.use((req, res, next) => {
     const bypass = req.query.bypass;
     const service = req.query.service;
@@ -41,16 +42,14 @@ router.use((req, res, next) => {
 
     if(bypass === 'true' || service){
         // Check for the host name
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const sessionToken = req.headers.sessiontoken;
         const token = req.query.oauth_token;
         Users.findOne({
             token,
         })
         .then(user => {
-            if(user === null){
+            if(!user){
                 res.json({
-                    error: `Not authenticated domain`,
+                    error: `Bad oauth token`,
                     code: 'bad_authentication',
                 });
                 return false;
@@ -64,15 +63,7 @@ router.use((req, res, next) => {
             }
         })
         .catch(error => {
-            if(error.message.includes('Cast to ObjectId failed for value')){
-                res.json({
-                    error: `Not authenticated domain`,
-                    code: 'bad_authentication',
-                });
-                return false;
-            }else{
-                console.log(error)
-            }
+            console.log(error);
         })
     }else{
         // Normal API calls
@@ -93,10 +84,10 @@ router.use((req, res, next) => {
             return Users.findOne({id: rightAccess.author.user});
         })
         .then(user => {
-            // Rate limit control
             req.hsAuth = {
                 user,
                 app: _rightAccess,
+                isNormalApiCall: true,
             };
             next();
         })
@@ -106,24 +97,20 @@ router.use((req, res, next) => {
     }
 });
 
+router.use('/me', require('../../API/GET/me'));
+router.use('/notification', require('../../API/GET/notification'));
 
-router.use('/me', require('../../../API/me'));
+// POST APIs
 
-router.use('/upload', require('../../../API/upload'));
+router.use('/upload', require('../../API/POST/upload'));
 
-router.use('/track', require('../../../API/track'));
+router.use('/track', require('../../API/POST/track'));
 
-router.use('/settings', require('../../../API/settings'));
+router.use('/settings', require('../../API/POST/settings'));
 
-router.use('/notification', require('./../../../API/notification'));
+router.use('/notification', require('../../API/POST/notification'));
 
-router.use('/doodle', require('./../../../API/doodle'));
-
-router.use('/events', require('./../../../API/events'));
-
-router.use('/user', require('./../../../API/user'));
-
-router.use('/playlist', require('./../../../API/playlist'));
+router.use('/events', require('../../API/POST/events'));
 
 
 router.all('*', (req, res) => {

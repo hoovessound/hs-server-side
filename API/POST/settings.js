@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../schema/Users');
-const Tracks = require('../schema/Tracks');
+const Users = require('../../schema/Users');
+const Tracks = require('../../schema/Tracks');
 const formidable = require('formidable');
 const randomstring = require('randomstring');
 const sha256 = require('sha256');
@@ -9,7 +9,7 @@ const fs =require('fs');
 const path = require('path');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
-    keyFilename: require('../src/index').gcsPath,
+    keyFilename: require('../../src/index').gcsPath,
 });
 const fp = require('fs-promise');
 const easyimage = require('easyimage');
@@ -19,8 +19,7 @@ const escape = require('escape-html');
 router.post('/', (req, res) => {
     if(req.query.bypass !== 'true'){
         res.json({
-            error: true,
-            msg: 'Internal API',
+            error: 'Internal API',
             code: 'services_lock_down',
         })
         return false;
@@ -29,8 +28,7 @@ router.post('/', (req, res) => {
     // Check for MINE types
     if(req.headers['content-type'] !== 'application/json'){
         res.json({
-            error: true,
-            msg: 'Please using application/json as your HTTP Content-Type',
+            error: 'Please using application/json as your HTTP Content-Type',
             code: 'invalid_http_request',
         });
         return false;
@@ -39,8 +37,7 @@ router.post('/', (req, res) => {
     // Check for the settings object
     if(!req.body.settings){
         res.json({
-            error: true,
-            msg: 'Missign the settings object',
+            error: 'Missign the settings object',
             code: 'not_valid_object',
         });
         return false;
@@ -49,8 +46,7 @@ router.post('/', (req, res) => {
     // Check for the settings.full_name
     if(!req.body.settings.full_name){
         res.json({
-            error: true,
-            msg: 'Missign the settings.full_name string',
+            error: 'Missign the settings.full_name string',
             code: 'not_valid_string',
         });
         return false;
@@ -81,23 +77,21 @@ router.post('/profilepicture', (req, res) => {
     this.user = req.hsAuth.user;
     if(req.query.bypass !== 'true'){
         res.json({
-            error: true,
-            msg: 'Internal API',
+            error: 'Internal API',
             code: 'services_lock_down',
         })
         return false;
     }
 
     const form = formidable.IncomingForm({
-        uploadDir: path.join(`${__dirname}/../usersContent`),
+        uploadDir: path.join(`${__dirname}/../../usersContent`),
     });
     form.encoding = 'utf-8';
     form.parse(req, (error, fields, files) => {
         // Check if the request contain the 'image' fields
         if(typeof files.image === 'undefined') {
             res.json({
-                error: true,
-                msg: 'Missing the image field',
+                error: 'Missing the image field',
                 code: 'missing_require_fields',
             });
             return false;
@@ -107,8 +101,7 @@ router.post('/profilepicture', (req, res) => {
         // MIME type checking
         if(!file.type.includes('image')){
             res.json({
-                error: true,
-                msg: 'Please upload a image file',
+                error: 'Please upload a image file',
                 code: 'not_valid_file_type',
             });
             return false;
@@ -117,8 +110,7 @@ router.post('/profilepicture', (req, res) => {
         // Check if the file is an GIF file
         if(file.type.includes('gif')){
             res.json({
-                error: true,
-                msg: 'GIF image is not supported',
+                error: 'GIF image is not supported',
                 code: 'not_valid_file_type',
             });
             return false;
@@ -133,19 +125,19 @@ router.post('/profilepicture', (req, res) => {
         const title = fields.title || file.name;
         const newID = sha256(randomstring.generate(10));
         let fileID = newID + ext;
-        const filePath = path.join(`${__dirname}/../usersContent/${fileID}`);
+        const filePath = path.join(`${__dirname}/../../usersContent/${fileID}`);
         fs.rename(file.path, filePath, error => {
             
             if(error){
                 console.log(error);
             }else{
-                // Resize the image to 50x50
+                // Resize the image to 200x200
 
                 return easyimage.resize({
                     src: filePath,
                     dst: filePath,
-                    width: 500,
-                    height: 500,
+                    width: 200,
+                    height: 200,
                     ignoreAspectRatio: true,
                 })
                 .then(processedImage => {

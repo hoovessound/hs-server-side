@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Tracks = require('../schema/Tracks');
+const Tracks = require('../../schema/Tracks');
 const path = require('path');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
-    keyFilename: require('../src/index').gcsPath,
+    keyFilename: require('../../src/index').gcsPath,
 });
 const request = require('request');
 
@@ -13,8 +13,7 @@ router.get('/:id?', (req, res) => {
     const id = req.params.id;
     if(typeof id === 'undefined'){
         res.json({
-            error: true,
-            msg: 'Missing the id field',
+            error: 'Missing the id field',
             code: 'missing_require_fields',
         });
         return false;

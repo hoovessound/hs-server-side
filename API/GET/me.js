@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../schema/Users');
-const Tracks = require('../schema/Tracks');
+const Users = require('../../schema/Users');
+const Tracks = require('../../schema/Tracks');
 const parseDomain = require('parse-domain');
 
 class Me {

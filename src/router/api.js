@@ -112,6 +112,8 @@ router.use('/notification', require('../../API/POST/notification'));
 
 router.use('/events', require('../../API/POST/events'));
 
+router.use('/playlist', require('../../API/POST/playlist'));
+
 
 router.all('*', (req, res) => {
     res.status(404);

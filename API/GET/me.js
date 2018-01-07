@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
+const Playlists = require('../../schema/Playlists');
 const parseDomain = require('parse-domain');
 
 class Me {
@@ -95,6 +96,31 @@ class Me {
         })
     }
 
+    async findPlaylists(){
+        const req = this.req;
+        const res = this.res;
+        const user = req.hsAuth.user;
+        const playlists = await Playlists.find({
+            author: user.id,
+        },
+        {
+            id: 1,
+            title: 1,
+            author: 1,
+            tracks: 1,
+            coverImage: 1,
+            _id: 0,
+        });
+        playlists.map((p, index) => {
+            playlists[index].author = {
+                id: user.id,
+                username: user.username,
+                fullname: user.fullName,
+            }
+        });
+        res.json(playlists);
+    }
+
 }
 
 router.get('/', (req, res) => {
@@ -107,6 +133,12 @@ router.get('/favorites', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
     const me = new Me(req, res);
     me.findMyFavorites();
+});
+
+router.get('/playlists', (req, res) => {
+    const token = req.body.token || req.headers.token || req.query.token;
+    const me = new Me(req, res);
+    me.findPlaylists();
 });
 
 module.exports = router;

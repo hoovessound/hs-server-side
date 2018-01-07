@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Tracks = require('../../schema/Tracks');
 const Users = require('../../schema/Users');
+const Playlists = require('../../schema/Playlists');
 const rp = require('request-promise');
 const Jimp = require('jimp');
 
@@ -51,6 +52,21 @@ class Image {
             return false;
         }else{
             this.resize(user.banner);
+        }
+    }
+
+    async findPlaylist(id){
+        const req = this.req;
+        const res = this.res;
+        const playlist = await Playlists.findOne({id});
+        if(!playlist){
+            res.json({
+                error: 'Playlist does not exists',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            this.resize(playlist.coverImage);
         }
     }
 
@@ -135,6 +151,11 @@ router.get('/:type?/:argument?', (req, res) => {
 
         case 'banner': {
             image.findUserBanner(argument);
+            break;
+        }
+
+        case 'playlist': {
+            image.findPlaylist(argument);
             break;
         }
 

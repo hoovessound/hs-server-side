@@ -146,6 +146,29 @@ class FindTrack {
             console.log(error);
         }
     }
+
+    async removeTag(track, tag){
+        const req = this.req;
+        const res = this.res;
+        const trackId = track.id;
+        // Remove the tag form the track job
+        if(track.tags.includes(tag)){
+            track.tags.splice(track.tags.indexOf(tag), 1);
+        }
+        // Update the tag registry
+        const tags = await Tags.findOne({
+            name: tag,
+        });
+        tags.tracks.splice(tags.tracks.indexOf(track.id), 1);
+        await Promise.all([
+            Tracks.update({_id: track._id}, track),
+            Tags.update({_id: tags._id}, tags),
+        ]);
+        res.json({
+            tag,
+            message: 'success',
+        });
+    }
 }
 
 router.post('/favorite/:id?', (req, res) => {
@@ -415,7 +438,12 @@ router.post('/tag/:trackid?', (req, res) => {
             .save()
         }else{
             // The tag already exists
-            return tagInfo.tracks.push(req.params.trackid);
+            if(!tagInfo.tracks.includes(req.params.trackid)){
+                tagInfo.tracks.push(req.params.trackid);
+                return Tags.update({
+                    _id: tagInfo._id,
+                }, tagInfo);
+            }
         }
     })
     .then(() => {
@@ -433,6 +461,7 @@ router.post('/tag/:trackid?', (req, res) => {
 router.delete('/tag/:trackid?', (req, res) => {
     const user = req.hsAuth.user;
     let tag = req.body.tag;
+    const findTrack = new FindTrack(res, req);
     tag = escapeHtml(tag);
     tag = tag.replace(/ /g, '_');
     tag = tag.replace(/[^a-zA-Z0-9_]/g, '');
@@ -448,36 +477,8 @@ router.delete('/tag/:trackid?', (req, res) => {
             });
             return false;
         }else{
-            if(track.tags.includes(tag)){
-                track.tags.splice(track.tags.indexOf(tag), 1);
-                return Tracks.update({
-                    _id: track._id,
-                }, track);
-            }else{
-                res.json({
-                    tag,
-                    message: 'Success',
-                });
-            }
+            findTrack.removeTag(track, tag);
         }
-    })
-    .then(() => {
-        // Update the tag registry
-        return Tags.findOne({
-            name: tag,
-        })
-    })
-    .then(tagInfo => {
-        tagInfo.tracks.splice(tagInfo.tracks.indexOf(tag), 1);
-        return Tags.update({
-            _id: tagInfo._id,
-        }, tagInfo);
-    })
-    .then(() => {
-        res.json({
-            tag,
-            message: 'Success',
-        });
     })
     .catch(error => {
         console.log(error);

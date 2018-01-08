@@ -61,7 +61,7 @@ class playlist {
                     return {
                         id: user.id,
                         username: user.username,
-                        fullanme: user.fullName,
+                        fullname: user.fullName,
                     }
                 }
                 tracks.map(track => {

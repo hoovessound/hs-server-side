@@ -23,13 +23,43 @@
         <form id="loginForm"  method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <p>Username: <input type="text" class="username" value="" name="username"></p>
-            <p>Password: <input type="password" class="password" value="" name="password"></p>
+            <p>Password: <input type="password" class="password" value="" name="password" onkeydown="checkPassword()"></p>
+            <div id="pwdError"></div>
             <p>Email: <input type="email" class="email" value="" name="email"></p>
             <p>Full Name: <input type="text" class="fullname" value="" name="fullname"></p>
             <button type="submit" class="btn waves-effect waves-default">Register</button>
         </form>
         <script src="/register.js"></script>
         <%-include('../includes/artwork')%>
+
+        <script>
+            var policy = [
+                {
+                    query: new RegExp(/[A-Z]/g),
+                    msg: 'At less one uppercase latter',
+                },
+                {
+                    query: new RegExp(/[a-z]/g),
+                    msg: 'At less one lowercase latter',
+                },
+                {
+                    query: new RegExp(/.{8,}/g),
+                    msg: 'At less have 8 characters',
+                }
+            ]
+            var pwdError = document.querySelector('#pwdError');
+            var password = document.querySelector('.password');
+            function checkPassword(){
+                for(let key in policy){
+                    if(!password.value.match(policy[key].query)){
+                        pwdError.innerHTML = policy[key].msg;
+                    }else{
+                        pwdError.innerHTML = '';
+                    }
+                }
+            }
+        </script>
+
     </div>
 </body>
 </html>

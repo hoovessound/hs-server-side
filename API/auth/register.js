@@ -166,48 +166,73 @@ router.post('/', csurf(), (req, res) => {
             })
             return false;
         }else{
-            // Hash the password
-            bcrypt.genSalt(10, (error, salt) => {
-                bcrypt.hash(req.body.password, salt, (error, hashedPassword) => {
-                    const randomBytes = crypto.randomBytes(50);
-                    let token = randomBytes.toString('hex');
-                    // Making sure there no one else using the same token
-                    return Users.findOne({
-                        token,
-                    })
-                    .then(user => {
-                        // Gen a new token, cuz someone else is using that token as well :/
-                        token = randomBytes.toString('hex');
-                        // Save the hashed password into the db     
-                        const newUser = new Users({
-                            id: genId(40),
-                            username: req.body.username,
-                            password: hashedPassword,
-                            fullName: req.body.fullname,
-                            email: req.body.email,
-                            token,
+
+            Users.findOne({
+                email: req.body.email,
+            })
+            .then(user =>{
+                if(user){
+                    let msg = 'Email is already taken';
+                    fetchDoodle()
+                    .then(background => {
+                        res.render('auth/register', {
+                            error: true,
+                            message: msg,
+                            csrfToken: req.csrfToken(),
+                            background,
                         });
-                        newUser.save()
-                        .then(user => {
-                            // save the token into the cookie
-                            if(req.query.no_cookie !== 'true'){
-                                const domain = parseDomain(req.hostname);
-                                res.cookie('oauth-token', user.token, {
-                                    maxAge: 3600 * 1000 * 24 * 365 * 10,
-                                    httpOnly: false,
-                                    // cors all HS subdomains
-                                    domain: `.${domain.domain}.${domain.tld}`,
-                                });
-                            }
-                            // redirect the user into the redirect url
-                            res.redirect(`${domain.domain}.${domain.tld}`);
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        })
                     })
-                });
-            });
+                    return false;
+                }else{
+
+                    // Hash the password
+                    bcrypt.genSalt(10, (error, salt) => {
+                        bcrypt.hash(req.body.password, salt, (error, hashedPassword) => {
+                            const randomBytes = crypto.randomBytes(50);
+                            let token = randomBytes.toString('hex');
+                            // Making sure there no one else using the same token
+                            return Users.findOne({
+                                token,
+                            })
+                            .then(user => {
+                                // Gen a new token, cuz someone else is using that token as well :/
+                                token = randomBytes.toString('hex');
+                                // Save the hashed password into the db     
+                                const newUser = new Users({
+                                    id: genId(40),
+                                    username: req.body.username,
+                                    password: hashedPassword,
+                                    fullName: req.body.fullname,
+                                    email: req.body.email,
+                                    token,
+                                });
+                                newUser.save()
+                                .then(user => {
+                                    // save the token into the cookie
+                                    const domain = parseDomain(req.hostname);
+                                    if(req.query.no_cookie !== 'true'){
+                                        res.cookie('oauth-token', user.token, {
+                                            maxAge: 3600 * 1000 * 24 * 365 * 10,
+                                            httpOnly: false,
+                                            // cors all HS subdomains
+                                            domain: `.${domain.domain}.${domain.tld}`,
+                                        });
+                                    }
+                                    // redirect the user into the redirect url
+                                    res.redirect(`${req.protocol}://${domain.domain}.${domain.tld}`);
+                                })
+                                .catch(error => {
+                                    console.log(error);
+                                })
+                            })
+                        });
+                    });
+
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
         }
     })
     .catch(error => {

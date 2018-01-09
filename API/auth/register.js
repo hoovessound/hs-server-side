@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const randomstring = require('randomstring');
 const Doodles = require('../../schema/Doodles');
+const Notifications = require('../../schema/Notifications');
 const crypto = require('crypto');
 const csurf = require('csurf');
 const genId = require('../../src/helper/genId');
@@ -220,6 +221,34 @@ router.post('/', csurf(), (req, res) => {
                                     }
                                     // redirect the user into the redirect url
                                     res.redirect(`${req.protocol}://${domain.domain}.${domain.tld}`);
+
+                                    const payload = {
+                                        to: user.id,
+                                        link: 'https://felixfong227.tumblr.com/post/169510233392/hoovessound-beta-yay',
+                                        icon: 'https://storage.googleapis.com/hs-static/favicon.png',
+                                        title: 'HoovesSound Beta YAY!',
+                                        message: 'For more information, please visit the link.',
+                                    };
+                                    const jobs = [];
+                                    const data = {
+                                        id: genId(50),
+                                        title: htmlEscape(payload.title),
+                                        link: payload.link,
+                                        message: htmlEscape(payload.message),
+                                        icon: payload.icon,
+                                        date: new Date(),
+                                        author: {
+                                            username: user.username,
+                                            fullname: user.fullName,
+                                            id: user.id,
+                                        },
+                                        receiver: payload.to,
+                                        read: false,
+                                    }
+                                    user.unreadNotification = true;
+                                    jobs.push(Notifications(data).save())
+                                    jobs.push(Users.update({_id: user._id}, user));
+                                    Promise.all(jobs);
                                 })
                                 .catch(error => {
                                     console.log(error);

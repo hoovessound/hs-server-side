@@ -12,6 +12,7 @@ class Notification {
     async get(){
         const req = this.req;
         const res = this.res;
+        const read = req.query.read;
         const user = req.hsAuth.user;
         const notifications = await Notifications
         .find({
@@ -59,6 +60,10 @@ class Notification {
             notifications[index].author = author;
         });
         res.json(notifications);
+        if(read){
+            user.unreadNotification = false;
+            await Users.update({_id: user._id}, user);
+        }
     }
 
 }

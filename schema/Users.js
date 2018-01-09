@@ -40,6 +40,10 @@ const usersSchema = new Schema({
             type: String,
             default: null,
         }
+    },
+    unreadNotification: {
+        type: Boolean,
+        default: false,
     }
 });
 module.exports = mongoose.model('Users', usersSchema);

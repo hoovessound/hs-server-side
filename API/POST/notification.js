@@ -54,8 +54,13 @@ class Notification {
             receiver: req.body.to,
             read: false,
         }
+        await new Notifications(data).save();
+        receiver.unreadNotification = true;
+        console.log(receiver)
+        // Update the user object
+        // Notify the user that he/she have a new unread message
+        await Users.update({id: req.body.to}, receiver);
         res.json(data);
-        new Notifications(data).save();
     }
 
     async delete(){

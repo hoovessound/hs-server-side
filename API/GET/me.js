@@ -30,6 +30,7 @@ class Me {
             banner: `${req.protocol}://${hostname}/image/banner/${hsAuth.user.username}`,
             tracks: hsAuth.user.tracks,
             history: hsAuth.user.lastPlay,
+            unreadNotification: hsAuth.user.unreadNotification,
         });
     }
 

@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
     }
 
     const full_address = req.protocol + "://" + req.headers.host;
-
+    const user = req.hsAuth.user;
     const form = formidable.IncomingForm({
         uploadDir: path.join(`${__dirname}/../../tracks`),
     });

@@ -122,6 +122,34 @@ class Me {
         res.json(playlists);
     }
 
+    async findTracks(){
+        const req = this.req;
+        const res = this.res;
+        const user = req.hsAuth.user;
+        const tracks = await Tracks.find({
+            author: user.id,
+        },
+        {
+            id: 1,
+            title: 1,
+            coverImage: 1,
+            description: 1,
+            uploadDate:1,
+            author: 1,
+            private: 1,
+            _id: 0,
+        });
+        tracks.map((track, index) => {
+            tracks[index].author = {
+                id: user.id,
+                fullname: user.fullName,
+                username: user.username,
+            };
+        });
+        res.json(tracks);
+
+    }
+
 }
 
 router.get('/', (req, res) => {
@@ -140,6 +168,12 @@ router.get('/playlists', (req, res) => {
     const token = req.body.token || req.headers.token || req.query.token;
     const me = new Me(req, res);
     me.findPlaylists();
+});
+
+router.get('/tracks', (req, res) => {
+    const token = req.body.token || req.headers.token || req.query.token;
+    const me = new Me(req, res);
+    me.findTracks();
 });
 
 module.exports = router;

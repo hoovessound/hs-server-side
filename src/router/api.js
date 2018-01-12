@@ -114,6 +114,8 @@ router.use('/events', require('../../API/POST/events'));
 
 router.use('/playlist', require('../../API/POST/playlist'));
 
+router.use('/doodle', require('../../API/POST/doodle'));
+
 
 router.all('*', (req, res) => {
     res.status(404);

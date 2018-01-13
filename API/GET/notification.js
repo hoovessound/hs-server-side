@@ -1,76 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../../schema/Users');
-const Notifications = require('../../schema/Notifications');
-
-class Notification {
-    constructor(req, res){
-        this.res = res;
-        this.req = req;
-    }
-
-    async get(){
-        const req = this.req;
-        const res = this.res;
-        const read = req.query.read;
-        const user = req.hsAuth.user;
-        const notifications = await Notifications
-        .find({
-            receiver: user.id,
-        }, {
-            id: 1,
-            icon: 1,
-            title: 1,
-            message: 1,
-            data: 1,
-            link: 1,
-            author: 1,
-            receiver: 1,
-            read: 1,
-            _id: 0,
-        })
-        .limit(5);
-
-        // Fetch the author
-        const jobs = [];
-
-        async function fetchAuthor(id) {
-            try{
-                const user = await Users.findOne({
-                    id,
-                });
-                return({
-                    username: user.username,
-                    fullname: user.fullName,
-                    id: user.id,
-                });
-            }
-            catch(error){
-                console.log(error);
-            }
-        }
-
-        notifications.map(payload => {
-            jobs.push(fetchAuthor(payload.author));
-        })
-        
-        const authors = await Promise.all(jobs);
-
-        authors.map((author, index) => {
-            notifications[index].author = author;
-        });
-        res.json(notifications);
-        if(read){
-            user.unreadNotification = false;
-            await Users.update({_id: user._id}, user);
-        }
-    }
-
-}
+const Notification = require('../functions/notification');
 
 router.get('/', (req, res) => {
-    const notification = new Notification(req, res);
-    notification.get();
+    const notification = new Notification(req.hsAuth.user);
+    notification.get(req.query.read)
+    .then(data => {
+        res.json(data);
+    })
+    .catch(error => {
+        console.log(error);
+    });
 })
 
 module.exports = router;

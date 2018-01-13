@@ -1,104 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../../schema/Users');
-const Notifications = require('../../schema/Notifications');
-const genId = require('../../src/helper/genId');
-const htmlEscape = require('escape-html');
-
-class Notification {
-    constructor(req, res){
-        this.res = res;
-        this.req = req;
-    }
-
-    async send(){
-        const req = this.req;
-        const res = this.res;
-        const user = req.hsAuth.user;
-
-        if(!req.body.to){
-            res.json({
-                error: 'Missing the "to" field',
-                code: 'missing_require_fields',
-            });
-            return false;
-        }
-
-        if(!req.body.message){
-            res.json({
-                error: 'Missing the "message" field',
-                code: 'missing_require_fields',
-            });
-            return false;
-        }
-        const receiver = await Users.findOne({id: req.body.to});
-        if(!receiver){
-            res.json({
-                error: 'Can not find the receiver ID',
-                code: 'unexpected_result',
-            });
-            return false;
-        }
-        const data = {
-            id: genId(50),
-            title: htmlEscape(req.body.title),
-            link: req.body.link,
-            message: htmlEscape(req.body.message),
-            icon: req.body.icon,
-            date: new Date(),
-            author: {
-                username: user.username,
-                fullname: user.fullName,
-                id: user.id,
-            },
-            receiver: req.body.to,
-            read: false,
-        }
-        await new Notifications(data).save();
-        receiver.unreadNotification = true;
-        console.log(receiver)
-        // Update the user object
-        // Notify the user that he/she have a new unread message
-        await Users.update({id: req.body.to}, receiver);
-        res.json(data);
-    }
-
-    async delete(){
-        const req = this.req;
-        const res = this.res;
-
-        const id = req.body.id;
-        const user = req.hsAuth.user;
-
-        const payload = await Notifications.findOne({id});
-
-        if(payload.author === user.id){
-            // Is the owner
-            await Notifications.remove({
-                _id: payload._id
-            });
-            res.json({
-                success: true,
-            })
-        }else{
-            res.json({
-                error: `This payload is not belong to you`,
-                code: 'bad_authentication',
-            });
-            return false;
-        }
-
-    }
-}
+const Notification = require('../functions/notification');
 
 router.post('/', (req, res) => {
-    const notification = new Notification(req, res);
-    notification.send();
+    const notification = new Notification(req.hsAuth.user);
+    notification.send(req.body)
+    .then(data => {
+        res.json(data);
+    })
+    .catch(error => {
+        console.log(error);
+    });
 })
 
 router.delete('/', (req, res) => {
-    const notification = new Notification(req, res);
-    notification.delete();
+    const notification = new Notification(req.hsAuth.user);
+    notification.delete(req.body.id)
+    .then(data => {
+        res.json(data);
+    })
+    .catch(error => {
+        console.log(error);
+    });
 })
 
 module.exports = router;

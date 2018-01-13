@@ -4,6 +4,7 @@ const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
 const Playlists = require('../../schema/Playlists');
 const parseDomain = require('parse-domain');
+const Notification = require('../functions/notification');
 
 class Me {
     constructor(req, res){
@@ -72,9 +73,24 @@ class Me {
         Promise.all(tracksJob)
         .then(tracks => {
             // Find the author
-            tracks.map(track => {
-                const authorId = track.author;
-                authorsJob.push(getAuthor(authorId));
+            tracks.map((track, index) => {
+                if(track){
+                    const authorId = track.author;
+                    authorsJob.push(getAuthor(authorId));
+                }else{
+                    // The track is been removed
+                    // So remove also remove it from the user's collections
+                    const trackId = user.fave[index];
+                    user.fave.splice(user.fave.indexOf(trackId), 1);
+                    Users.update({_id: user._id}, user);
+                    const notification = new Notification(user);
+                    notification.send({
+                        to: user.id,
+                        message: 'We have to remove one of your track from your favorites collection, due to the track is no longer available on HoovesSound',
+                        title: 'A track has been remove your favorite collection',
+                        icon: 'https://storage.googleapis.com/hs-static/favicon.png',
+                    });
+                }
             });
             Promise.all(authorsJob)
             .then(authors => {

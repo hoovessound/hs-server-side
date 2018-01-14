@@ -69,7 +69,7 @@ class Me {
         if(process.env.NODE_ENV !== 'production'){
             hostname += ':3000';
         }
-
+        let updateUser = false;
         Promise.all(tracksJob)
         .then(tracks => {
             // Find the author
@@ -82,16 +82,22 @@ class Me {
                     // So remove also remove it from the user's collections
                     const trackId = user.fave[index];
                     user.fave.splice(user.fave.indexOf(trackId), 1);
-                    Users.update({_id: user._id}, user);
-                    const notification = new Notification(user);
-                    notification.send({
-                        to: user.id,
-                        message: 'We have to remove one of your track from your favorites collection, due to the track is no longer available on HoovesSound',
-                        title: 'A track has been remove your favorite collection',
-                        icon: 'https://storage.googleapis.com/hs-static/favicon.png',
-                    });
+                    tracks.splice(tracks.indexOf(trackId), 1);
+                    updateUser = true;
                 }
             });
+
+            if(updateUser){
+                authorsJob.push(Users.update({_id: user._id}, user));
+                const notification = new Notification(user);
+                notification.send({
+                    to: user.id,
+                    message: 'We have to remove one of your track from your favorites collection, due to the track is no longer available on HoovesSound',
+                    title: 'A track has been remove your favorite collection',
+                    icon: 'https://storage.googleapis.com/hs-static/favicon.png',
+                });
+            }
+
             Promise.all(authorsJob)
             .then(authors => {
                 authors.map((author, index) => {

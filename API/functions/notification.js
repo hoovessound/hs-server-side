@@ -91,7 +91,6 @@ class Notification {
             _id: 0,
         })
         .limit(5);
-
         // Fetch the author
         const jobs = [];
         
@@ -121,11 +120,11 @@ class Notification {
         authors.map((author, index) => {
             notifications[index].author = author;
         });
-        return Promise.resolve(notifications);
-        if(read){
+        if(read === 'true'){
             user.unreadNotification = false;
-            await Users.update({_id: user._id}, user);
+            Users.update({_id: user._id}, user);
         }
+        return Promise.resolve(notifications);
     }
 }
 

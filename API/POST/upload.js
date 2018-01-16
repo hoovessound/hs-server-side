@@ -58,8 +58,8 @@ router.post('/', (req, res) => {
                 return false;
             }
             const coverImage = files.image;
-
-            if(coverImage){
+            const rawCoverImage = fs.readFileSync(coverImage.path);
+            if(coverImage && fileType(rawCoverImage) !== null){
                 if(!fileType(fs.readFileSync(coverImage.path)).mime.includes('image')){
                     res.json({
                         error: 'The image fields is not an image file',

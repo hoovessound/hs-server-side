@@ -9,9 +9,9 @@ class User {
         this.res = res;
     }
 
-    async findUser(username){
+    async findUser(username, jsonResponse=true){
         const req = this.req;
-        const res = this.res;   
+        const res = this.res;
         let user = await Users.findOne({username}, {
             username: 1,
             fullName: 1,
@@ -25,14 +25,46 @@ class User {
         });
         if(!user){
             res.json({
-                error: 'Missing the "message" field',
+                error: 'User not exists',
                 code: 'unexpected_result',
             });
             return false;
         }else{
             user['fullname'] = user.fullName;
-            res.json(user);
+            if(jsonResponse){
+                res.json(user);
+            }
+            return user;
         }
+    }
+
+    async findUserTracks(username){
+        const req = this.req;
+        const res = this.res;
+        const user = await this.findUser(username, false);
+        const tracks = await Tracks.find({
+            author: user.id,
+            private: false,
+        }, {
+            id: 1,
+            title: 1,
+            author: 1,
+            uploadDate: 1,
+            description: 1,
+            tags: 1,
+            private: 1,
+            coverImage: 1,
+            _id: 0,
+        });
+        tracks.map((track, index) => {
+            tracks[index].author = {
+                username: user.username,
+                fullname: user.fullName,
+                id: user.id,
+            }
+            tracks[index].coverImage = `${req.protocol}://api.hoovessound.ml/image/coverart/${track.id}`;
+        });
+        res.json(tracks);
     }
 }
 
@@ -47,6 +79,19 @@ router.get('/:username?', (req, res) => {
         return false;
     }
     user.findUser(username);
+});
+
+router.get('/:username?/tracks', (req, res) => {
+    const user = new User(req, res);
+    const username = req.params.username;
+    if(!username){
+        res.json({
+            error: 'Missing username argument',
+            code: 'missing_require_fields',
+        });
+        return false;
+    }
+    user.findUserTracks(username);
 });
 
 module.exports = router;

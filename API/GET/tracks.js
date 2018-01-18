@@ -68,6 +68,7 @@ class Track {
                             tracks[index].author = author;
                         }
                     });
+                    tracks[index].coverImage = `${req.protocol}://api.hoovessound.ml/image/coverart/${track.id}`;
                 });
                 res.json(tracks);
             }

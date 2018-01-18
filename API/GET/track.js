@@ -24,7 +24,7 @@ class FindTrack {
                 private: 1,
                 coverImage: 1,
                 _id: 0,
-            })
+            });
 
             if(!this.req.query.bypass){
                 if(track.private){

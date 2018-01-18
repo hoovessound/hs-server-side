@@ -3,7 +3,6 @@ const router = express.Router();
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
 const Playlists = require('../../schema/Playlists');
-const parseDomain = require('parse-domain');
 const Notification = require('../functions/notification');
 
 class Me {
@@ -20,7 +19,7 @@ class Me {
         if(process.env.NODE_ENV !== 'production'){
             hostname += ':3000';
         }
-        this.res.json({
+        res.json({
             id: hsAuth.user.id,
             username: hsAuth.user.username,
             fullname: hsAuth.user.fullName,
@@ -29,7 +28,6 @@ class Me {
             roles: hsAuth.user.roles,
             fave: hsAuth.user.fave,
             banner: `${req.protocol}://${hostname}/image/banner/${hsAuth.user.username}`,
-            tracks: hsAuth.user.tracks,
             history: hsAuth.user.lastPlay,
             unreadNotification: hsAuth.user.unreadNotification,
         });
@@ -175,25 +173,21 @@ class Me {
 }
 
 router.get('/', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
     const me = new Me(req, res);
     me.findThisUserTracks();
 });
 
 router.get('/favorites', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
     const me = new Me(req, res);
     me.findMyFavorites();
 });
 
 router.get('/playlists', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
     const me = new Me(req, res);
     me.findPlaylists();
 });
 
 router.get('/tracks', (req, res) => {
-    const token = req.body.token || req.headers.token || req.query.token;
     const me = new Me(req, res);
     me.findTracks();
 });

@@ -43,14 +43,15 @@ router.get('/:query?', (req, res) => {
                 }
             ]
         }, {
-            password: 0,
-            tracks: 0,
-            token: 0,
+            username: 1,
+            fullName: 1,
+            email: 1,
+            id: 1,
+            lastPlay: 1,
+            roles: 1,
+            banner: 1,
+            icon: 1,
             _id: 0,
-            __v: 0,
-            thirdparty: 0,
-            notification: 0,
-            lastPlay: 0,
         }),
         Tracks.find({
             title: regex,
@@ -65,11 +66,15 @@ router.get('/:query?', (req, res) => {
                 }
             ]
         }, {
-            file: 0,
+            id: 1,
+            title: 1,
+            author: 1,
+            uploadDate: 1,
+            description: 1,
+            tags: 1,
+            private: 1,
+            coverImage: 1,
             _id: 0,
-            __v: 0,
-            comments: 0,
-            fave: 0,
         }),
         Tags.findOne({
             name: req.params.query,

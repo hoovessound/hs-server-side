@@ -10,6 +10,7 @@
 </head>
 <body>
 <div id="app">
+    <div id="bg"></div>
     <%if(error){%>
     <div id="messages" class="error">
         <p class="title">Error :/</p>
@@ -20,7 +21,7 @@
       <div class="pwdError"><%=pwdError%></div>
     <%}%>
     <div class="icon"></div>
-    <h1>Login</h1>
+    <h3>Login</h3>
     <form id="loginForm" action="" method="post" enctype="application/x-www-form-urlencoded">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">
         <p><input type="email" class="username" value="" name="email" placeholder="Email Address"></p>

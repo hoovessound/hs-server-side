@@ -3,11 +3,19 @@
     <a href="<%=background.author.link%>" target="_blank"><%=background.author.name%></a>
 </div>
 <style>
-    html{
+    #bg{
+        position: fixed;
         background: url(<%=background.image%>);
         background-repeat: no-repeat;
         background-size: cover;
         width: 100vw;
         height: 100vh;
+        z-index: -1;
+    }
+
+    @media (max-width: 415px){
+        #bg{
+            display: none;
+        }
     }
 </style>

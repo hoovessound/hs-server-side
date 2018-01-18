@@ -1,12 +1,11 @@
 @media (min-width: 415px) {
     #app{
-        width: 32em;
+        width: 25em;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 0em;
+        left: 0em;
         background: #FFF;
-        padding: 7em 2em;
+        height: 100vh;
 
         .error{
             background: #F03861;

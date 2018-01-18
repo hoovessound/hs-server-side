@@ -1,13 +1,13 @@
 @media (min-width: 415px) {
-    
+
     #app{
-        width: 32em;
+        width: 21em;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 0em;
+        left: 0em;
         background: #FFF;
-        padding: 7em 2em;
+        height: 100vh;
+        box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.3);
 
         .error{
             background: #F03861;
@@ -22,7 +22,6 @@
                 margin-left: 0.3em;
             }
         }
-
     }
 
 }
@@ -71,5 +70,11 @@
     #loginButton{
         position: absolute;
         right: 1em;
+    }
+    #app{
+        top: 0em;
+        background: #FFF;
+        width: 100vw;
+        height: 100vh;
     }
 }

@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Users = require('../../schema/Users');
 const Changepassword = require('../../schema/Changepassword');
+const Doodles = require('../../schema/Doodles');
 const nodemailer = require('nodemailer');
 const randomstring = require('randomstring');
 const mg = require('nodemailer-mailgun-transport');
@@ -13,15 +14,40 @@ const csurf = require('csurf');
 
 router.use(csurf());
 
+function fetchDoodle(){
+    return new Promise((resolve, reject) => {
+        Doodles.count()
+        .then(count => {
+            const random = Math.floor(Math.random() * count);
+            return Doodles.findOne().skip(random);
+        })
+        .then(artWork => {
+            resolve({
+                id: artWork.id,
+                image: artWork.image,
+                used: artWork.used,
+                author: artWork.author,
+            });
+        })
+        .catch(error => {
+            reject(error);
+        })
+    })
+}
+
 router.get('/', csurf(),  (req, res) => {
     const token = req.query.token;
     // render the change password page
-    res.render('auth/changepassword', {
-        error: null,
-        message: null,
-        token,
-        csrfToken: req.csrfToken(),
-    });
+    fetchDoodle()
+    .then(background => {
+        res.render('auth/changepassword', {
+            error: null,
+            message: null,
+            token,
+            csrfToken: req.csrfToken(),
+            background,
+        });
+    })
 });
 
 router.post('/', csurf(),  (req, res) => {
@@ -36,21 +62,29 @@ router.post('/', csurf(),  (req, res) => {
         })
         .then(job => {
             if(job === null){
-                res.render('auth/changepassword', {
-                    error: true,
-                    message: 'Can not found your token',
-                    token,
-                    csrfToken: req.csrfToken(),
+                fetchDoodle()
+                .then(background => {
+                    res.render('auth/changepassword', {
+                        error: true,
+                        message: 'Can not found your token',
+                        token,
+                        csrfToken: req.csrfToken(),
+                        background,
+                    });
                 });
                 return false;
             }else{
                 // Check if that token is use before
                 if(job.updated){
-                    res.render('auth/changepassword', {
-                        error: true,
-                        message: 'Token used before',
-                        token,
-                        csrfToken: req.csrfToken(),
+                    fetchDoodle()
+                    .then(background => {
+                        res.render('auth/changepassword', {
+                            error: true,
+                            message: 'Token used before',
+                            token,
+                            csrfToken: req.csrfToken(),
+                            background,
+                        });
                     });
                     return false;
                 }else{
@@ -95,11 +129,15 @@ router.post('/', csurf(),  (req, res) => {
     }else{
 
         if(typeof req.body.email === 'undefined'){
-            res.render('auth/login', {
-                error: true,
-                message: 'Please enter the email',
-                code: 'missing_require_fields',
-                token,
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Please enter the email',
+                    code: 'missing_require_fields',
+                    token,
+                    background,
+                });
             });
             return false;
         }
@@ -117,12 +155,16 @@ router.post('/', csurf(),  (req, res) => {
                     });
                     return false;
                 }else{
-                    res.render('auth/changepassword', {
-                        error: true,
-                        message: 'Incorrect email',
-                        code: 'unauthorized_action',
-                        token,
-                        csrfToken: req.csrfToken(),
+                    fetchDoodle()
+                    .then(background => {
+                        res.render('auth/changepassword', {
+                            error: true,
+                            message: 'Incorrect email',
+                            code: 'unauthorized_action',
+                            token,
+                            csrfToken: req.csrfToken(),
+                            background,
+                        });
                     });
                     return false;
                 }
@@ -173,13 +215,17 @@ router.post('/', csurf(),  (req, res) => {
                                 })
                             })
                         }else{
-                            res.render('auth/changepassword', {
-                                error: true,
-                                message: 'Are you a bot',
-                                code: 'not_a_human',
-                                token: null,
-                                csrfToken: req.csrfToken(),
-                            });
+                            fetchDoodle()
+                            .then(background => {
+                                res.render('auth/changepassword', {
+                                    error: true,
+                                    message: 'Are you a bot',
+                                    code: 'not_a_human',
+                                    token: null,
+                                    csrfToken: req.csrfToken(),
+                                    background,
+                                });
+                            })
                             return false;
                         }
                     })

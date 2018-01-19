@@ -1,7 +1,5 @@
 const express = require('express');
 const http = require('http');
-const tls = require('tls');
-const fs = require('fs');
 const app = express();
 const server = http.createServer(app);
 const path = require('path');
@@ -15,14 +13,10 @@ const color = require('cli-color');
 const compression = require('compression');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const Users = require('../schema/Users');
-const Doodles = require('../schema/Doodles');
-const cookie = require('cookie');
 const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
-const url = require('url');
-const parseDomain = require('parse-domain');
+
 require('dotenv').config();
 
 let socketConnection = {};
@@ -72,7 +66,7 @@ module.exports.mailgun.domain = process.env.MAILGUN_DOMAIN;
 
 module.exports.filezizgag = {
     key:  process.env.FILEZIGZAG_TOKEN,
-}
+};
 
 // Setting up the app port
 const port = 3000;

@@ -104,13 +104,13 @@ class Image {
                 }
                 img.resize(width, height).getBuffer(Jimp.AUTO, function(e,buffer){
                     res.type(img.getMIME());
-                    res.setHeader('Cache-Control', 'public, max-age=31557600');
+                    res.setHeader('Cache-Control', 'no-cache');
                     res.end(buffer);
                 });
             })
             return false;
         }else{
-            res.setHeader('Cache-Control', 'public, max-age=31557600');
+            res.setHeader('Cache-Control', 'no-cache');
             rp.get(imageUrl).pipe(res);
         }
     }

@@ -2,11 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Tracks = require('../../schema/Tracks');
 const path = require('path');
-const gcs = require('@google-cloud/storage')({
-    projectId: 'hoovessound',
-    keyFilename: require('../../src/index').gcsPath,
-});
 const request = require('request');
+const sendSeekable = require('send-seekable');
+router.use(sendSeekable);
 
 router.get('/:id?', (req, res) => {
 
@@ -34,14 +32,17 @@ router.get('/:id?', (req, res) => {
                 }
 
                 if(track.file.extend){
-                    // res.set('Cache-Control', 'public, max-no-cache');
-                    res.set('Cache-Control', 'public, max-31557600');
-                    res.set('Transfer-Encodin', 'chunked');
-                    res.set('Content-Type', 'application/octet-stream');
-                    request.get(track.file.location).pipe(res);
+                    request({
+                        url: track.file.location,
+                        encoding: null,
+                    }, (error, response, body) => {
+                        res.setHeader('Cache-Control', 'no-cache');
+                        res.sendSeekable(body);
+                    })
                 }else{
                     // Send back the audio file
                     const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);
+                    res.setHeader('Cache-Control', 'no-cache');
                     res.sendFile(trackPath);
                 }
             }

@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 const url = require('url');
 const parseDomain = require('parse-domain');
+const jwt = require('jsonwebtoken');
 
 const Doodles = require('../../../schema/Doodles');
 
@@ -332,7 +333,14 @@ router.post('/', csurf(), (req, res) => {
                     if(same){
                         const rawQuery = url.parse(req.url).query;
                         const domain = parseDomain(req.hostname);
-                        res.cookie('oauth-token', user.token, {
+                        const jwtToken = jwt.sign({
+                            id: user.id,
+                            username: user.username,
+                            signDate: Date.now(),
+                        }, process.env.JWTTOKEN, {
+                            expiresIn: 3600 * 1000 * 24 * 365 * 10,
+                        });
+                        res.cookie('jwt_token', jwtToken, {
                             maxAge: 3600 * 1000 * 24 * 365 * 10,
                             httpOnly: false,
                             // cors all HS subdomains

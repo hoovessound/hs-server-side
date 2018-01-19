@@ -5,7 +5,7 @@ const limiter = require('express-better-ratelimit_hs_specific');
 const oAuthApps = require('../../schema/oAuthApps');
 const Users = require('../../schema/Users');
 const AccessTokes = require('../../schema/AccessTokes');
-
+const jwt = require('jsonwebtoken');
 router.use('/oauth2/token/access', require('../../API/auth/token/accessToken'));
 
 // Third party oAuth
@@ -42,29 +42,45 @@ router.use((req, res, next) => {
 
     if(bypass === 'true' || service){
         // Check for the host name
-        const token = req.query.oauth_token;
-        Users.findOne({
-            token,
-        })
-        .then(user => {
-            if(!user){
+        const token = req.query.jwt;
+        if(!token){
+            res.json({
+                error: `Please provide the authorization token`,
+                code: 'bad_authentication',
+            });
+            return false;
+        }
+        jwt.verify(token, process.env.JWTTOKEN, (error, data) => {
+            if(error){
                 res.json({
-                    error: `Bad oauth token`,
+                    error: `Bad authorization token`,
                     code: 'bad_authentication',
                 });
-                return false;
             }else{
-                req.hsAuth = {
-                    token,
-                    user,
-                    isNormalApiCall: false,
-                }
-                next();
+                Users.findOne({
+                    id: data.id,
+                })
+                .then(user => {
+                    if(!user){
+                        res.json({
+                            error: `Bad oauth token`,
+                            code: 'bad_authentication',
+                        });
+                        return false;
+                    }else{
+                        req.hsAuth = {
+                            token,
+                            user,
+                            isNormalApiCall: false,
+                        };
+                        next();
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                })
             }
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        });
     }else{
         // Normal API calls
         const accessToken = req.headers.authorization || req.headers.access_token || req.query.access_token;

@@ -6,7 +6,6 @@ const usersSchema = new Schema({
     password: String,
     email: String,
     fullName: String,
-    token: String,
     tracks: Array,
     icon: {
         type: String,
@@ -29,16 +28,6 @@ const usersSchema = new Schema({
         playtime: {
             currentTime: Number,
             duration: Number,
-        }
-    },
-    thirdparty: {
-        provider: {
-            type: String,
-            default: 'hoovessound',
-        },
-        token: {
-            type: String,
-            default: null,
         }
     },
     unreadNotification: {

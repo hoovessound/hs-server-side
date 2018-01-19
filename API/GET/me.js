@@ -38,83 +38,78 @@ class Me {
         const res = this.res;
         const hsAuth = req.hsAuth;
         const user = hsAuth.user;
-        const tracksJob = [];
         const authorsJob = [];
+        const existsAuthors = [];
 
-        async function getTrack(id){
-            return await Tracks.findOne({id}, {
-                id: 1,
-                title: 1,
-                author: 1,
-                uploadDate: 1,
-                description: 1,
-                tags: 1,
-                private: 1,
-                coverImage: 1,
-                _id: 0,
-            });
-        }
-
-        async function getAuthor(id){
-            return await Users.findOne({id});
-        }
-
-        user.fave.map(id => {
-            tracksJob.push(getTrack(id));
-        })
 
         let hostname = req.hostname;
         if(process.env.NODE_ENV !== 'production'){
             hostname += ':3000';
         }
         let updateUser = false;
-        Promise.all(tracksJob)
-        .then(tracks => {
-            // Find the author
-            tracks.map((track, index) => {
-                if(track){
-                    const authorId = track.author;
-                    authorsJob.push(getAuthor(authorId));
-                }else{
-                    // The track is been removed
-                    // So remove also remove it from the user's collections
-                    const trackId = user.fave[index];
-                    user.fave.splice(user.fave.indexOf(trackId), 1);
-                    tracks.splice(tracks.indexOf(trackId), 1);
-                    updateUser = true;
+        const tracks = await Tracks.find({
+            id: {
+                $in: user.fave,
+            }
+        },{
+            id: 1,
+            title: 1,
+            author: 1,
+            uploadDate: 1,
+            description: 1,
+            tags: 1,
+            private: 1,
+            coverImage: 1,
+            _id: 0,
+        });
+
+        // Fetch the author object
+
+        tracks.map(track => {
+            if(track){
+                if(!existsAuthors.includes(track.author)){
+                    existsAuthors.push(track.author);
+                }
+            }else{
+                // The track is been removed
+                // So remove also remove it from the user's collections
+                const trackId = user.fave[index];
+                user.fave.splice(user.fave.indexOf(trackId), 1);
+                tracks.splice(tracks.indexOf(trackId), 1);
+                updateUser = true;
+            }
+        });
+
+        const authors = await Users.find({
+            id: {
+                $in: existsAuthors,
+            }
+        });
+        tracks.map((track, index) => {
+            authors.map(author => {
+                if(track.author === author.id){
+                    tracks[index].author = {
+                        id: author.id,
+                        username: author.username,
+                        fullname: author.fullName,
+                    };
                 }
             });
+            tracks[index].coverImage = `${req.protocol}://api.hoovessound.ml/image/coverart/${track.id}`;
+        });
 
-            if(updateUser){
-                authorsJob.push(Users.update({_id: user._id}, user));
-                const notification = new Notification(user);
-                notification.send({
-                    to: user.id,
-                    message: 'We have to remove one of your track from your favorites collection, due to the track is no longer available on HoovesSound',
-                    title: 'A track has been remove your favorite collection',
-                    icon: 'https://storage.googleapis.com/hs-static/favicon.png',
-                });
-            }
+        if(updateUser){
+            authorsJob.push(Users.update({_id: user._id}, user));
+            const notification = new Notification(user);
+            notification.send({
+                to: user.id,
+                message: 'We have to remove one of your track from your favorites collection, due to the track is no longer available on HoovesSound',
+                title: 'A track has been remove your favorite collection',
+                icon: 'https://storage.googleapis.com/hs-static/favicon.png',
+            });
+        }
 
-            Promise.all(authorsJob)
-            .then(authors => {
-                authors.map((author, index) => {
-                    tracks[index].author = {
-                        fullname: author.fullName,
-                        username: author.username,
-                        id: author.id,
-                    }
-                    tracks[index].coverImage = `${req.protocol}://${hostname}/image/coverart/${tracks[index].id}`;
-                });
-                res.json(tracks);
-            })
-            .catch(error => {
-                console.log(error);
-            })
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        res.json(tracks);
     }
 
     async findPlaylists(){

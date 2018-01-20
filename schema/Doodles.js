@@ -3,12 +3,8 @@ const Schema = mongoose.Schema;
 const DoodlesSchema = new Schema({
     id: String, // Random ID
     title: String, // The title of this doodle
-    author: {
-        source: String, // The source EP: deviantart, facebook
-        name: String, // Author's name
-        link: String, // Author's origin link EP: Facebook profile or DeviantArt profile page
-        id: String // HoovesSound's UUID
-    },
+    author: Schema.Types.Mixed,
+    link: String, // Author's origin link EP: Facebook profile or DeviantArt profile page
     image: String, // The image itself
     used: {
         // How many times this image has been used

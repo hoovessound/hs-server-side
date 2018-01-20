@@ -3,6 +3,7 @@ const router = express.Router();
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
 const Playlists = require('../../schema/Playlists');
+const Doodles = require('../../schema/Doodles');
 const Notification = require('../functions/notification');
 
 class Me {
@@ -165,6 +166,26 @@ class Me {
 
     }
 
+    async findDoodles(){
+        const req = this.req;
+        const res = this.res;
+        const user = req.hsAuth.user;
+
+        const doodles = await Doodles.find({
+            author: user.id,
+        }, {
+            id: 1,
+            title: 1,
+            image: 1,
+            author: 1,
+            link: 1,
+            pending: 1,
+            used: 1,
+            _id: 0,
+        });
+        res.json(doodles);
+    }
+
 }
 
 router.get('/', (req, res) => {
@@ -185,6 +206,11 @@ router.get('/playlists', (req, res) => {
 router.get('/tracks', (req, res) => {
     const me = new Me(req, res);
     me.findTracks();
+});
+
+router.get('/doodles', (req, res) => {
+    const me = new Me(req, res);
+    me.findDoodles();
 });
 
 module.exports = router;

@@ -3,6 +3,7 @@ const router = express.Router();
 const Tracks = require('../../schema/Tracks');
 const Users = require('../../schema/Users');
 const Playlists = require('../../schema/Playlists');
+const Doodles = require('../../schema/Doodles');
 const rp = require('request-promise');
 const Jimp = require('jimp');
 
@@ -13,7 +14,6 @@ class Image {
     }
 
     async findUserAvatar(username){
-        const req = this.req;
         const res = this.res;
         const user = await Users.findOne({username});
         if(!user){
@@ -28,7 +28,6 @@ class Image {
     }
 
     async findTrackCoverart(id){
-        const req = this.req;
         const res = this.res;
         const track = await Tracks.findOne({id});
         if(!track){
@@ -41,22 +40,20 @@ class Image {
     }
 
     async findUserBanner(username){
-        const req = this.req;
         const res = this.res;
         const user = await Users.findOne({username});
         if(!user){
             res.json({
-                error: 'User does not exists',
+                error: 'Doodle does not exists',
                 code: 'unexpected_result',
             });
             return false;
         }else{
-            this.resize(user.banner);
+            this.resize(doodle.image);
         }
     }
 
     async findPlaylist(id){
-        const req = this.req;
         const res = this.res;
         const playlist = await Playlists.findOne({id});
         if(!playlist){
@@ -67,6 +64,20 @@ class Image {
             return false;
         }else{
             this.resize(playlist.coverImage);
+        }
+    }
+
+    async findDoodle(id){
+        const res = this.res;
+        const doodle = await Doodles.findOne({id});
+        if(!doodle){
+            res.json({
+                error: 'Playlist does not exists',
+                code: 'unexpected_result',
+            });
+            return false;
+        }else{
+            this.resize(doodle.image);
         }
     }
 
@@ -107,7 +118,7 @@ class Image {
                     res.setHeader('Cache-Control', 'no-cache');
                     res.end(buffer);
                 });
-            })
+            });
             return false;
         }else{
             res.setHeader('Cache-Control', 'no-cache');
@@ -156,6 +167,11 @@ router.get('/:type?/:argument?', (req, res) => {
 
         case 'playlist': {
             image.findPlaylist(argument);
+            break;
+        }
+
+        case 'doodle': {
+            image.findDoodle(argument);
             break;
         }
 

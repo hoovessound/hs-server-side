@@ -3,7 +3,7 @@ const router = express.Router();
 const Tracks = require('../../schema/Tracks');
 const Users = require('../../schema/Users');
 const Tags = require('../../schema/Tags');
-const mongoose = require('mongoose');
+const Doodles = require('../../schema/Doodles');
 let status;
 const formidable = require('formidable');
 const path = require('path');
@@ -168,6 +168,42 @@ class FindTrack {
             tag,
             message: 'success',
         });
+    }
+
+    async updateBackgroundDrop(){
+        const req = this.req;
+        const res = this.res;
+        const user = req.hsAuth.user;
+        const doodle = await Doodles.findOne({
+            author: user.id,
+        });
+        if(!doodle){
+            res.json({
+                error: 'Doodle does not exits',
+                code: 'unexpected_result',
+            });
+            return false;
+        }
+
+        const track = await Tracks.findOne({
+            id: req.params.id,
+        });
+
+        if(!track){
+            res.json({
+                error: 'Track does not exits',
+                code: 'unexpected_result',
+            });
+            return false;
+        }
+
+        track.backgrounddrop = doodle.id;
+
+        await Tracks.update({_id: track._id}, track);
+        res.json({
+            success: true,
+        });
+
     }
 }
 
@@ -364,6 +400,11 @@ router.post('/edit/:id?', (req, res) => {
 
         }
     });
+});
+
+router.post('/backgrounddrop/:id?', (req, res) => {
+    const findTrack = new FindTrack(res, req);
+    findTrack.updateBackgroundDrop(req, res);
 });
 
 router.post('/comment/:id?', (req, res) => {

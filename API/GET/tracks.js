@@ -26,6 +26,7 @@ class Track {
                 tags: 1,
                 private: 1,
                 coverImage: 1,
+                backgrounddrop: 1,
                 _id: 0,
             })
             .limit(10)

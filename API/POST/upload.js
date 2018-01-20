@@ -8,7 +8,6 @@ const path = require('path');
 const Tracks = require('../../schema/Tracks');
 const fs = require('fs');
 const fsp = require('fs-promise');
-const rp = require('request-promise');
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
     keyFilename: require('../../src/index').gcsPath,

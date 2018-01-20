@@ -42,18 +42,15 @@ router.post('/', (req, res) => {
                     }
                     res.json({
                         success: true,
-                    })
+                    });
                     return Users.update({
                         _id: user._id,
                     }, user)
                 }
             })
             .catch(error => {
-                res.json({
-                    error: erroe.message,
-                })
                 console.log(error);
-            })
+            });
 
             break;
         }

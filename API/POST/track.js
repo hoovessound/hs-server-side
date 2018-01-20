@@ -223,7 +223,6 @@ router.post('/edit/:id?', (req, res) => {
                     });
                     return false;
                 }
-
                 if(track.author !== user.id){
                     res.json({
                         error: 'You are unauthorized to perform this action',
@@ -407,6 +406,15 @@ router.post('/tag/:trackid?', (req, res) => {
             });
             return false;
         }else{
+
+            if(track.author !== user.id){
+                res.json({
+                    error: 'You are unauthorized to perform this action',
+                    code: 'unauthorized_action',
+                });
+                return false;
+            }
+
             if(!track.tags.includes(tag)){
                 track.tags.push(tag);
                 return Tracks.update({
@@ -477,6 +485,15 @@ router.delete('/tag/:trackid?', (req, res) => {
             });
             return false;
         }else{
+
+            if(track.author !== user.id){
+                res.json({
+                    error: 'You are unauthorized to perform this action',
+                    code: 'unauthorized_action',
+                });
+                return false;
+            }
+
             findTrack.removeTag(track, tag);
         }
     })

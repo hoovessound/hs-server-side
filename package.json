@@ -41,6 +41,7 @@
     "randomstring": "^1.1.5",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
+    "send-seekable": "^1.0.4",
     "sha256": "^0.2.0",
     "snyk": "^1.41.1",
     "socket.io": "^2.0.3",

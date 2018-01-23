@@ -75,6 +75,7 @@ router.get('/:query?', (req, res) => {
             private: 1,
             coverImage: 1,
             _id: 0,
+            backgrounddrop: 1,
         }),
         Tags.findOne({
             name: req.params.query,

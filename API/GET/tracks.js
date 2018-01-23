@@ -3,6 +3,8 @@ const router = express.Router();
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
 
+const TrackResponse = require('../../responseSchema/Track');
+
 class Track {
 
     constructor(req, res){
@@ -18,16 +20,7 @@ class Track {
             const tracks = await Tracks.find({
                 private: false,
             }, {
-                id: 1,
-                title: 1,
-                author: 1,
-                uploadDate: 1,
-                description: 1,
-                tags: 1,
-                private: 1,
-                coverImage: 1,
-                backgrounddrop: 1,
-                _id: 0,
+                ...TrackResponse,
             })
             .limit(10)
             .skip(offset)

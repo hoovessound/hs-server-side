@@ -3,6 +3,8 @@ const router = express.Router();
 const Tracks = require('../../schema/Tracks');
 const Users = require('../../schema/Users');
 
+
+const TrackResponse = require('../../responseSchema/Track');
 class User {
     constructor(req, res){
         this.req = req;
@@ -46,15 +48,7 @@ class User {
             author: user.id,
             private: false,
         }, {
-            id: 1,
-            title: 1,
-            author: 1,
-            uploadDate: 1,
-            description: 1,
-            tags: 1,
-            private: 1,
-            coverImage: 1,
-            _id: 0,
+            ...TrackResponse,
         });
         tracks.map((track, index) => {
             tracks[index].author = {

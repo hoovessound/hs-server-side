@@ -95,8 +95,8 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
 });
 
 skygear.config({
-    'endPoint': 'https://hoovessound.skygeario.com/', // trailing slash is required
-    'apiKey': 'e85bab9ff9a5403e851170dfd2731364',
+    'endPoint': process.env.SKYGEAR_SERVER_LOCATION, // trailing slash is required
+    'apiKey': process.env.SKYGEAR_API_KEY,
 }).then(container => {
     console.log('Skygear is ready');
 }, (error) => {

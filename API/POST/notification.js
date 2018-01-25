@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../functions/notification');
+const skygear = require('skygear');
 
 router.post('/', (req, res) => {
     const notification = new Notification(req.hsAuth.user);
     notification.send(req.body)
     .then(data => {
+        skygear.pubsub.publish('NOTIFICATION_SENT', data);
         res.json(data);
     })
     .catch(error => {
         console.log(error);
     });
-})
+});
 
 router.delete('/', (req, res) => {
     const notification = new Notification(req.hsAuth.user);
@@ -22,6 +24,6 @@ router.delete('/', (req, res) => {
     .catch(error => {
         console.log(error);
     });
-})
+});
 
 module.exports = router;

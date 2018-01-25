@@ -131,13 +131,12 @@ router.post('/profilepicture', (req, res) => {
             if(error){
                 console.log(error);
             }else{
-                // Resize the image to 200x200
 
                 return easyimage.resize({
                     src: filePath,
                     dst: filePath,
-                    width: 200,
-                    height: 200,
+                    width: 500,
+                    height: 500,
                     ignoreAspectRatio: true,
                 })
                 .then(processedImage => {

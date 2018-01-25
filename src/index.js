@@ -16,6 +16,7 @@ const morgan = require('morgan');
 const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
+const skygear = require('skygear');
 
 require('dotenv').config();
 
@@ -46,7 +47,7 @@ envs.map(env => {
 
 module.exports.db = {
     url: process.env.DB,
-}
+};
 
 const gcsAuth = JSON.parse(process.env.GCS_AUTH);
 // Create that file
@@ -60,7 +61,7 @@ module.exports.gcsPath = gcsPath;
 
 module.exports.mailgun = {
     key: process.env.MAILGUN_KEY,
-}
+};
 
 module.exports.mailgun.domain = process.env.MAILGUN_DOMAIN;
 
@@ -91,6 +92,15 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
     }
 }).catch(error => {
     console.log(error);
+});
+
+skygear.config({
+    'endPoint': 'https://hoovessound.skygeario.com/', // trailing slash is required
+    'apiKey': 'e85bab9ff9a5403e851170dfd2731364',
+}).then(container => {
+    console.log('Skygear is ready');
+}, (error) => {
+    console.error(error);
 });
 
 app.use(helmet());

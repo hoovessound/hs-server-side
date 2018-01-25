@@ -2,6 +2,7 @@ const Users = require('../../schema/Users');
 const Notifications = require('../../schema/Notifications');
 const genId = require('../../src/helper/genId');
 const htmlEscape = require('escape-html');
+const skygear = require('skygear');
 
 class Notification {
     constructor(user){
@@ -44,12 +45,12 @@ class Notification {
             },
             receiver: payload.to,
             read: false,
-        }
-        await new Notifications(data).save();
+        };
+        // await new Notifications(data).save();
         receiver.unreadNotification = true;
         // Update the user object
         // Notify the user that he/she have a new unread message
-        await Users.update({id: payload.to}, receiver);
+        // await Users.update({id: payload.to}, receiver);
         return Promise.resolve(data);
     }
 

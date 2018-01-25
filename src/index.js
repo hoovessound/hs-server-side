@@ -16,7 +16,6 @@ const morgan = require('morgan');
 const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
-const skygear = require('skygear');
 
 require('dotenv').config();
 
@@ -92,15 +91,6 @@ fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
     }
 }).catch(error => {
     console.log(error);
-});
-
-skygear.config({
-    'endPoint': process.env.SKYGEAR_SERVER_LOCATION, // trailing slash is required
-    'apiKey': process.env.SKYGEAR_API_KEY,
-}).then(container => {
-    console.log('Skygear is ready');
-}, (error) => {
-    console.error(error);
 });
 
 app.use(helmet());

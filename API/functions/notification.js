@@ -51,7 +51,7 @@ class Notification {
         // Update the user object
         // Notify the user that he/she have a new unread message
         await Users.update({id: payload.to}, receiver);
-        return Promise.resolve(data);
+        return Promise.resolve(data, receiver);
     }
 
     async delete(id){

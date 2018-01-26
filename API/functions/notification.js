@@ -123,7 +123,7 @@ class Notification {
         });
         if(read === 'true'){
             user.unreadNotification = false;
-            Users.update({_id: user._id}, user);
+            await Users.update({_id: user._id}, user);
         }
         return Promise.resolve(notifications);
     }

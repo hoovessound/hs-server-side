@@ -76,10 +76,10 @@ router.post('/profilepicture', (req, res) => {
     const user = req.hsAuth.user;
     this.user = req.hsAuth.user;
     if(req.query.bypass !== 'true'){
+        res.status(401);
         res.json({
             error: 'Internal API',
-            code: 'services_lock_down',
-        })
+        });
         return false;
     }
 
@@ -90,9 +90,9 @@ router.post('/profilepicture', (req, res) => {
     form.parse(req, (error, fields, files) => {
         // Check if the request contain the 'image' fields
         if(typeof files.image === 'undefined') {
+            res.status(403);
             res.json({
                 error: 'Missing the image field',
-                code: 'missing_require_fields',
             });
             return false;
         }
@@ -100,18 +100,18 @@ router.post('/profilepicture', (req, res) => {
         file = files.image;
         // MIME type checking
         if(!file.type.includes('image')){
+            res.status(403);
             res.json({
                 error: 'Please upload a image file',
-                code: 'not_valid_file_type',
             });
             return false;
         }
 
         // Check if the file is an GIF file
         if(file.type.includes('gif')){
+            res.status(403);
             res.json({
                 error: 'GIF image is not supported',
-                code: 'not_valid_file_type',
             });
             return false;
         }
@@ -164,9 +164,9 @@ router.post('/profilepicture', (req, res) => {
                             })
                         });
                     }else{
+                        res.status(500);
                         res.json({
                             error: 'Something when wrong, please try again later',
-                            code: 'system_error',
                         })
                     }
                 })

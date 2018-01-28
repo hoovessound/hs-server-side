@@ -30,9 +30,9 @@ class Doodle {
         const user = req.hsAuth.user;
         // Check the file type
         if(!fileType(fs.readFileSync(image.path)).mime.includes('image')){
+            res.status(403);
             res.json({
                 error: 'You much upload an image file',
-                code: 'not_valid_file_object',
             });
             return false;
         }
@@ -76,25 +76,25 @@ router.post('/', (req, res) => {
     const form = new formidable.IncomingForm;
     form.parse(req, (error, fields, files) => {
         if(!fields.title){
+            res.status(403);
             res.json({
                 error: 'Missing the "title" field',
-                code: 'missing_require_fields',
             });
             return false;
         }
     
         if(!fields.url){
+            res.status(403);
             res.json({
                 error: 'Missing the "profile url" field',
-                code: 'missing_require_fields',
             });
             return false;
         }
     
         if(!files.image){
+            res.status(403);
             res.json({
                 error: 'Missing the artwork image',
-                code: 'missing_require_fields',
             });
             return false;
         }

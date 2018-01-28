@@ -9,9 +9,9 @@ router.post('/', (req, res) => {
     const user = req.hsAuth.user;
     switch(eventType){
         default: {
+            res.status(403);
             res.json({
                 error: 'invalid event type name',
-                code: 'unexpected_result',
             });
             return false;
         }
@@ -23,9 +23,9 @@ router.post('/', (req, res) => {
             })
             .then(track => {
                 if(!track){
+                    res.status(403);
                     res.json({
                         error: 'invalid track ID',
-                        code: 'unexpected_result',
                     });
                     return false;
                 }else{

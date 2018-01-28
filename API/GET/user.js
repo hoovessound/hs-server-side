@@ -66,9 +66,9 @@ router.get('/:username?', (req, res) => {
     const user = new User(req, res);
     const username = req.params.username;
     if(!username){
+        res.status(403);
         res.json({
             error: 'Missing username argument',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -79,9 +79,9 @@ router.get('/:username?/tracks', (req, res) => {
     const user = new User(req, res);
     const username = req.params.username;
     if(!username){
+        res.status(403);
         res.json({
             error: 'Missing username argument',
-            code: 'missing_require_fields',
         });
         return false;
     }

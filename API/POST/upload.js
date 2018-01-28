@@ -24,9 +24,9 @@ router.post('/', (req, res) => {
 
     if(!req.query.bypass){
         if(!req.hsAuth.app.permission.includes('upload_track')){
+            res.status(401);
             res.json({
                 error: 'Bad permission scoping',
-                code: 'service_lock_down',
             });
             return false;
         }
@@ -41,18 +41,16 @@ router.post('/', (req, res) => {
 
     form.parse(req, (error, fields, files) => {
         if(user === null){
+            res.status(403);
             res.json({
-                error: true,
-                msg: 'Can not find your userid',
-                code: 'unexpected_result',
+                error: 'Can not find your userid',
             });
             return false;
         }else{
             if(typeof files.audio === 'undefined'){
+                res.status(403);
                 res.json({
-                    error: true,
-                    msg: 'Missing the audio file',
-                    code: 'missing_require_fields',
+                    error: 'Missing the audio file',
                 });
                 return false;
             }
@@ -60,9 +58,9 @@ router.post('/', (req, res) => {
             const rawCoverImage = fs.readFileSync(coverImage.path);
             if(coverImage && fileType(rawCoverImage) !== null){
                 if(!fileType(fs.readFileSync(coverImage.path)).mime.includes('image')){
+                    res.status(403);
                     res.json({
                         error: 'The image fields is not an image file',
-                        code: 'not_valid_file_object',
                     });
                     return false;
                 }
@@ -82,9 +80,9 @@ router.post('/', (req, res) => {
                 }
             });
             if(!findAudioType){
+                res.status(403);
                 res.json({
                     error: 'HoovesSound only suport MP3 or OGG audio file',
-                    code: 'not_valid_file_object',
                 });
                 return false;
             }

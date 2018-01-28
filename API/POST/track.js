@@ -42,10 +42,10 @@ class FindTrack {
             const track = await Tracks.findOne({id: this.req.params.id});
 
             if (track === null) {
+                res.status(403);
                 this.res.json({
                     error: 'Can not found your track',
-                    code: 'missing_result_object',
-                })
+                });
                 return false;
             }else{
                 // If the user already fave the track, just remove it, if not add one
@@ -67,22 +67,6 @@ class FindTrack {
                         faves: user.fave,
                         status,
                     });
-
-                    // request({
-                    //     url: `${full_address}/api/notification`,
-                    //     headers: {
-                    //         token: this.token,
-                    //     },
-                    //     method: 'post',
-                    //     json: true,
-                    //     body: {
-                    //         to: user.id,
-                    //         title: 'Someone Has Liked Your Track',
-                    //         body: `${user.username} Has Favorited Your Track`,
-                    //         link: `${full_address}/track/${user.username}/${track.title}`,
-                    //         icon: track.coverImage,
-                    //     }
-                    // });
                 }
 
             }
@@ -98,11 +82,11 @@ class FindTrack {
 
         if(!this.req.query.bypass){
             if(!this.req.hsAuth.app.permission.includes('post_comment')){
+                res.status(401);
                 this.res.json({
                     error: 'Bad permission scoping',
-                    code: 'service_lock_down',
                 });
-                // return false;
+                return false;
             }
         }
 
@@ -112,9 +96,9 @@ class FindTrack {
             })
 
             if(!track){
+                res.status(403);
                 this.res.json({
-                    error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
+                    error: 'Can not not that track id',
                 });
                 return false;
             }
@@ -178,9 +162,9 @@ class FindTrack {
             author: user.id,
         });
         if(!doodle){
+            res.status(403);
             res.json({
                 error: 'Doodle does not exits',
-                code: 'unexpected_result',
             });
             return false;
         }
@@ -190,9 +174,9 @@ class FindTrack {
         });
 
         if(!track){
+            res.status(403);
             res.json({
                 error: 'Track does not exits',
-                code: 'unexpected_result',
             });
             return false;
         }
@@ -211,10 +195,9 @@ router.post('/favorite/:id?', (req, res) => {
     const id = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (typeof id === 'undefined') {
+        res.status(403);
         res.json({
-            error: true,
-            msg: 'Missing the id field',
-            code: 'missing_require_fields',
+            error: 'Missing the id field',
         });
         return false;
     }
@@ -225,10 +208,9 @@ router.post('/edit/:id?', (req, res) => {
 
     const id = req.params.id;
     if (!id) {
+        res.status(403);
         res.json({
-            error: true,
-            msg: 'Missing the trackid field',
-            code: 'missing_require_fields',
+            error: 'Missing the trackid field',
         });
         return false;
     }
@@ -253,16 +235,16 @@ router.post('/edit/:id?', (req, res) => {
             .then(track => {
 
                 if(!track){
+                    res.status(403);
                     res.json({
-                        error: 'can\'t not find your track',
-                        code: 'unexpected_result',
+                        error: 'can not not find your track',
                     });
                     return false;
                 }
                 if(track.author !== user.id){
+                    res.status(403);
                     res.json({
                         error: 'You are unauthorized to perform this action',
-                        code: 'unauthorized_action',
                     });
                     return false;
                 }else{
@@ -270,17 +252,17 @@ router.post('/edit/:id?', (req, res) => {
                         if(track.private){
                             // Check permission
                             if(!req.hsAuth.app.permission.includes('private_track')){
+                                res.status(401);
                                 res.json({
                                     error: 'Bad permission scoping',
-                                    code: 'service_lock_down',
                                 });
                                 return false;
                             }
                         }else{
                             if(!req.hsAuth.app.permission.includes('edit_track')){
+                                res.status(401);
                                 res.json({
                                     error: 'Bad permission scoping',
-                                    code: 'service_lock_down',
                                 });
                                 return false;
                             }
@@ -297,9 +279,9 @@ router.post('/edit/:id?', (req, res) => {
                     if(files.image){
                         if(files.image.size > 0){
                             if(!files.image.type.includes('image')){
+                                res.status(403);
                                 res.json({
                                     error: 'File is not an image type',
-                                    code: 'not_valid_file_type',
                                 });
                                 return false;
                             }else{
@@ -386,9 +368,9 @@ router.post('/edit/:id?', (req, res) => {
                             }
                         }
                         if(!fields.title && !fields.image && !fields.description){
+                            res.status(403);
                             res.json({
                                 error: 'You have to pass in one or more argument',
-                                code: 'missing_require_fields',
                             });
                             return false;
                         }else{
@@ -411,17 +393,17 @@ router.post('/comment/:id?', (req, res) => {
     const trackid = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (!trackid) {
+        res.status(403);
         res.json({
             error: 'Missing the trackid field',
-            code: 'missing_require_fields',
         });
         return false;
     }
 
     if(!req.body.comment) {
+        res.status(403);
         res.json({
             error: 'Missing the comment field',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -441,17 +423,17 @@ router.post('/tag/:trackid?', (req, res) => {
     })
     .then(track => {
         if(!track){
+            res.status(403);
             res.json({
-                error: 'Can\'t not that track id',
-                code: 'unexpected_result',
+                error: 'Can not not that track id',
             });
             return false;
         }else{
 
             if(track.author !== user.id){
+                res.status(401);
                 res.json({
                     error: 'You are unauthorized to perform this action',
-                    code: 'unauthorized_action',
                 });
                 return false;
             }
@@ -520,17 +502,17 @@ router.delete('/tag/:trackid?', (req, res) => {
     })
     .then(track => {
         if(!track){
+            res.status(403);
             res.json({
-                error: 'Can\'t not that track id',
-                code: 'unexpected_result',
+                error: 'Can not not that track id',
             });
             return false;
         }else{
 
             if(track.author !== user.id){
+                res.status(401);
                 res.json({
                     error: 'You are unauthorized to perform this action',
-                    code: 'unauthorized_action',
                 });
                 return false;
             }

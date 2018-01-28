@@ -20,7 +20,7 @@ class playlist {
             author: req.hsAuth.user.id,
             tracks: payload.tracks,
             coverImage: payload.coverImage,
-        }
+        };
         try{
             await new Playlists(data).save();
             res.json(data);
@@ -76,25 +76,25 @@ router.post('/create', (req, res) => {
     const p = new playlist(req, res);
     const payload = req.body;
     if(!payload.title){
+        res.status(403);
         res.json({
             error: 'Missing the playlist title',
-            code: 'missing_require_fields',
         });
         return false;
     }
 
     if(!payload.tracks){
+        res.status(403);
         res.json({
             error: 'Please put at less one track at a new playlist',
-            code: 'missing_require_fields',
         });
         return false;
     }
 
     if(payload.tracks.length <= 0){
+        res.status(403);
         res.json({
             error: 'Please put at less one track at a new playlist',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -111,9 +111,9 @@ router.post('/create', (req, res) => {
     .then(tracks => {
         tracks.map((track, index) => {
             if(!track){
+                res.status(403);
                 res.json({
                     error: `Track ${payload.tracks[index]} does not exists`,
-                    code: 'unexpected_result',
                 })
                 return false;
             }
@@ -131,17 +131,17 @@ router.post('/add/:playlistId?/:trackId?', (req, res) => {
     const playlistId = req.params.playlistId;
 
     if(!trackId){
+        res.status(403);
         res.json({
             error: 'Missing the track ID',
-            code: 'missing_require_fields',
         });
         return false;
     }
 
     if(!playlistId){
+        res.status(403);
         res.json({
             error: 'Missing the playlist ID',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -150,18 +150,18 @@ router.post('/add/:playlistId?/:trackId?', (req, res) => {
     Playlists.findOne({id: playlistId})
     .then(playlist => {
         if(!playlist){
+            res.status(403);
             res.json({
                 error: 'Playlist does not exits',
-                code: 'unexpected_result',
             });
             return false;
         }else{
             Tracks.findOne({id: trackId})
             .then(track => {
                 if(!track){
+                    res.status(403);
                     res.json({
                         error: 'Track does not exits',
-                        code: 'unexpected_result',
                     });
                     return false;
                 }else{
@@ -184,17 +184,17 @@ router.delete('/remove/:playlistId?/:trackId?', (req, res) => {
     const playlistId = req.params.playlistId;
 
     if(!trackId){
+        res.status(403);
         res.json({
             error: 'Missing the track ID',
-            code: 'missing_require_fields',
         });
         return false;
     }
 
     if(!playlistId){
+        res.status(403);
         res.json({
             error: 'Missing the playlist ID',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -203,18 +203,18 @@ router.delete('/remove/:playlistId?/:trackId?', (req, res) => {
     Playlists.findOne({id: playlistId})
     .then(playlist => {
         if(!playlist){
+            res.status(403);
             res.json({
                 error: 'Playlist does not exits',
-                code: 'unexpected_result',
             });
             return false;
         }else{
             Tracks.findOne({id: trackId})
             .then(track => {
                 if(!track){
+                    res.status(403);
                     res.json({
                         error: 'Track does not exits',
-                        code: 'unexpected_result',
                     });
                     return false;
                 }else{

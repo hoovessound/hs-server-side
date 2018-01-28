@@ -65,9 +65,9 @@ class playlist {
                 });
                 res.json(playlist);
             }else{
+                res.status(403);
                 res.json({
                     error: 'Playlist does not exists',
-                    code: 'unexpected_result',
                 });
                 return false;
             }
@@ -82,9 +82,9 @@ router.get('/:id?', (req, res) => {
     const p = new playlist(req, res);
     const id = req.params.id;
     if(!id){
+        res.status(403);
         res.json({
             error: 'Missing playlist ID',
-            code: 'missing_require_fields',
         });
         return false;
     }else{

@@ -10,9 +10,9 @@ router.get('/:id?', (req, res) => {
 
     const id = req.params.id;
     if(typeof id === 'undefined'){
+        res.status(403);
         res.json({
             error: 'Missing the id field',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -25,9 +25,9 @@ router.get('/:id?', (req, res) => {
                 // Check if the file is extened or not
 
                 if(!track){
+                    res.status(403);
                     res.json({
-                        error: 'Can\'t find your audio track source',
-                        code: 'unexpected_result',
+                        error: 'Can not find your audio track source',
                     });
                 }
 

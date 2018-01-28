@@ -8,10 +8,10 @@ const Tags = require('../../schema/Tags');
 router.get('/:query?', (req, res) => {
     const query = req.params.query;
     if(typeof query === 'undefined'){
+        res.status(403);
         res.json({
             error: true,
             msg: 'Missing the query',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -19,10 +19,10 @@ router.get('/:query?', (req, res) => {
     // Search the query
 
     if(query.length <= 0){
+        res.status(403);
         res.json({
             error: true,
             msg: 'Too less query keyword',
-            code: 'unexpected_result',
         });
         return false;
     }

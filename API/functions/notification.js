@@ -14,21 +14,21 @@ class Notification {
         if(!payload.to){
             return Promise.reject({
                 error: 'Missing the "to" field',
-                code: 'missing_require_fields',
+                code: 403,
             });
         }
 
         if(!payload.message){
             return Promise.reject({
                 error: 'Missing the "message" field',
-                code: 'missing_require_fields',
+                code: 403,
             });
         }
         const receiver = await Users.findOne({id: payload.to});
         if(!receiver){
             return Promise.reject({
                 error: 'Can not find the receiver ID',
-                code: 'unexpected_result',
+                code: 403,
             });
         }
         const data = {
@@ -68,8 +68,8 @@ class Notification {
             });
         }else{
             return Promise.reject({
-                error: `This payload is not belong to you`,
-                code: 'bad_authentication',
+                error: 'This payload is not belong to you',
+                code: 403,
             });
         }
     }
@@ -114,7 +114,7 @@ class Notification {
         
         notifications.map(payload => {
             jobs.push(fetchAuthor(payload.receiver));
-        })
+        });
         
         const authors = await Promise.all(jobs);
         

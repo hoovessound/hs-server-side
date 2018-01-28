@@ -24,9 +24,9 @@ class FindTrack {
                 if(track.private){
                     // Check permission
                     if(!this.req.hsAuth.app.permission.includes('private_track')){
+                        res.status(401);
                         this.res.json({
                             error: 'Bad permission scoping',
-                            code: 'service_lock_down',
                         });
                         return false;
                     }
@@ -34,9 +34,9 @@ class FindTrack {
             }
 
             if(!track){
+                res.status(403);
                 this.res.json({
                     error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
                 });
                 return false;
             }
@@ -74,9 +74,9 @@ class FindTrack {
             })
 
             if(!track){
+                res.status(403);
                 this.res.json({
                     error: 'Can\'t not that track id',
-                    code: 'unexpected_result',
                 });
                 return false;
             }
@@ -126,10 +126,10 @@ router.get('/:id', (req, res) => {
     const ID = req.params.id;
     const findTrack = new FindTrack(res,req);
     if(!ID){
+        res.status(403);
         res.json({
             error: true,
             msg: 'Missing the ID field',
-            code: 'missing_require_fields',
         });
         return false;
     }
@@ -140,10 +140,10 @@ router.get('/comment/:id?', (req, res) => {
     const trackid = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (!trackid) {
+        res.status(403);
         res.json({
             error: true,
             msg: 'Missing the trackid field',
-            code: 'missing_require_fields',
         });
         return false;
     }

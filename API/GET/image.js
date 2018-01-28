@@ -17,9 +17,9 @@ class Image {
         const res = this.res;
         const user = await Users.findOne({username});
         if(!user){
+            res.status(403);
             res.json({
                 error: 'User does not exists',
-                code: 'unexpected_result',
             });
             return false;
         }else{
@@ -43,9 +43,9 @@ class Image {
         const res = this.res;
         const user = await Users.findOne({username});
         if(!user){
+            res.status(403);
             res.json({
                 error: 'Doodle does not exists',
-                code: 'unexpected_result',
             });
             return false;
         }else{
@@ -57,9 +57,9 @@ class Image {
         const res = this.res;
         const playlist = await Playlists.findOne({id});
         if(!playlist){
+            res.status(403);
             res.json({
                 error: 'Playlist does not exists',
-                code: 'unexpected_result',
             });
             return false;
         }else{
@@ -71,9 +71,9 @@ class Image {
         const res = this.res;
         const doodle = await Doodles.findOne({id});
         if(!doodle){
+            res.status(403);
             res.json({
                 error: 'Playlist does not exists',
-                code: 'unexpected_result',
             });
             return false;
         }else{
@@ -133,17 +133,17 @@ router.get('/:type?/:argument?', (req, res) => {
     const argument = req.params.argument;
     const image = new Image(req, res);
     if(!type){
+        res.status(403);
         res.json({
             error: 'Missing the type field',
-            code: 'unexpected_result',
         });
         return false;
     }
 
     if(!argument){
+        res.status(403);
         res.json({
             error: 'Missing the argument field',
-            code: 'unexpected_result',
         });
         return false;
     }
@@ -176,9 +176,9 @@ router.get('/:type?/:argument?', (req, res) => {
         }
 
         default:{
+            res.status(403);
             res.json({
                 error: 'Unsupport type of image',
-                code: 'unexpected_result',
             });
             return false;
         }

@@ -157,9 +157,9 @@ class FindTrack {
     async updateBackgroundDrop(){
         const req = this.req;
         const res = this.res;
-        const user = req.hsAuth.user;
+        const id = req.body.id;
         const doodle = await Doodles.findOne({
-            author: user.id,
+            id,
         });
         if(!doodle){
             res.status(403);
@@ -168,7 +168,6 @@ class FindTrack {
             });
             return false;
         }
-
         const track = await Tracks.findOne({
             id: req.params.id,
         });

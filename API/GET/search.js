@@ -96,12 +96,47 @@ router.get('/:query?', (req, res) => {
         })
     ])
     .then(response => {
-        res.json({
-            users: response[0],
-            tracks: response[1],
-            tags: response[2],
-            playlist: response[3],
-        })
+
+        const jobs = [];
+        const existsAuthors = [];
+
+        async function fetchUser(id){
+            const user = await Users.findOne({
+                id,
+            });
+            return({
+                username: user.username,
+                fullname: user.fullName,
+                id: user.id,
+            });
+        }
+        const tracks = response[1];
+        tracks.map(track => {
+            if(!existsAuthors.includes(track.author)){
+                jobs.push(fetchUser(track.author));
+                existsAuthors.push(track.author);
+            }
+        });
+
+        Promise.all(jobs)
+        .then(authors => {
+            tracks.map((track, index) => {
+                authors.map(author => {
+                    if(track.author === author.id){
+                        tracks[index].author = author;
+                    }
+                });
+                tracks[index].coverImage = `${req.protocol}://api.hoovessound.ml/image/coverart/${track.id}`;
+            });
+
+            res.json({
+                users: response[0],
+                tracks,
+                tags: response[2],
+                playlist: response[3],
+            });
+
+        });
     })
 });
 

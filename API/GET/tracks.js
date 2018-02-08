@@ -27,9 +27,7 @@ class Track {
             .sort({uploadDate: -1});
 
             if(tracks.length <= 0){
-                res.json({
-                    tracks: [],
-                });
+                res.json([]);
                 return false;
             }else{
                 const jobs = [];

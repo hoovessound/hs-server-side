@@ -18,6 +18,10 @@ const tracksSchema = new Schema({
         default: false,
     },
     tags: Array,
-    backgrounddrop: String // HoovesSound Doodle UUID
+    backgrounddrop: String, // HoovesSound Doodle UUID
+    source: {
+        type: String,
+        default: 'hoovessound',
+    }
 });
 module.exports = mongoose.model('Tracks', tracksSchema);

@@ -9,4 +9,5 @@ module.exports = {
     coverImage: 1,
     backgrounddrop: 1,
     _id: 0, // Remove the MongoDB ID
+    source: 1,
 };

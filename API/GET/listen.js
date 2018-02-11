@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Tracks = require('../../schema/Tracks');
 const path = require('path');
-const request = require('request');
-const sendSeekable = require('send-seekable');
-router.use(sendSeekable);
+const youtubeDl = require('../../src/helper/youtubeDlCLI');
 
 router.get('/:id?', (req, res) => {
 
@@ -30,15 +28,19 @@ router.get('/:id?', (req, res) => {
                         error: 'Can not find your audio track source',
                     });
                 }
-
+                res.set('X-HoovesSound-Streaming', 'True');
                 if(track.file.extend){
-                    request({
-                        url: track.file.location,
-                        encoding: null,
-                    }, (error, response, body) => {
-                        res.setHeader('Cache-Control', 'no-cache');
-                        res.sendSeekable(body);
-                    })
+                    if(track.source === 'youtube'){
+                        // Youtube import
+
+                        // Grab the latest source link
+                        const dl = new youtubeDl.youtubeDlCLI(track.file.location);
+                        res.set('X-Youtube-Import', 'True');
+                        dl.getUrl()
+                        .then(url => res.redirect(url));
+                    }else{
+                        res.redirect(track.file.location);
+                    }
                 }else{
                     // Send back the audio file
                     const trackPath = path.join(`${__dirname}/../tracks/${track.file.location}`);

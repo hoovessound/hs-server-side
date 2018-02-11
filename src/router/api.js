@@ -14,6 +14,10 @@ router.use('/oauth2/thirdparty/facebook', require('../../API/auth/thirdparty/fac
 
 router.use(cors());
 
+// No rate limit free to use publicly accessible APIs
+router.use('/image', require('../../API/GET/image'));
+router.use('/youtube-dl', require('../../API/GET/youtubeDl'));
+
 router.use(limiter({
     // duration: 900000, // 15 min
     max: 500,
@@ -28,7 +32,6 @@ router.use(limiter({
 // GET APIs
 router.use('/tracks', require('../../API/GET/tracks'));
 router.use('/track', require('../../API/GET/track'));
-router.use('/image', require('../../API/GET/image'));
 router.use('/search', require('../../API/GET/search'))
 router.use('/doodle', require('../../API/GET/doodle'));
 router.use('/playlist', require('../../API/GET/playlist'));

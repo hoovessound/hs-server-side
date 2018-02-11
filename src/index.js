@@ -17,6 +17,9 @@ const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
 
+const youtubeDl = require('./helper/youtubeDlCLI');
+const dl = new youtubeDl.youtubeDlCLI('https://www.youtube.com/watch?v=Vix8YJvWhq4');
+
 require('dotenv').config();
 
 let socketConnection = {};

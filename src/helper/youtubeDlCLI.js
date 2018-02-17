@@ -6,8 +6,26 @@ class youtubeDlCLI {
     constructor(url){
         this.url = url;
     }
-    async getUrl(){
+    async getBestVideo(){
+        const query = `youtube-dl -f bestvideo ${this.url} -g ${prefix}`;
+        const result = await exec(query);
+        return result.stdout;
+    }
+
+    async getBesetAudio(){
         const query = `youtube-dl -f bestaudio ${this.url} -g ${prefix}`;
+        const result = await exec(query);
+        return result.stdout;
+    }
+
+    async getWorstVideo(){
+        const query = `youtube-dl -f worstvideo ${this.url} -g ${prefix}`;
+        const result = await exec(query);
+        return result.stdout;
+    }
+
+    async getWorstAudio(){
+        const query = `youtube-dl -f worstaudio ${this.url} -g ${prefix}`;
         const result = await exec(query);
         return result.stdout;
     }

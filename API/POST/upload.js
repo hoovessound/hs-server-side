@@ -48,7 +48,7 @@ router.post('/', (req, res) => {
             return false;
         }else{
 
-            if(fields['youtube-import'] !== 'on'){
+            if(fields['youtube-import'] !== 'on' || !fields['youtube-import']){
 
                 // Raw upload
                 if(typeof files.audio === 'undefined'){
@@ -134,7 +134,7 @@ router.post('/', (req, res) => {
                                 _id: user._id,
                             }, user)
                             .then(() => {
-                                res.stack(201);
+                                res.status(201);
                                 res.json({
                                     id: track.id,
                                     title,

@@ -36,7 +36,7 @@ router.get('/:id?', (req, res) => {
                         // Grab the latest source link
                         const dl = new youtubeDl.youtubeDlCLI(track.file.location);
                         res.set('X-Youtube-Import', 'True');
-                        dl.getUrl()
+                        dl.getBesetAudio()
                         .then(url => res.redirect(url));
                     }else{
                         res.redirect(track.file.location);

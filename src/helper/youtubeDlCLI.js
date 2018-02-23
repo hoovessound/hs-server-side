@@ -6,7 +6,7 @@ const prefix = [
     '--simulate',
     '--no-warnings',
     '--ignore-errors',
-    '--no-call-home',
+    '--force-ipv4'
 ];
 
 class youtubeDlCLI {

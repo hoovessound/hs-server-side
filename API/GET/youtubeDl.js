@@ -48,6 +48,10 @@ router.get('/', (req, res) => {
         res.json(json);
     })
     .catch(error => {
+        res.status(500);
+        res.json({
+            error: 'Something when wrong while trying to fetch data from YouTube',
+        });
         console.log(error);
     });
 });

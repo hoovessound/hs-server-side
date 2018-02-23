@@ -1,4 +1,4 @@
-const exec = require('node-exec-promise').execFile;
+const { spawn } = require('child_process');
 
 const prefix = [
     '--no-progress',
@@ -14,38 +14,66 @@ class youtubeDlCLI {
         this.url = url;
     }
     async getBestVideo(){
-        const result = await exec('youtube-dl', ['-f', 'bestvideo', this.url, '-g', ...prefix]);
-        return result.stdout;
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['-f', 'bestvideo', this.url, '-g', ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 
     async getBesetAudio(){
-        const result = await exec('youtube-dl', ['-f', 'bestaudio', this.url, '-g', ...prefix]);
-        return result.stdout;
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['-f', 'bestaudio', this.url, '-g', ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 
     async getWorstVideo(){
-        const result = await exec('youtube-dl', ['-f', 'worstvideo', this.url, '-g', ...prefix]);
-        return result.stdout;
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['-f', 'worstvideo', this.url, '-g', ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 
     async getWorstAudio(){
-        const result = await exec('youtube-dl', ['-f', 'worstaudio', this.url, '-g', ...prefix]);
-        return result.stdout;
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['-f', 'worstaudio', this.url, '-g', ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 
     async getDescription(){
-        const result = await exec('youtube-dl', ['--get-description', this.url, ...prefix]);
-        return result.stdout;
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['--get-description', this.url, ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 
     async getCoverArt(){
-        const result = await exec('youtube-dl', ['--get-thumbnail', this.url, ...prefix]);
-        return result.stdout.split('\n')[0];
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['--get-thumbnail', this.url, ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 
     async getTitle(){
-        const result = await exec('youtube-dl', ['--get-title', this.url, ...prefix]);
-        return result.stdout;
+        return new Promise((resolve, reject) => {
+            spawn('youtube-dl', ['--get-title', this.url, ...prefix])
+            .stdout.on('data', data => {
+                resolve(data.toString())
+            });
+        });
     }
 }
 

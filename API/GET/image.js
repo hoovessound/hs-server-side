@@ -81,6 +81,10 @@ class Image {
         }
     }
 
+    async proxy(url){
+        this.resize(url);
+    }
+
     resize(imageUrl){
         if(!imageUrl){
             imageUrl = 'https://storage.googleapis.com/hs-static/missing_track.jpg';
@@ -140,7 +144,7 @@ router.get('/:type?/:argument?', (req, res) => {
         return false;
     }
 
-    if(!argument){
+    if(type !== 'proxy' && !argument){
         res.status(403);
         res.json({
             error: 'Missing the argument field',
@@ -172,6 +176,11 @@ router.get('/:type?/:argument?', (req, res) => {
 
         case 'doodle': {
             image.findDoodle(argument);
+            break;
+        }
+
+        case 'proxy': {
+            image.proxy(req.query.url);
             break;
         }
 

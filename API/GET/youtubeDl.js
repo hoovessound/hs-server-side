@@ -3,8 +3,9 @@ const router = express.Router();
 const youtubeDl = require('../../src/helper/youtubeDlCLI');
 
 class Info {
-    constructor(url){
+    constructor(url, req){
         this.url = url;
+        this.req = req;
     }
     async getJSON(){
         const dl = new youtubeDl.youtubeDlCLI(this.url);
@@ -22,7 +23,14 @@ class Info {
                 best: info[0].trim(),
                 worst: info[1].trim(),
             },
-            coverImage: info[2].trim(),
+            coverImage: {
+                origin: info[2].trim(),
+                100: `${this.req.protocol}://${this.req.get('host')}/image/proxy?url=${info[2].trim()}&width=100`,
+                250: `${this.req.protocol}://${this.req.get('host')}/image/proxy?url=${info[2].trim()}&width=250`,
+                300: `${this.req.protocol}://${this.req.get('host')}/image/proxy?url=${info[2].trim()}&width=300`,
+                480: `${this.req.protocol}://${this.req.get('host')}/image/proxy?url=${info[2].trim()}&width=480`,
+                500: `${this.req.protocol}://${this.req.get('host')}/image/proxy?url=${info[2].trim()}&width=500`,
+            },
             description: info[3].trim(),
             title: info[4].trim(),
             video: {
@@ -34,7 +42,7 @@ class Info {
 }
 
 router.get('/', (req, res) => {
-    const info = new Info(req.query.url);
+    const info = new Info(req.query.url, req);
     info.getJSON()
     .then(json => {
         res.json(json);

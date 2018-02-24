@@ -13,39 +13,10 @@ class youtubeDlCLI {
     constructor(url){
         this.url = url;
     }
-    async getBestVideo(){
-        return new Promise((resolve, reject) => {
-            spawn('youtube-dl', ['-f', 'bestvideo', '-g', ...prefix, this.url])
-            .stdout.on('data', data => {
-                resolve(data.toString());
-                // console.log(data.toString());
-            });
-        });
-    }
 
     async getBesetAudio(){
         return new Promise((resolve, reject) => {
             spawn('youtube-dl', ['-f', 'bestaudio', '-g', ...prefix, this.url])
-            .stdout.on('data', data => {
-                resolve(data.toString());
-                // console.log(data.toString());
-            });
-        });
-    }
-
-    async getWorstVideo(){
-        return new Promise((resolve, reject) => {
-            spawn('youtube-dl', ['-f', 'worstvideo', '-g', ...prefix, this.url])
-            .stdout.on('data', data => {
-                resolve(data.toString());
-                // console.log(data.toString());
-            });
-        });
-    }
-
-    async getWorstAudio(){
-        return new Promise((resolve, reject) => {
-            spawn('youtube-dl', ['-f', 'worstaudio', '-g', ...prefix, this.url])
             .stdout.on('data', data => {
                 resolve(data.toString());
                 // console.log(data.toString());

@@ -63,12 +63,23 @@ function fetchDoodle(){
             return Doodles.findOne().skip(random);
         })
         .then(artWork => {
-            resolve({
-                id: artWork.id,
-                image: artWork.image,
-                used: artWork.used,
-                author: artWork.author,
-            });
+            Users.findOne({
+                id: artWork.author,
+            })
+            .then(user => {
+                resolve({
+                    id: artWork.id,
+                    image: artWork.image,
+                    used: artWork.used,
+                    author: {
+                        link: `https://hoovessound.ml/@${user.username}`,
+                        name: user.fullName,
+                    },
+                });
+            })
+            .catch(error => {
+                console.log(error);
+            })
         })
         .catch(error => {
             reject(error);
@@ -81,7 +92,7 @@ router.get('/', csurf(), (req, res) => {
     const service = req.query.service;
     const redirect = req.query.redirect;
     const clientId = req.query.client_id;
-    const oAuthToken = req.cookies['oauth-token'];
+    const oAuthToken = req.cookies['jwt_token'];
     const rawQuery = url.parse(req.url).query;
     req.session.rawQuery = rawQuery;
     let _app;
@@ -96,119 +107,118 @@ router.get('/', csurf(), (req, res) => {
                 oAuth: req.query.client_id ? true : false,
                 background,
             });
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        });
     }else{
-        Users.findOne({
-            token: oAuthToken,
-        })
-        .then(user => {
-    
-            // Didn't have oAuth token
+        // Error checking
+        if(!clientId){
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Missing the redirect Client ID',
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            });
+            return false;
+        }
 
-            if(!clientId){
-                fetchDoodle()
-                .then(background => {
-                    res.render('auth/login', {
-                        error: true,
-                        message: 'Please pass in your client ID',
-                        csrfToken: req.csrfToken(),
-                        background,
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                return false;
-            }else{
-    
-                if(!redirect){
+        if(!redirect){
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: true,
+                    message: 'Missing the redirect url',
+                    csrfToken: req.csrfToken(),
+                    background,
+                });
+            });
+            return false;
+        }
+
+
+        // Checks if the JWT token exits
+        if(!oAuthToken){
+            // No JWT Token
+            fetchDoodle()
+            .then(background => {
+                res.render('auth/login', {
+                    error: null,
+                    message: null,
+                    csrfToken: req.csrfToken(),
+                    oAuth: req.query.client_id ? true : false,
+                    background,
+                });
+            });
+        }else{
+
+            // Find the oAuthApp
+            oAuthApps.findOne({
+                clientId,
+            })
+            .then(app => {
+                if(!app){
                     fetchDoodle()
                     .then(background => {
                         res.render('auth/login', {
                             error: true,
-                            message: 'Missing the redirect url',
+                            message: 'Incorrect Client ID',
                             csrfToken: req.csrfToken(),
                             background,
                         });
+                    });
+                    return false;
+                }else{
+                    const deCodeedObject = jwt.verify(oAuthToken, process.env.JWTTOKEN);
+                    Users.findOne({
+                        id: deCodeedObject.id,
+                    })
+                    .then(user => {
+                        if(!user){
+                            // Remove the jwt_token
+                            req.cookie.clearColor('jwt_token');
+                            // And re-login
+                            fetchDoodle()
+                            .then(background => {
+                                res.render('auth/login', {
+                                    error: null,
+                                    message: null,
+                                    csrfToken: req.csrfToken(),
+                                    oAuth: req.query.client_id ? true : false,
+                                    background,
+                                });
+                            });
+                        }else{
+                            // User exits
+                            fetchDoodle()
+                            .then(background => {
+                                console.log(background)
+                                res.render('auth/permission', {
+                                    appName: app.name,
+                                    csrfToken: req.csrfToken(),
+                                    error: null,
+                                    message: null,
+                                    rawQuery,
+                                    uid: user.id,
+                                    user,
+                                    scope: req.scopeInAction.parse,
+                                    background,
+                                });
+                            });
+                        }
                     })
                     .catch(error => {
-                        console.log(error)
-                    })
-                    return false;
+                        res.status(500);
+                        res.end('Opps, something when wrong...');
+                        console.log(error);
+                    });
                 }
-    
-                oAuthApps.findOne({
-                    clientId,
-                })
-                .then(app =>{
-                    if(app === null) {
-                        fetchDoodle()
-                        .then(background => {
-                            res.render('auth/login', {
-                                error: true,
-                                message: 'Bad client ID',
-                                csrfToken: req.csrfToken(),
-                                background,
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        })
-                        return false;
-                    }
-                    _app = app;
-                    
-                    if(user){
-                        // Have OAuth tokekn
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
 
-                        // Logined user
-            
-                        // Fastforward to permission page
-            
-                        const rawQuery = url.parse(req.url).query;
-
-                        fetchDoodle()
-                        .then(background => {
-                            console.log(req.hsAuth)
-                            res.render('auth/permission', {
-                                appName: _app.name,
-                                csrfToken: req.csrfToken(),
-                                error: null,
-                                message: null,
-                                rawQuery,
-                                uid: user.id,
-                                user,
-                                scope: req.scopeInAction.parse,
-                                background,
-                            });
-                        })
-                    }else{
-                        fetchDoodle()
-                        .then(background => {
-                            res.render('auth/login', {
-                                error: null,
-                                message: null,
-                                csrfToken: req.csrfToken(),
-                                background,
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        })
-                    }
-    
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        })
     }
 });
 
@@ -241,7 +251,7 @@ router.post('/', csurf(), (req, res) => {
             error: true,
             msg: 'Please making sure you are using application/x-www-form-urlencoded as the content type',
             code: 'invalid_http_request',
-        })
+        });
         return false;
     }
 
@@ -255,7 +265,7 @@ router.post('/', csurf(), (req, res) => {
                     csrfToken: req.csrfToken(),
                     background,
                 });
-            })
+            });
             return false;
         }
     }
@@ -271,7 +281,7 @@ router.post('/', csurf(), (req, res) => {
                 csrfToken: req.csrfToken(),
                 background,
             });
-        })
+        });
         return false;
     }
 
@@ -286,7 +296,7 @@ router.post('/', csurf(), (req, res) => {
                 csrfToken: req.csrfToken(),
                 background,
             });
-        })
+        });
 
         return false;
     }
@@ -305,7 +315,7 @@ router.post('/', csurf(), (req, res) => {
                         csrfToken: req.csrfToken(),
                         background,
                     });
-                })
+                });
                 return false;
             }
             app = dbApp;
@@ -325,7 +335,7 @@ router.post('/', csurf(), (req, res) => {
                         csrfToken: req.csrfToken(),
                         background,
                     });
-                })
+                });
                 return false;
             }else{
                 // Check for the password
@@ -363,7 +373,7 @@ router.post('/', csurf(), (req, res) => {
                                     scope: req.scopeInAction.parse,
                                     background,
                                 });
-                            })
+                            });
                         }
                     }else{
                         // Incorrect username or password

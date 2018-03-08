@@ -82,7 +82,7 @@ class FindTrack {
 
         if(!this.req.query.bypass){
             if(!this.req.hsAuth.app.permission.includes('post_comment')){
-                res.status(401);
+                this.res.status(401);
                 this.res.json({
                     error: 'Bad permission scoping',
                 });

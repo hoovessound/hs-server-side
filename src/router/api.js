@@ -108,7 +108,6 @@ router.use((req, res, next) => {
 });
 
 router.use('/me', require('../../API/GET/me'));
-router.use('/notification', require('../../API/GET/notification'));
 
 // POST APIs
 
@@ -117,8 +116,6 @@ router.use('/upload', require('../../API/POST/upload'));
 router.use('/track', require('../../API/POST/track'));
 
 router.use('/settings', require('../../API/POST/settings'));
-
-router.use('/notification', require('../../API/POST/notification'));
 
 router.use('/events', require('../../API/POST/events'));
 

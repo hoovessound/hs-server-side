@@ -6,26 +6,17 @@ const oAuthApps = require('../../schema/oAuthApps');
 const Users = require('../../schema/Users');
 const AccessTokes = require('../../schema/AccessTokes');
 const jwt = require('jsonwebtoken');
-router.use('/oauth2/token/access', require('../../API/auth/token/accessToken'));
 
+router.use(cors());
+
+router.use('/oauth2/token/access', require('../../API/auth/token/accessToken'));
 // Third party oAuth
 router.use('/oauth2/thirdparty/poniverse', require('../../API/auth/thirdparty/poniverse'));
 router.use('/oauth2/thirdparty/facebook', require('../../API/auth/thirdparty/facebook'));
 
-router.use(cors());
-
 // No rate limit free to use publicly accessible APIs
 router.use('/image', require('../../API/GET/image'));
 router.use('/youtube-dl', require('../../API/GET/youtubeDl'));
-
-router.use(limiter({
-    // duration: 900000, // 15 min
-    max: 500,
-    accessLimited: {
-        error: 'Too many request for this IP address, please read the API rate limit docs',
-        code: 'service_lock_down',
-    }
-}));
 
 // Authoriz-free APIs
 

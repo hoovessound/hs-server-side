@@ -435,7 +435,7 @@ router.post('/:id?/comment/upload', (req, res) => {
     const findTrack = new FindTrack(res, req);
     const imgurClientId = process.env.IMGUR_CLIENT_ID;
     const form = formidable.IncomingForm({
-        uploadDir: path.join(`${__dirname}/../../usersContent`),
+        uploadDir: indexJs.tmp,
     });
     form.parse(req, (error, fields, files) => {
         if(error){

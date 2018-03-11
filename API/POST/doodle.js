@@ -10,6 +10,7 @@ const sha256 = require('sha256');
 const path = require('path');
 const fsp = require('fs-promise');
 const fs = require('fs');
+const indexJs = require('../../src/index');
 
 const gcs = require('@google-cloud/storage')({
     projectId: 'hoovessound',
@@ -73,7 +74,9 @@ class Doodle {
 
 router.post('/', (req, res) => {
     const doodle = new Doodle(req, res);
-    const form = new formidable.IncomingForm;
+    const form = formidable.IncomingForm({
+        uploadDir: indexJs.tmp,
+    });
     form.parse(req, (error, fields, files) => {
         if(!fields.title){
             res.status(403);

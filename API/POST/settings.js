@@ -14,6 +14,7 @@ const gcs = require('@google-cloud/storage')({
 const fp = require('fs-promise');
 const easyimage = require('easyimage');
 const escape = require('escape-html');
+const indexJs = require('../../src/index');
 
 // save the normal settings
 router.post('/', (req, res) => {
@@ -84,7 +85,7 @@ router.post('/profilepicture', (req, res) => {
     }
 
     const form = formidable.IncomingForm({
-        uploadDir: path.join(`${__dirname}/../../usersContent`),
+        uploadDir: indexJs.tmp,
     });
     form.encoding = 'utf-8';
     form.parse(req, (error, fields, files) => {

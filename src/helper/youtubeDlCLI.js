@@ -27,7 +27,7 @@ class youtubeDlCLI {
         return new Promise((resolve, reject) => {
             spawn('youtube-dl', ['--get-description', ...prefix, this.url])
             .stdout.on('data', data => {
-                resolve(data.toString());
+                resolve(data.toString().trim());
             });
         });
     }

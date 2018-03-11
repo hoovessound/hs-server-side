@@ -20,6 +20,8 @@ const escape = require('escape-html');
 const moment = require('moment');
 const escapeHtml = require('escape-html');
 const genId = require('../../src/helper/genId');
+const imgurUploader = require('imgur-uploader');
+const indexJs = require('../../src/index');
 
 class FindTrack {
 
@@ -188,6 +190,25 @@ class FindTrack {
         });
 
     }
+
+    async uploadImage(options, image){
+        const req = this.req;
+        const res = this.res;
+        // Read the file
+        try {
+            const file = await fsp.readFile(image.path);
+            const response = await imgurUploader(file, options);
+            res.json(response);
+        }
+        catch(error){
+            res.status(500);
+            res.json({
+                error: true,
+                msg: 'Something when wrong',
+            });
+            console.log(error);
+        }
+    }
 }
 
 router.post('/favorite/:id?', (req, res) => {
@@ -215,7 +236,7 @@ router.post('/edit/:id?', (req, res) => {
     }
     
     const form = formidable.IncomingForm({
-        uploadDir: path.join(`${__dirname}/../../../usersContent`),
+        uploadDir: indexJs.tmp,
     });
     form.encoding = 'utf-8';
     form.parse(req, (error, fields, files) => {
@@ -383,12 +404,12 @@ router.post('/edit/:id?', (req, res) => {
     });
 });
 
-router.post('/backgrounddrop/:id?', (req, res) => {
+router.post('/:id?/backgrounddrop', (req, res) => {
     const findTrack = new FindTrack(res, req);
     findTrack.updateBackgroundDrop(req, res);
 });
 
-router.post('/comment/:id?', (req, res) => {
+router.post('/:id?/comment', (req, res) => {
     const trackid = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (!trackid) {
@@ -410,7 +431,47 @@ router.post('/comment/:id?', (req, res) => {
     findTrack.addComment(trackid);
 });
 
-router.post('/tag/:trackid?', (req, res) => {
+router.post('/:id?/comment/upload', (req, res) => {
+    const findTrack = new FindTrack(res, req);
+    const imgurClientId = process.env.IMGUR_CLIENT_ID;
+    const form = formidable.IncomingForm({
+        uploadDir: path.join(`${__dirname}/../../usersContent`),
+    });
+    form.parse(req, (error, fields, files) => {
+        if(error){
+            res.status(500);
+            res.json({
+                error: true,
+                msg: 'Something when wrong',
+            })
+            console.log(error);
+        }
+        const image = files.image;
+        if(!image){
+            res.json({
+                error: true,
+                msg: 'Request body much including the image field',
+            });
+            return false;
+        }
+
+        if(!image.type.includes('image')){
+            res.json({
+                error: true,
+                msg: 'Unsupported file type',
+            });
+            return false;
+        }
+        // Everthing cheks out
+        const options = {
+            title: image.name,
+            description: `https://hoovessound.ml/track/${req.params.id}`,
+        };
+        findTrack.uploadImage(options, image);
+    });
+});
+
+router.post('/:trackid?/tag', (req, res) => {
     const user = req.hsAuth.user;
     let tag = req.body.tag;
     tag = escapeHtml(tag);
@@ -488,7 +549,7 @@ router.post('/tag/:trackid?', (req, res) => {
     })
 });
 
-router.delete('/tag/:trackid?', (req, res) => {
+router.delete('/:trackid?/tag', (req, res) => {
     const user = req.hsAuth.user;
     let tag = req.body.tag;
     const findTrack = new FindTrack(res, req);

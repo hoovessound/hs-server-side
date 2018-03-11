@@ -18,6 +18,7 @@ const genId = require('../../src/helper/genId');
 const escape = require('escape-html');
 const fileType = require('file-type');
 const youtubeDl = require('../../src/helper/youtubeDlCLI');
+const indexJs = require('../../src/index');
 
 router.post('/', (req, res) => {
     // Check permission
@@ -35,7 +36,7 @@ router.post('/', (req, res) => {
     const full_address = req.protocol + "://" + req.headers.host;
     const user = req.hsAuth.user;
     const form = formidable.IncomingForm({
-        uploadDir: path.join(`${__dirname}/../../tracks`),
+        uploadDir: indexJs.tmp,
     });
     form.encoding = 'utf-8';
 

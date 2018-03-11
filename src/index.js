@@ -16,9 +16,7 @@ const morgan = require('morgan');
 const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
-
-const youtubeDl = require('./helper/youtubeDlCLI');
-const dl = new youtubeDl.youtubeDlCLI('https://www.youtube.com/watch?v=Vix8YJvWhq4');
+const tmp = require('tmp');
 
 require('dotenv').config();
 
@@ -74,27 +72,10 @@ module.exports.filezizgag = {
 // Setting up the app port
 const port = 3000;
 
-// Check of require directory
-fsp.exists(path.join(`${__dirname}/../usersContent`)).then(exists => {
-    if (!exists) {
-        fsp.mkdir(path.join(`${__dirname}/../usersContent`), () => {
-            console.log('usersContent directory created');
-            return false;
-        });
-    }
-}).catch(error => {
-    console.log(error);
-});
-
-fsp.exists(path.join(`${__dirname}/../tracks`)).then(exists => {
-    if (!exists) {
-        fsp.mkdir(path.join(`${__dirname}/../tracks`), () => {
-            console.log('tracks directory created');
-        });
-    }
-}).catch(error => {
-    console.log(error);
-});
+// Create a tmp folder for the application
+const tmpobj = tmp.dirSync();
+console.log('Tmp dir: ', tmpobj.name);
+module.exports.tmp = tmpobj.name;
 
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended: true}));

@@ -383,12 +383,12 @@ router.post('/edit/:id?', (req, res) => {
     });
 });
 
-router.post('/backgrounddrop/:id?', (req, res) => {
+router.post('/:id?/backgrounddrop', (req, res) => {
     const findTrack = new FindTrack(res, req);
     findTrack.updateBackgroundDrop(req, res);
 });
 
-router.post('/comment/:id?', (req, res) => {
+router.post('/:id?/comment', (req, res) => {
     const trackid = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (!trackid) {
@@ -410,7 +410,7 @@ router.post('/comment/:id?', (req, res) => {
     findTrack.addComment(trackid);
 });
 
-router.post('/tag/:trackid?', (req, res) => {
+router.post('/:trackid?/tag', (req, res) => {
     const user = req.hsAuth.user;
     let tag = req.body.tag;
     tag = escapeHtml(tag);
@@ -488,7 +488,7 @@ router.post('/tag/:trackid?', (req, res) => {
     })
 });
 
-router.delete('/tag/:trackid?', (req, res) => {
+router.delete('/:trackid?/tag', (req, res) => {
     const user = req.hsAuth.user;
     let tag = req.body.tag;
     const findTrack = new FindTrack(res, req);

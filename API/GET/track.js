@@ -136,7 +136,7 @@ router.get('/:id', (req, res) => {
     findTrack.findById(ID);
 });
 
-router.get('/comment/:id?', (req, res) => {
+router.get('/:id?/comments', (req, res) => {
     const trackid = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (!trackid) {

@@ -142,8 +142,14 @@ io.on('connection', (socket) => {
                 token: socketJwt,
             });
 
-            socket.on('user.history.update', payload => {
-                require('./websocket/events/user/history/update')(payload);
+            socket.on('user.sync.track', payload => {
+                require('./websocket/events/user/sync/track')(payload, user);
+                // Emit the update event to all user's devices
+                connections.devices(user.username).map(device => {
+                    if(socket.id !== device.id){
+                        io.sockets.connected[device.id].emit('user.track.update', connections.getTrack(user.username));
+                    }
+                });
             });
         
             socket.on('disconnect', () => {

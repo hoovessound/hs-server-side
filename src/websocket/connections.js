@@ -5,7 +5,10 @@ let connections = {
 module.exports = {
     add(user, id, token){
         if(typeof connections[user.username] !== 'object'){
+            // Init user's devices stack
             connections[user.username] = [];
+            // Init user's track sync object
+            connections[user.username].track = {};
         }
         connections[user.username].push({
             user,
@@ -50,5 +53,14 @@ module.exports = {
         }else{
             return false;
         }
+    },
+    updateTrackSync(username, object){
+        connections[username].track = {
+            ...connections[username].track,
+            ...object,
+        }
+    },
+    getTrack(username){
+        return connections[username].track;
     }
 }

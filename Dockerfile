@@ -4,12 +4,13 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN npm install --production
+RUN apt-get install -y vim git sudo
 
-RUN apt-get install imagemagick libmagickcore-dev libmagickwand-dev
+RUN sudo npm install yarn -g
 
-# Must have packages
-RUN apt-get update && apt-get install -y vim curl git sudo
+RUN yarn install --production
+
+RUN apt-get update && apt-get install -y imagemagick libmagickcore-dev libmagickwand-dev
 
 RUN sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
 RUN sudo chmod a+rx /usr/local/bin/youtube-dl

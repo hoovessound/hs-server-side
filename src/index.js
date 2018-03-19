@@ -1,7 +1,8 @@
 const express = require('express');
-const http = require('http');
 const app = express();
-const server = http.createServer(app);
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+module.exports.io = io;
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -17,6 +18,7 @@ const request = require('request');
 const csurf = require('csurf');
 const subdomain = require('express-subdomain');
 const tmp = require('tmp');
+const genId = require('./helper/genId');
 
 require('dotenv').config();
 
@@ -92,10 +94,7 @@ app.use(cookieSession({
     keys: [randomstring.generate(30)],
 }));
 
-const io = require('socket.io').listen(server);
-module.exports.io = io;
-
-server.listen(port, () => {
+http.listen(port, () => {
     console.log(`HoovesSound are running on port ${color.green(port)}`);
     // connect to the db
     mongoose.connect(process.env.DB, {
@@ -103,29 +102,18 @@ server.listen(port, () => {
     });
 });
 
+app.use((req, res, next) => {
+    res.io = io;
+    next();  
+})
+
 // Using GZIP
 app.use(compression());
-
-// Productions only settings
-if (process.env.NODE_ENV === 'production') {
-    // Production
-} else {
-    // Development only settings
-    
-    // using the morgan dev server log
-    app.use(morgan('dev'));
-}
 
 app.all('/favicon.ico', (req, res) => {
     res.set('Cache-Control', 'public, max-age=31557600');
     res.set('Transfer-Encoding', 'chunked');
     request('https://storage.googleapis.com/hs-static/favicon.png').pipe(res);
-});
-
-// Using Socket.io
-app.use((req, res, next) => {
-    res.io = io;
-    next();
 });
 
 // No CSRF check
@@ -139,6 +127,50 @@ app.use(subdomain('stream', require('../API/GET/listen')));
 // app.use(subdomain('developer', require('../API/listen')));
 
 app.use(subdomain('console.developer', require('./router/view/oAuthApp')));
+
+io.on('connection', (socket) => {
+    const connections = require('./websocket/connections');
+
+    socket.on('auth.register', payload => {
+        // First, register a new socket session in order to get a websocket JWT
+        require('./websocket/authorization')(payload.jwt)
+        .then(user => {
+            const socketJwt = require('./websocket/register')(user);
+            connections.add(user, socket.id, socketJwt);
+            socket.emit('auth.new', {
+                id: socket.id,
+                token: socketJwt,
+            });
+
+            socket.on('user.sync.track', payload => {
+                require('./websocket/events/user/sync/track')(payload, user);
+                // Emit the update event to all user's devices
+                connections.devices(user.username).map(device => {
+                    if(socket.id !== device.id){
+                        io.sockets.connected[device.id].emit('user.track.update', connections.getTrack(user.username));
+                    }
+                });
+            });
+        
+            socket.on('disconnect', () => {
+                connections.remove(user.username, socket.id);
+            });
+
+        })
+        .catch(error => {
+            socket.emit('auth.new', {
+                error: 'Unauthorized user',
+            });
+            console.log(error);
+        });
+    });
+});
+
+// Web socket APIs
+// Internal use only
+app.use(subdomain('socket', require('./router/websocket')));
+
+app.all('*', (req, res) => res.end('HoovesSound API Server'));
 
 app.use(csurf());
 app.use(function (err, req, res, next) {

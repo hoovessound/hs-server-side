@@ -96,10 +96,10 @@ router.post('/', (req, res) => {
 
                 // Upload the audio first
                 const tmp_audioFile = files.audio.path;
-                const newAudioId = sha256(randomstring.generate(20));
+                const newAudioId = sha256(randomstring.generate(20) + Date.now());
                 const file = files.audio;
                 const ext = path.extname(file.name);
-                return fsp.rename(tmp_audioFile, path.join(`${__dirname}/../../tracks/${newAudioId}${ext}`))
+                return fsp.rename(tmp_audioFile, path.join(`${indexJs.tmp}/${newAudioId}${ext}`))
                 .then(() => {
                     let title = escape(fields.title) || file.name;
                     // Check for the same title
@@ -118,7 +118,7 @@ router.post('/', (req, res) => {
                             id: genId(),
                             title,
                             file: {
-                                location: path.join(`${__dirname}/../../tracks/${newAudioId}`),
+                                location: path.join(`${indexJs.tmp}/${newAudioId}${ext}`),
                                 extend: false,
                             },
                             author: user.id,
@@ -147,9 +147,9 @@ router.post('/', (req, res) => {
 
                                 // Upload the audio to Google Cloud Storage
                                 gcs.bucket('hs-track')
-                                .upload(path.join(`${__dirname}/../../tracks/${newAudioId}${ext}`))
+                                .upload(path.join(`${indexJs.tmp}/${newAudioId}${ext}`))
                                 .then(file => {
-                                    fs.unlinkSync(path.join(`${__dirname}/../../tracks/${newAudioId}${ext}`));
+                                    fs.unlinkSync(path.join(`${indexJs.tmp}/${newAudioId}${ext}`));
                                     file = file[0];
                                     function removeGcsTrack(){
                                         file.delete();
@@ -170,16 +170,16 @@ router.post('/', (req, res) => {
                                 });
 
                                 // Upload the cover image if they have any of those
-                                if(coverImage){
+                                if(coverImage && coverImage.size > 1){
                                     const gcsCoverImage = gcs.bucket('hs-cover-image');
-                                    const newImageId = sha256(randomstring.generate(20));
+                                    const newImageId = sha256(randomstring.generate(20) + Date.now());
                                     const extImage = path.extname(coverImage.name);
-                                    fsp.rename(coverImage.path, path.join(`${__dirname}/../../usersContent/${newImageId}${extImage}`))
+                                    fsp.rename(coverImage.path, path.join(`${indexJs.tmp}/${newImageId}${extImage}`))
                                     .then(() => {
                                         // Resize the image first
                                         return easyimage.resize({
-                                            src: path.join(`${__dirname}/../../usersContent/${newImageId}${extImage}`),
-                                            dst: path.join(`${__dirname}/../../usersContent/${newImageId}${extImage}`),
+                                            src: path.join(`${indexJs.tmp}/${newImageId}${extImage}`),
+                                            dst: path.join(`${indexJs.tmp}/${newImageId}${extImage}`),
                                             width: 500,
                                             height: 500,
                                             ignoreAspectRatio: true,

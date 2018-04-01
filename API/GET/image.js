@@ -5,7 +5,7 @@ const Users = require('../../schema/Users');
 const Playlists = require('../../schema/Playlists');
 const Doodles = require('../../schema/Doodles');
 const rp = require('request-promise');
-const Jimp = require('jimp');
+const sharp = require('sharp');
 
 class Image {
     constructor(req, res){
@@ -91,38 +91,77 @@ class Image {
         }
         const req = this.req;
         const res = this.res;
-        const rawWith = req.query.width;
-        const rawHeight = req.query.height;
+        let rawWidth = req.query.width;
+        let rawHeight = req.query.height;
+        const isWebp = req.query.webp === "false" ? false : true;
 
-        if(rawWith || rawHeight){
-            Jimp.read(imageUrl, (error, img) => {
-                if(error){
-                    console.log(error);
-                }
-                let width;
-                let height;
+        if(rawWidth || rawHeight){
 
-                if(rawWith){
-                    width = parseInt(rawWith);
-                }
+            if(rawWidth && !rawHeight){
+                rawHeight = rawWidth;
+            }
 
-                if(rawHeight){
-                    height = parseInt(rawHeight);
-                }
+            if(rawHeight && !rawWidth){
+                rawWidth = rawHeight;
+            }
 
-                if(rawWith && !rawHeight){
-                    height = parseInt(rawWith);
-                }
+            rawWidth = parseInt(rawWidth, 10);
+            rawHeight = parseInt(rawHeight, 10);
 
-                if(rawHeight && !rawWith){
-                    width = parseInt(rawHeight);
+            let httpClient;
+            if(imageUrl.startsWith('http://')){
+                httpClient = require('http');
+            }else{
+                httpClient = require('https');
+            }
+
+            const imageResizer = sharp();
+
+            imageResizer
+            .resize(rawWidth, rawHeight)
+
+            if(isWebp){
+                imageResizer.webp();
+            }
+            
+            httpClient.get(imageUrl, image => {
+                if(isWebp){
+                    res.type('image/webp');
+                }else{
+                    res.type(image.headers['content-type']);
                 }
-                img.resize(width, height).getBuffer(Jimp.AUTO, function(e,buffer){
-                    res.type(img.getMIME());
-                    res.setHeader('Cache-Control', 'no-cache');
-                    res.end(buffer);
-                });
+                image
+                .pipe(imageResizer)
+                .pipe(res)
             });
+            // Jimp.read(imageUrl, (error, img) => {
+            //     if(error){
+            //         console.log(error);
+            //     }
+            //     let width;
+            //     let height;
+
+            //     if(rawWith){
+            //         width = parseInt(rawWith);
+            //     }
+
+            //     if(rawHeight){
+            //         height = parseInt(rawHeight);
+            //     }
+
+            //     if(rawWith && !rawHeight){
+            //         height = parseInt(rawWith);
+            //     }
+
+            //     if(rawHeight && !rawWith){
+            //         width = parseInt(rawHeight);
+            //     }
+            //     img.resize(width, height).getBuffer(Jimp.AUTO, function(e,buffer){
+            //         res.type(img.getMIME());
+            //         res.setHeader('Cache-Control', 'no-cache');
+            //         res.end(buffer);
+            //     });
+            // });
             return false;
         }else{
             res.setHeader('Cache-Control', 'no-cache');

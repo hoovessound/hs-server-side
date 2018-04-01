@@ -20,6 +20,8 @@ const subdomain = require('express-subdomain');
 const tmp = require('tmp');
 const genId = require('./helper/genId');
 
+app.use(morgan('dev'));
+
 require('dotenv').config();
 
 let socketConnection = {};

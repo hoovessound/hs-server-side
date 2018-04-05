@@ -176,29 +176,18 @@ router.post('/', (req, res) => {
                                     const extImage = path.extname(coverImage.name);
                                     fsp.rename(coverImage.path, path.join(`${indexJs.tmp}/${newImageId}${extImage}`))
                                     .then(() => {
-                                        // Resize the image first
-                                        return easyimage.resize({
-                                            src: path.join(`${indexJs.tmp}/${newImageId}${extImage}`),
-                                            dst: path.join(`${indexJs.tmp}/${newImageId}${extImage}`),
-                                            width: 500,
-                                            height: 500,
-                                            ignoreAspectRatio: true,
-                                        })
-                                        .then(processedImage => {
-                                            // Upload the image to Google Cloud Storage
-                                            return gcsCoverImage.upload(processedImage.path)
-                                            .then(file => {
-                                                file = file[0];
-                                                return file.makePublic()
-                                                .then(() => {
-                                                    // Update the track's cover image
-                                                    track.coverImage = `https://storage.googleapis.com/hs-cover-image/${newImageId}${extImage}`;
-                                                    return Tracks.update({
-                                                        _id: track._id,
-                                                    }, track);
-                                                })
+                                        return gcsCoverImage.upload(path.join(`${indexJs.tmp}/${newImageId}${extImage}`))
+                                        .then(file => {
+                                            file = file[0];
+                                            return file.makePublic()
+                                            .then(() => {
+                                                // Update the track's cover image
+                                                track.coverImage = `https://storage.googleapis.com/hs-cover-image/${newImageId}${extImage}`;
+                                                return Tracks.update({
+                                                    _id: track._id,
+                                                }, track);
                                             })
-                                        });
+                                        })
                                     })
                                     .catch(error => {
                                         console.log(error);

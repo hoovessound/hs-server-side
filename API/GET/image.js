@@ -94,6 +94,14 @@ class Image {
         let rawWidth = req.query.width;
         let rawHeight = req.query.height;
         const isWebp = req.query.webp === "false" ? false : true;
+        const imageResizer = sharp();
+
+        let httpClient;
+        if(imageUrl.startsWith('http://')){
+            httpClient = require('http');
+        }else{
+            httpClient = require('https');
+        }
 
         if(rawWidth || rawHeight){
 
@@ -108,22 +116,13 @@ class Image {
             rawWidth = parseInt(rawWidth, 10);
             rawHeight = parseInt(rawHeight, 10);
 
-            let httpClient;
-            if(imageUrl.startsWith('http://')){
-                httpClient = require('http');
-            }else{
-                httpClient = require('https');
-            }
-
-            const imageResizer = sharp();
-
             imageResizer
             .resize(rawWidth, rawHeight)
-
+            
             if(isWebp){
                 imageResizer.webp();
             }
-            
+
             httpClient.get(imageUrl, image => {
                 if(isWebp){
                     res.type('image/webp');
@@ -134,38 +133,20 @@ class Image {
                 .pipe(imageResizer)
                 .pipe(res)
             });
-            // Jimp.read(imageUrl, (error, img) => {
-            //     if(error){
-            //         console.log(error);
-            //     }
-            //     let width;
-            //     let height;
-
-            //     if(rawWith){
-            //         width = parseInt(rawWith);
-            //     }
-
-            //     if(rawHeight){
-            //         height = parseInt(rawHeight);
-            //     }
-
-            //     if(rawWith && !rawHeight){
-            //         height = parseInt(rawWith);
-            //     }
-
-            //     if(rawHeight && !rawWith){
-            //         width = parseInt(rawHeight);
-            //     }
-            //     img.resize(width, height).getBuffer(Jimp.AUTO, function(e,buffer){
-            //         res.type(img.getMIME());
-            //         res.setHeader('Cache-Control', 'no-cache');
-            //         res.end(buffer);
-            //     });
-            // });
-            return false;
         }else{
-            res.setHeader('Cache-Control', 'no-cache');
-            rp.get(imageUrl).pipe(res);
+            // res.setHeader('Cache-Control', 'no-cache');
+            // rp.get(imageUrl).pipe(res);
+            httpClient.get(imageUrl, image => {
+                if(isWebp){
+                    imageResizer.webp();
+                    res.type('image/webp');
+                }else{
+                    res.type(image.headers['content-type']);
+                }
+                image
+                .pipe(imageResizer)
+                .pipe(res)
+            });
         }
     }
 

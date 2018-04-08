@@ -134,8 +134,6 @@ class Image {
                 .pipe(res)
             });
         }else{
-            // res.setHeader('Cache-Control', 'no-cache');
-            // rp.get(imageUrl).pipe(res);
             httpClient.get(imageUrl, image => {
                 if(isWebp){
                     imageResizer.webp();

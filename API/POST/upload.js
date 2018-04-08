@@ -19,6 +19,7 @@ const escape = require('escape-html');
 const fileType = require('file-type');
 const youtubeDl = require('../../src/helper/youtubeDlCLI');
 const indexJs = require('../../src/index');
+const sharp = require('sharp');
 
 router.post('/', (req, res) => {
     // Check permission
@@ -174,19 +175,32 @@ router.post('/', (req, res) => {
                                     const gcsCoverImage = gcs.bucket('hs-cover-image');
                                     const newImageId = sha256(randomstring.generate(20) + Date.now());
                                     const extImage = path.extname(coverImage.name);
-                                    fsp.rename(coverImage.path, path.join(`${indexJs.tmp}/${newImageId}${extImage}`))
+                                    const newFilePath = path.join(`${indexJs.tmp}/${newImageId}${extImage}`);
+                                    fsp.rename(coverImage.path, newFilePath)
                                     .then(() => {
-                                        return gcsCoverImage.upload(path.join(`${indexJs.tmp}/${newImageId}${extImage}`))
-                                        .then(file => {
-                                            file = file[0];
-                                            return file.makePublic()
-                                            .then(() => {
-                                                // Update the track's cover image
-                                                track.coverImage = `https://storage.googleapis.com/hs-cover-image/${newImageId}${extImage}`;
-                                                return Tracks.update({
-                                                    _id: track._id,
-                                                }, track);
-                                            })
+                                        sharp(newFilePath)
+                                        .resize(500, 500)
+                                        .toFile(newFilePath)
+                                        .then(() => {
+                                            return gcsCoverImage.upload(newFilePath)
+                                            .then(file => {
+                                                file = file[0];
+                                                return file.makePublic()
+                                                .then(() => {
+                                                    // Update the track's cover image
+                                                    track.coverImage = `https://storage.googleapis.com/hs-cover-image/${newImageId}${extImage}`;
+                                                    return Tracks.update({
+                                                        _id: track._id,
+                                                    }, track);
+                                                })
+                                            })  
+                                        })
+                                        .catch(error => {
+                                            console.log(error);
+                                            res.type(500);
+                                            res.json({
+                                                error: 'Something when wrong while trying to resize your cover art image',
+                                            });
                                         })
                                     })
                                     .catch(error => {

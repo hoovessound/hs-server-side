@@ -123,6 +123,10 @@ class Image {
                 imageResizer.webp();
             }
 
+            if(req.query.download){
+                res.set('Content-Disposition', `attachment;`);
+            }
+
             httpClient.get(imageUrl, image => {
                 if(isWebp){
                     res.type('image/webp');

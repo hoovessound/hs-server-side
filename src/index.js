@@ -20,9 +20,9 @@ const subdomain = require('express-subdomain');
 const tmp = require('tmp');
 const genId = require('./helper/genId');
 
-app.use(morgan('dev'));
-
-require('dotenv').config();
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
 
 let socketConnection = {};
 module.exports.socketConnection = socketConnection;
@@ -45,7 +45,6 @@ envs.map(env => {
         console.log(`ENV CHECK: ${color.blue(env)} ${color.green('PASS')} `);
     }else{ 
         console.log(`ENV CHECK: ${color.yellow(env)} ${color.red('FAIL')} `);
-        process.exit();
     }
 });
 
@@ -73,9 +72,6 @@ module.exports.filezizgag = {
     key:  process.env.FILEZIGZAG_TOKEN,
 };
 
-// Setting up the app port
-const port = 3000;
-
 // Create a tmp folder for the application
 const tmpobj = tmp.dirSync();
 console.log('Tmp dir: ', tmpobj.name);
@@ -96,8 +92,8 @@ app.use(cookieSession({
     keys: [randomstring.generate(30)],
 }));
 
-http.listen(port, () => {
-    console.log(`HoovesSound are running on port ${color.green(port)}`);
+http.listen(3000, () => {
+    console.log(`HoovesSound are running on port ${color.green(3000)}`);
     // connect to the db
     mongoose.connect(process.env.DB, {
         useMongoClient: true,
@@ -129,6 +125,16 @@ app.use(subdomain('stream', require('../API/GET/listen')));
 // app.use(subdomain('developer', require('../API/listen')));
 
 app.use(subdomain('console.developer', require('./router/view/oAuthApp')));
+
+app.use(subdomain('redirect', (req, res, next) => {
+    const redirect = req.query.redirect;
+    if(!redirect){
+        res.redirect(302, 'https://hoovessound.ml');
+    }else{
+        res.redirect(302, redirect);
+    }
+    next();
+}));
 
 io.on('connection', (socket) => {
     const connections = require('./websocket/connections');

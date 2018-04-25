@@ -211,7 +211,7 @@ class FindTrack {
     }
 }
 
-router.post('/favorite/:id?', (req, res) => {
+router.post('/:id?/favorite', (req, res) => {
     const id = req.params.id;
     const findTrack = new FindTrack(res, req);
     if (typeof id === 'undefined') {
@@ -224,7 +224,7 @@ router.post('/favorite/:id?', (req, res) => {
     findTrack.faveOrUnfave(id);
 });
 
-router.post('/edit/:id?', (req, res) => {
+router.post('/:id?/edit/', (req, res) => {
 
     const id = req.params.id;
     if (!id) {

@@ -20,6 +20,14 @@ class FindTrack {
                 ...TrackResponse,
             });
 
+            if(!track){
+                this.res.status(403);
+                this.res.json({
+                    error: 'Can\'t not that track id',
+                });
+                return false;
+            }
+
             if(!this.req.query.bypass){
                 if(track.private){
                     // Check permission
@@ -31,14 +39,6 @@ class FindTrack {
                         return false;
                     }
                 }
-            }
-
-            if(!track){
-                res.status(403);
-                this.res.json({
-                    error: 'Can\'t not that track id',
-                });
-                return false;
             }
 
             // Find the author

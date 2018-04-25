@@ -27,6 +27,7 @@ router.use('/search', require('../../API/GET/search'))
 router.use('/doodle', require('../../API/GET/doodle'));
 router.use('/playlist', require('../../API/GET/playlist'));
 router.use('/user', require('../../API/GET/user'));
+router.use('/tag', require('../../API/GET/tag'));
 
 // Authoriz APIs
 router.use((req, res, next) => {

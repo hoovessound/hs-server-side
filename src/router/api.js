@@ -4,6 +4,7 @@ const cors = require('cors');
 const limiter = require('express-better-ratelimit_hs_specific');
 const oAuthApps = require('../../schema/oAuthApps');
 const Users = require('../../schema/Users');
+const Tracks = require('../../schema/Tracks');
 const AccessTokes = require('../../schema/AccessTokes');
 const jwt = require('jsonwebtoken');
 
@@ -109,6 +110,22 @@ router.use((req, res, next) => {
 });
 
 router.use('/me', require('../../API/GET/me'));
+
+router.get('/track/:id?/is_favorite', async function(req, res){
+    const user = req.hsAuth.user;
+    const track = await Tracks.findOne({id: req.params.id});
+    if(!track){
+        res.status(403);
+        res.json({
+            error: 'Track do not exits',
+        });
+        return false;
+    }else{
+        res.json({
+            is_favorite: user.fave.includes(req.params.id),
+        });
+    }
+});
 
 // POST APIs
 

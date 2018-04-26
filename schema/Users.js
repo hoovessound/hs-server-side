@@ -33,6 +33,14 @@ const usersSchema = new Schema({
     unreadNotification: {
         type: Boolean,
         default: false,
+    },
+    fcmTokens: {
+        type: Array,
+        default: null,
+    },
+    sendPushNotification: {
+        type: Boolean,
+        default: false,
     }
 });
 module.exports = mongoose.model('Users', usersSchema);

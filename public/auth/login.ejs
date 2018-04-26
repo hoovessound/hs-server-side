@@ -45,6 +45,18 @@
     <%-include('../includes/artwork')%>
     <script>
         document.querySelector('.username').focus();
+
+        // Google Smart Lock
+        if(navigator.credentials){
+            navigator.credentials.get({
+                password: true,
+            })
+            .then(cred => {
+                document.querySelector('[name=email]').value = cred.id;
+                document.querySelector('[name=password]').value = cred.password;
+                document.querySelector('#loginButton').click();
+            });
+        }
     </script>
 </div>
 </body>

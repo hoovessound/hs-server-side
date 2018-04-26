@@ -120,6 +120,8 @@ app.use(subdomain('api', require('./router/api')));
 
 app.use(subdomain('id', require('./router/id')));
 
+app.use(subdomain('notification', require('./router/notification')));
+
 app.use(subdomain('stream', require('../API/GET/listen')));
 
 // app.use(subdomain('developer', require('../API/listen')));

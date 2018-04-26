@@ -44,6 +44,7 @@
     <%}%>
     <%-include('../includes/artwork')%>
     <script>
+        var loginButton = document.querySelector('#loginButton');
         document.querySelector('.username').focus();
 
         // Google Smart Lock
@@ -54,8 +55,12 @@
             .then(cred => {
                 document.querySelector('[name=email]').value = cred.id;
                 document.querySelector('[name=password]').value = cred.password;
-                document.querySelector('#loginButton').click();
+                loginButton.click();
             });
+        }
+        loginButton.onsubmit = function(){
+            loginButton.disabled = true;
+            loginButton.value = 'Logging In';
         }
     </script>
 </div>

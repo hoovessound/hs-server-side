@@ -161,6 +161,37 @@ router.post('/send', async function(req, res){
     }
 });
 
+router.post('/broadcast', async function(req, res){
+
+    if(!req.hsAuth.user.sendPushNotification){
+        res.status(403);
+        res.json({
+            error: 'User has disabled or haven\'t enable push notification yet',
+        });
+        return false;
+    }
+
+    const user = await Users.findOne({id: req.body.to});
+    if(user === null){
+        res.status(403);
+        res.json({
+            error: 'User does not exits',
+        });
+        return false;
+    }
+
+    try{
+        const response = await notification(user.fcmTokens, req.body.notification, req.body.options);
+        res.json({
+            done: true,
+            response,
+        });
+    }
+    catch(error){
+        res.json(error)
+    }
+});
+
 router.all('*', (req, res) => {
     res.status(404);
     res.json({

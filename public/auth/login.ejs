@@ -58,9 +58,9 @@
                 loginButton.click();
             });
         }
-        loginButton.onsubmit = function(){
+        document.querySelector('#loginForm').onsubmit = function(){
             loginButton.disabled = true;
-            loginButton.value = 'Logging In';
+            loginButton.innerHTML = 'Logging In';
         }
     </script>
 </div>

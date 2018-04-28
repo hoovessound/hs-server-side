@@ -55,7 +55,8 @@
     "start": "node src/index.js",
     "build": "gulp default",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "test": "exit 0"
   },
   "snyk": true
 }

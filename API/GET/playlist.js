@@ -45,7 +45,7 @@ class playlist {
                     jobs.push(fetchTrack(id));
                 });
                 const tracks = await Promise.all(jobs);
-                playlist.tracks = tracks;
+                playlist.tracks = tracks.reverse();
                 // Fetch users
                 const usersJobs = [];
                 async function fetchUser(id){

@@ -129,7 +129,7 @@ class Me {
                 fullname: user.fullName,
             }
         });
-        res.json(playlists);
+        res.json(playlists.reverse());
     }
 
     async findTracks(){
@@ -149,7 +149,7 @@ class Me {
                 username: user.username,
             };
         });
-        res.json(tracks);
+        res.json(tracks.reverse());
 
     }
 

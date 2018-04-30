@@ -19,6 +19,7 @@ const csurf = require('csurf');
 const subdomain = require('express-subdomain');
 const tmp = require('tmp');
 const genId = require('./helper/genId');
+const cors = require('cors');
 
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config();
@@ -116,17 +117,20 @@ app.all('/favicon.ico', (req, res) => {
 
 // No CSRF check
 
-app.use(subdomain('api', require('./router/api')));
-
 app.use(subdomain('id', require('./router/id')));
+
+app.use(subdomain('console.developer', require('./router/view/oAuthApp')));
+
+
+app.use(cors());
+
+app.use(subdomain('api', require('./router/api')));
 
 app.use(subdomain('notification', require('./router/notification')));
 
 app.use(subdomain('stream', require('../API/GET/listen')));
 
 // app.use(subdomain('developer', require('../API/listen')));
-
-app.use(subdomain('console.developer', require('./router/view/oAuthApp')));
 
 app.use(subdomain('redirect', (req, res, next) => {
     const redirect = req.query.redirect;

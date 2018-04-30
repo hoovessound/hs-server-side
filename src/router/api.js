@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const cors = require('cors');
 const limiter = require('express-better-ratelimit_hs_specific');
 const oAuthApps = require('../../schema/oAuthApps');
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');
 const AccessTokes = require('../../schema/AccessTokes');
 const jwt = require('jsonwebtoken');
-
-router.use(cors());
 
 router.use('/oauth2/token/access', require('../../API/auth/token/accessToken'));
 // Third party oAuth

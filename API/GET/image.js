@@ -6,6 +6,7 @@ const Playlists = require('../../schema/Playlists');
 const Doodles = require('../../schema/Doodles');
 const rp = require('request-promise');
 const sharp = require('sharp');
+const request = require('request');
 
 class Image {
     constructor(req, res){
@@ -95,61 +96,48 @@ class Image {
         let rawHeight = req.query.height;
         const isWebp = req.query.webp === "false" ? false : true;
         const imageResizer = sharp();
-
-        let httpClient;
-        if(imageUrl.startsWith('http://')){
-            httpClient = require('http');
+        const response = request(imageUrl);
+        if(isWebp){
+            imageResizer.webp();
+            res.type('image/webp');
         }else{
-            httpClient = require('https');
+            if(response.headers['content-type']){
+                res.type(response.headers['content-type']);
+            }else{
+                res.type('image/png');
+                imageResizer.png();
+            }
         }
 
-        if(rawWidth || rawHeight){
+        imageResizer.on('error', error => {
+            res.type('application/json');
+            res.status(500);
+            res.end(JSON.stringify({
+                error: 'Something when wrong while processing your image request',
+            }))
+        });
 
+        if(rawWidth || rawHeight){
             if(rawWidth && !rawHeight){
                 rawHeight = rawWidth;
             }
-
+    
             if(rawHeight && !rawWidth){
                 rawWidth = rawHeight;
             }
-
+    
             rawWidth = parseInt(rawWidth, 10);
             rawHeight = parseInt(rawHeight, 10);
-
-            imageResizer
-            .resize(rawWidth, rawHeight)
-            
-            if(isWebp){
-                imageResizer.webp();
-            }
-
-            if(req.query.download){
-                res.set('Content-Disposition', `attachment;`);
-            }
-
-            httpClient.get(imageUrl, image => {
-                if(isWebp){
-                    res.type('image/webp');
-                }else{
-                    res.type(image.headers['content-type']);
-                }
-                image
-                .pipe(imageResizer)
-                .pipe(res)
-            });
-        }else{
-            httpClient.get(imageUrl, image => {
-                if(isWebp){
-                    imageResizer.webp();
-                    res.type('image/webp');
-                }else{
-                    res.type(image.headers['content-type']);
-                }
-                image
-                .pipe(imageResizer)
-                .pipe(res)
-            });
+            imageResizer.resize(rawWidth, rawHeight);
         }
+
+        if(req.query.download){
+            res.set('Content-Disposition', `attachment;`);
+        }
+
+        response
+        .pipe(imageResizer)
+        .pipe(res)
     }
 
 }

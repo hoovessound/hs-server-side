@@ -17,9 +17,9 @@ services:
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
       docker --version ;
-      docker build -t moongod101/hs-server-client . ;
+      docker build -t moongod101/hs-server-side . ;
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD ;
-      docker push moongod101/hs-server-client ;
+      docker push moongod101/hs-server-side ;
     fi
 
 notifications:

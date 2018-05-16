@@ -22,7 +22,7 @@ class Track {
             }, {
                 ...TrackResponse,
             })
-            .limit(10)
+            .limit(req.query.limit ? parseInt(req.query.limit, 10) : 10)
             .skip(offset)
             .sort({uploadDate: -1});
 

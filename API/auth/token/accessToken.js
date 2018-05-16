@@ -57,7 +57,7 @@ router.post('/', (req, res) => {
             return false;
         }
 
-        const expired = moment(rightAccess.timestamp.end).isBefore(moment()._d)
+        const expired = moment(rightAccess.timestamp.end).isAfter(moment()._d)
 
         if(expired){
             res.json({

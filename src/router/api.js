@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const limiter = require('express-better-ratelimit_hs_specific');
 const oAuthApps = require('../../schema/oAuthApps');
 const Users = require('../../schema/Users');
 const Tracks = require('../../schema/Tracks');

@@ -142,6 +142,9 @@ app.use(subdomain('redirect', (req, res, next) => {
     next();
 }));
 
+// CDN API
+app.use('/image', require('../API/GET/image'));
+
 io.on('connection', (socket) => {
     const connections = require('./websocket/connections');
 

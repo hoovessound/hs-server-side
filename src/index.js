@@ -130,6 +130,8 @@ app.use(subdomain('notification', require('./router/notification')));
 
 app.use(subdomain('stream', require('../API/GET/listen')));
 
+app.use(subdomain('image', require('../API/GET/image')));
+
 // app.use(subdomain('developer', require('../API/listen')));
 
 app.use(subdomain('redirect', (req, res, next) => {
@@ -141,9 +143,6 @@ app.use(subdomain('redirect', (req, res, next) => {
     }
     next();
 }));
-
-// CDN API
-app.use('/image', require('../API/GET/image'));
 
 io.on('connection', (socket) => {
     const connections = require('./websocket/connections');

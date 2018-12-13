@@ -28,7 +28,7 @@
     "imgur-uploader": "^4.2.1",
     "jsonwebtoken": "^8.1.0",
     "moment": "^2.18.1",
-    "mongoose": "^4.11.1",
+    "mongoose": "^4.13.17",
     "morgan": "^1.8.2",
     "mpromise": "^0.5.5",
     "node-exec-promise": "^1.0.2",

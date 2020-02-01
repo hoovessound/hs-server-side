@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@google-cloud/storage": "^1.2.0",
+    "@google-cloud/storage": "^3.0.0",
     "base64-url": "^2.2.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",

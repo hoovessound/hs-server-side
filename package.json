@@ -46,7 +46,7 @@
     "snyk": "^1.41.1",
     "socket.io": "^2.0.3",
     "tmp": "^0.0.33",
-    "underscore": "^1.8.3",
+    "underscore": "^1.12.1",
     "x-frame-options": "^1.0.0"
   },
   "private": true,

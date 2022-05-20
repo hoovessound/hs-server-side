@@ -21,7 +21,7 @@
     "fast-crc32c": "^1.0.4",
     "fb": "^2.0.0",
     "file-type": "^7.2.0",
-    "formidable": "^1.1.1",
+    "formidable": "^3.2.4",
     "fs-promise": "^2.0.3",
     "fullurl": "^1.0.0",
     "helmet": "^3.8.0",

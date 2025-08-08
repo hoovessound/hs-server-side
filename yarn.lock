@@ -1090,12 +1090,6 @@ expect-ct@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/expect-ct/-/expect-ct-0.1.0.tgz#52735678de18530890d8d7b95f0ac63640958094"
 
-"express-better-ratelimit_hs_specific@https://github.com/hoovessound/express-better-ratelimit_hs_specific":
-  version "1.1.2"
-  resolved "https://github.com/hoovessound/express-better-ratelimit_hs_specific#e6ecd0d401fc0f1940ce87e2ad73b2d2c6beee35"
-  dependencies:
-    ipchecker "*"
-
 express-subdomain@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/express-subdomain/-/express-subdomain-1.0.5.tgz#990ef97940b7f4c2823d9593648b79be858a638b"
@@ -1720,10 +1714,6 @@ ip@^1.1.4:
 ipaddr.js@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.3.0.tgz#1e03a52fdad83a8bbb2b25cbf4998b4cffcd3dec"
-
-ipchecker@*:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/ipchecker/-/ipchecker-0.0.2.tgz#9606ebf7bb3cd23419b149a704e17c1532f0b679"
 
 is-arrayish@^0.2.1:
   version "0.2.1"
@@ -2506,7 +2496,7 @@ os-name@^1.0.3:
     osx-release "^1.0.0"
     win-release "^1.0.0"
 
-os-tmpdir@^1.0.0, os-tmpdir@~1.0.2:
+os-tmpdir@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
 
@@ -3757,11 +3747,10 @@ timers-ext@0.1:
     es5-ext "~0.10.14"
     next-tick "1"
 
-tmp@^0.0.33:
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
-  dependencies:
-    os-tmpdir "~1.0.2"
+tmp@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.4.tgz#c6db987a2ccc97f812f17137b36af2b6521b0d13"
+  integrity sha512-UdiSoX6ypifLmrfQ/XfiawN6hkjSBpCjhKxxZcWlUUmoXLaCKQU0bx4HF/tdDK2uzRuchf1txGvrWBzYREssoQ==
 
 to-array@0.1.4:
   version "0.1.4"
